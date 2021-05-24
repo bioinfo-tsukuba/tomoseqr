@@ -2,7 +2,7 @@
 % Please edit documentation in R/run_function.R
 \name{animate2d}
 \alias{animate2d}
-\title{animate 2D expressions along axes}
+\title{Animate 2D expressions along axes}
 \usage{
 animate2d(tomo_obj, gene_ID, target = "expression")
 }
@@ -14,5 +14,5 @@ animate2d(tomo_obj, gene_ID, target = "expression")
 \item{target}{"expression" or "mask"}
 }
 \description{
-animate 2D expressions along axes
+Animate 2D expressions along axes
 }

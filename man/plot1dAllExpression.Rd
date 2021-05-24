@@ -2,7 +2,7 @@
 % Please edit documentation in R/run_function.R
 \name{plot1dAllExpression}
 \alias{plot1dAllExpression}
-\title{plot expressions of all genes along axes}
+\title{Plot expressions of all genes along axes}
 \usage{
 plot1dAllExpression(tomo_obj, axes)
 }
@@ -12,5 +12,5 @@ plot1dAllExpression(tomo_obj, axes)
 \item{axes}{axes (1, 2 or 3)}
 }
 \description{
-plot expressions of all genes along axes
+Plot expressions of all genes along axes
 }

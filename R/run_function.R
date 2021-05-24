@@ -1,4 +1,4 @@
-#' make set of tomoseq objects
+#' Make set of tomoseq objects
 #' @param x marginal data (x axes)
 #' @param y marginal data (y axes)
 #' @param z marginal data (z axes)
@@ -22,7 +22,7 @@ estimate3dExpressions <- function(tomo_obj, query) {
 }
 
 
-#' plots the trend of the value of the loss function.
+#' Plot the trend of the value of the loss function.
 #' @param tomo_obj tomo_seq object
 #' @param gene_ID single gene ID (string)
 #' @export
@@ -31,7 +31,7 @@ plotLossFunction <- function(tomo_obj, gene_ID) {
   return(invisible(tomo_obj))
 }
 
-#' animate 2D expressions along axes
+#' Animate 2D expressions along axes
 #' @param tomo_obj tomo_seq object
 #' @param gene_ID single gene ID (string)
 #' @param  target "expression" or "mask"
@@ -41,7 +41,7 @@ animate2d <- function (tomo_obj, gene_ID, target="expression") {
   return(invisible(tomo_obj))
 }
 
-#' plot expression of single gene along axes
+#' Plot expression of single gene along axes
 #' @param tomo_obj tomo_seq object
 #' @param gene_ID single gene ID (string)
 #' @param axes axes (1, 2 or 3)
@@ -51,7 +51,7 @@ plot1dExpression <- function (tomo_obj, gene_ID, axes) {
   return(invisible(tomo_obj))
 }
 
-#' plot expressions of all genes along axes
+#' Plot expressions of all genes along axes
 #' @param tomo_obj tomo_seq object
 #' @param axes axes (1, 2 or 3)
 #' @export
@@ -60,7 +60,7 @@ plot1dAllExpression <- function(tomo_obj, axes) {
   return(invisible(tomo_obj))
 }
 
-#' convert reconstructed matrix to data.frame
+#' Convert reconstructed matrix to data.frame
 #' @param tomo_obj tomo_seq object
 #' @param gene_ID single gene ID
 #' @export
