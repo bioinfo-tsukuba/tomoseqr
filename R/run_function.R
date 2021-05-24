@@ -26,6 +26,8 @@ estimate3dExpressions <- function(tomo_obj, query) {
 #' @param tomo_obj tomo_seq object
 #' @param gene_ID single gene ID (string)
 #' @export
+#' @note  You can do the same things with
+#' `tomo_obj$plotLossFunction(gene_ID)`.
 plotLossFunction <- function(tomo_obj, gene_ID) {
   tomo_obj$plotLossFunction(gene_ID = gene_ID)
   return(invisible(tomo_obj))
@@ -36,6 +38,8 @@ plotLossFunction <- function(tomo_obj, gene_ID) {
 #' @param gene_ID single gene ID (string)
 #' @param  target "expression" or "mask"
 #' @export 
+#' @note  You can do the same things with
+#' `tomo_obj$animate2d(gene_ID, target)`.
 animate2d <- function (tomo_obj, gene_ID, target="expression") {
   tomo_obj$animate2d(gene_ID, target)
   return(invisible(tomo_obj))
@@ -46,6 +50,8 @@ animate2d <- function (tomo_obj, gene_ID, target="expression") {
 #' @param gene_ID single gene ID (string)
 #' @param axes axes (1, 2 or 3)
 #' @export
+#' @note  You can do the same things with
+#' `tomo_obj$plot1dExpression(gene_ID, axes)`.
 plot1dExpression <- function (tomo_obj, gene_ID, axes) {
   tomo_obj$plot1dExpression(gene_ID, axes)
   return(invisible(tomo_obj))
@@ -55,6 +61,7 @@ plot1dExpression <- function (tomo_obj, gene_ID, axes) {
 #' @param tomo_obj tomo_seq object
 #' @param axes axes (1, 2 or 3)
 #' @export
+#' @note  You can do the same things with
 plot1dAllExpression <- function(tomo_obj, axes) {
   tomo_obj$plot1dAllExpression(axes)
   return(invisible(tomo_obj))
@@ -64,6 +71,8 @@ plot1dAllExpression <- function(tomo_obj, axes) {
 #' @param tomo_obj tomo_seq object
 #' @param gene_ID single gene ID
 #' @export
+#' @note  You can do the same things with
+#' `tomo_obj$toDataFrame(gene_ID)`.
 toDataFrame <- function(tomo_obj, gene_ID) {
   tomo_obj$toDataFrame(gene_ID)
 }

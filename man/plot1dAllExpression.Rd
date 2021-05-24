@@ -14,3 +14,6 @@ plot1dAllExpression(tomo_obj, axes)
 \description{
 Plot expressions of all genes along axes
 }
+\note{
+You can do the same things with
+}

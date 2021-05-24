@@ -16,3 +16,7 @@ animate2d(tomo_obj, gene_ID, target = "expression")
 \description{
 Animate 2D expressions along axes
 }
+\note{
+You can do the same things with
+\code{tomo_obj$animate2d(gene_ID, target)}.
+}
