@@ -307,14 +307,14 @@ tomo_seq <- R6Class(
         },
 
         contourForAnimate = function (array_3d, main, xlab, ylab, zlim) {
-          # cat("generating")
-          # for (i in seq_along(array_3d[1, 1, ])) {
-          #   cat("...")
-          i = 20
-            filled.contour(self$reconst[, , i], main=paste(main, "_", i, sep=""), xlab=xlab,
-                           ylab=ylab, zlim=zlim, asp=1, frame.plot=F, levels=c(0, 0.5, 1), nlevels=2, col=c("#000000", "#FFFFFF00"))
-          # }
-          # cat("\n")
+          cat("generating")
+          for (i in seq_along(array_3d[1, 1, ])) {
+            cat("...")
+          # i = 20
+            filled.contour(array_3d[, , i], main=paste(main, "_", i, sep=""), xlab=xlab,
+                           ylab=ylab, zlim=zlim, asp=1, frame.plot=F)
+          }
+          cat("\n")
         },
         contourMaskAndExpression = function (mask_apermed, reconst_apermed, main, xlab, ylab, zlim) {
           cat("generating")
