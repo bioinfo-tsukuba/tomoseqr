@@ -298,8 +298,8 @@ tomo_seq <- R6Class(
         },
 
         animate2dUnite = function(axes1=1, axes2=2, main=self$gene_ID, xlab=axes1, ylab=axes2,
-                                 file=paste(self$gene_ID, "_MASK_", axes1, "_", axes2, ".gif", sep=""),
-                                 zlim=c(0, 1), interval=0.1)
+                                 file=paste(self$gene_ID, "_unite_", axes1, "_", axes2, ".gif", sep=""),
+                                 zlim=range(self$reconst), interval=0.1)
         {
           self$animateMaskAndExpression(axes1=axes1, axes2=axes2,
                          main=main, xlab=xlab, ylab=ylab, file=file,
@@ -310,7 +310,6 @@ tomo_seq <- R6Class(
           cat("generating")
           for (i in seq_along(array_3d[1, 1, ])) {
             cat("...")
-          # i = 20
             filled.contour(array_3d[, , i], main=paste(main, "_", i, sep=""), xlab=xlab,
                            ylab=ylab, zlim=zlim, asp=1, frame.plot=F)
           }
@@ -320,9 +319,9 @@ tomo_seq <- R6Class(
           cat("generating")
           for (i in seq_along(mask_apermed[1, 1, ])) {
             cat("...")
-            image(reconst_apermed[, , i], zlim=zlim, breaks=seq(zlim[1], zlim[2], length=1000), col=hcl.colors(999, palette="Oslo"))
+            image(reconst_apermed[, , i], zlim=zlim, breaks=seq(zlim[1], zlim[2], length=floor(zlim[2])), col=hcl.colors(floor(zlim[2])-1, palette="Oslo"))
             par(new=T)
-            image(mask_apermed[,,i], col=c("#000000", "#FFFFFF00"))
+            image(mask_apermed[,,i], col=c("#000000", "#FFFFFF00"), main=paste(main, "_", i, seq=""), xlab=xlab, ylab=ylab)
           }
           cat("\n")
         },
@@ -330,18 +329,12 @@ tomo_seq <- R6Class(
         animate2d = function (array3d, axes1, axes2, main, xlab, ylab, file, zlim, interval) {
           array3d_apermed <- aperm(array3d, perm=c(axes1, axes2, 6 - (axes1 + axes2)))
           saveGIF(self$contourForAnimate(array_3d=array3d_apermed, main=main, xlab=xlab, ylab=ylab, zlim=zlim),
-          # self$contourForAnimate(array_3d=array3d_apermed, main=main, xlab=xlab, ylab=ylab, zlim=zlim)
-          # self$contourMaskAndExpression(main=main, xlab=xlab, ylab=ylab, zlim=zlim)
-          # saveGIF(self$contourMaskAndExpression(main=main, xlab=xlab, ylab=ylab, zlim=zlim),
                   movie.name=file, interval=interval)
         },
 
         animateMaskAndExpression = function (axes1, axes2, main, xlab, ylab, file, zlim, interval) {
           mask_apermed <- aperm(self$mask, perm=c(axes1, axes2, 6 - (axes1 + axes2)))
           reconst_apermed <- aperm(self$reconst, perm=c(axes1, axes2, 6 - (axes1 + axes2)))
-          # saveGIF(self$contourForAnimate(array_3d=array3d_apermed, main=main, xlab=xlab, ylab=ylab, zlim=zlim),
-          # self$contourForAnimate(array_3d=array3d_apermed, main=main, xlab=xlab, ylab=ylab, zlim=zlim)
-          # self$contourMaskAndExpression(main=main, xlab=xlab, ylab=ylab, zlim=zlim)
           saveGIF(self$contourMaskAndExpression(mask_apermed = mask_apermed, reconst_apermed = reconst_apermed, main=main, xlab=xlab, ylab=ylab, zlim=zlim),
                   movie.name=file, interval=interval)
         },
