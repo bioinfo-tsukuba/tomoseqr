@@ -79,13 +79,16 @@ tomo_seq <- R6Class(
       private$objects_each_gene[[gene_ID]]$toDataFrame()
     },
 
-    animate2d = function (gene_ID, target="expression") {
+    animate2d = function (gene_ID, target, axes1, axes2, main, xlab, ylab, file, zlim, interval) {
       if (target == "expression") {
-        private$objects_each_gene[[gene_ID]]$animate2dExpression()
+        private$objects_each_gene[[gene_ID]]$animate2dExpression(axes1=axes1, axes2=axes2, main=main, xlab=xlab, ylab=ylab,
+                                                                 zlim=zlim, file=file, interval=interval)
       } else if (target == "mask") {
-        private$objects_each_gene[[gene_ID]]$animate2dMask()
+        private$objects_each_gene[[gene_ID]]$animate2dMask(axes1=axes1, axes2=axes2, main=main, xlab=xlab, ylab=ylab,
+                                                           file=file, interval=interval)
       } else if (target == "unite") {
-        private$objects_each_gene[[gene_ID]]$animate2dUnite()
+        private$objects_each_gene[[gene_ID]]$animate2dUnite(axes1=axes1, axes2=axes2, main=main, xlab=xlab, ylab=ylab,
+                                                                 zlim=zlim, file=file, interval=interval)
       } else {
         cat("ERROR: animate2d\n")
         cat(paste("Invalid option: target =", target, "\n"))
@@ -267,9 +270,7 @@ tomo_seq <- R6Class(
           plot(self$loss, type="l", main=self$gene_ID, xlab="Iteration number", ylab="Loss")
         },
 
-        animate2dExpression = function(axes1=1, axes2=2, main=self$gene_ID, xlab=axes1, ylab=axes2,
-                                       file=paste(self$gene_ID, "_", axes1, "_", axes2, ".gif", sep=""),
-                                       zlim=range(self$reconst), interval=0.1)
+        animate2dExpression = function(axes1, axes2, main, xlab, ylab, file, zlim, interval)
         {
           # if (self$already_reconstructed == TRUE) {
           #   if (private$has_species_name == TRUE) {
@@ -279,31 +280,37 @@ tomo_seq <- R6Class(
           #   } else {
               gene_name <- ""
           #   }
+          if (is.na(zlim[1]) == TRUE) {
+            real_zlim <- range(self$reconst)
+          } else {
+            real_zlim <- zlim
+          }
             self$animate2d(self$reconst, axes1=axes1, axes2=axes2,
                            main=paste(main, "(", gene_name, ")", sep=""), xlab=xlab, ylab=ylab, file=file,
-                           zlim=zlim, interval=interval)
+                           zlim=real_zlim, interval=interval)
           # } else {
           #   cat("Before animate, please run estimateExpression().")
           #   return(1)
           # }
         },
 
-        animate2dMask = function(axes1=1, axes2=2, main=self$gene_ID, xlab=axes1, ylab=axes2,
-                                 file=paste(self$gene_ID, "_MASK_", axes1, "_", axes2, ".gif", sep=""),
-                                 zlim=c(0, 1), interval=0.1)
+        animate2dMask = function(axes1, axes2, main, xlab, ylab, file, interval)
         {
           self$animate2d(self$mask, axes1=axes1, axes2=axes2,
                          main=main, xlab=xlab, ylab=ylab, file=file,
-                         zlim=zlim, interval=interval)
+                         zlim=c(0, 1), interval=interval)
         },
 
-        animate2dUnite = function(axes1=1, axes2=2, main=self$gene_ID, xlab=axes1, ylab=axes2,
-                                 file=paste(self$gene_ID, "_unite_", axes1, "_", axes2, ".gif", sep=""),
-                                 zlim=range(self$reconst), interval=0.1)
+        animate2dUnite = function(axes1, axes2, main, xlab, ylab, file, zlim, interval)
         {
+          if (is.na(zlim[1]) == TRUE) {
+            real_zlim <- range(self$reconst)
+          } else {
+            real_zlim <- zlim
+          }
           self$animateMaskAndExpression(axes1=axes1, axes2=axes2,
                          main=main, xlab=xlab, ylab=ylab, file=file,
-                         zlim=zlim, interval=interval)
+                         zlim=real_zlim, interval=interval)
         },
 
         contourForAnimate = function (array_3d, main, xlab, ylab, zlim) {

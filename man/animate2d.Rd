@@ -4,7 +4,19 @@
 \alias{animate2d}
 \title{Animate 2D expressions along axes}
 \usage{
-animate2d(tomo_obj, gene_ID, target = "expression")
+animate2d(
+  tomo_obj,
+  gene_ID,
+  target = "expression",
+  axes1 = 1,
+  axes2 = 2,
+  main = gene_ID,
+  xlab = axes1,
+  ylab = axes2,
+  file = paste(gene_ID, "_", target, "_", axes1, "_", axes2, ".gif", sep = ""),
+  zlim = NA,
+  interval = 0.1
+)
 }
 \arguments{
 \item{tomo_obj}{tomo_seq object}

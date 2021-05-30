@@ -40,9 +40,15 @@ plotLossFunction <- function(tomo_obj, gene_ID) {
 #' @export 
 #' @note  You can do the same things with
 #' `tomo_obj$animate2d(gene_ID, target)`.
-animate2d <- function (tomo_obj, gene_ID, target="expression") {
-  tomo_obj$animate2d(gene_ID, target)
-  return(invisible(tomo_obj))
+animate2d <- function (tomo_obj, gene_ID, target="expression", axes1=1, axes2=2, main=gene_ID, xlab=axes1, ylab=axes2,
+                       file=paste(gene_ID, "_", target, "_", axes1, "_", axes2, ".gif", sep=""), zlim=NA, interval=0.1)
+                       {
+                         if (target == "mask" & is.na(zlim[1]) == FALSE) {
+                           warning('If target = "mask", parameter "zlim" is ignored.')
+                         }
+                         tomo_obj$animate2d(gene_ID=gene_ID, target=target, axes1=axes1, axes2=axes2, main=main, xlab=xlab, ylab=ylab,
+                                            file=file, zlim=zlim, interval=interval)
+                                            return(invisible(tomo_obj))
 }
 
 #' Plot expression of single gene along axes
