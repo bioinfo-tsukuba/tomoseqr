@@ -315,13 +315,28 @@ tomo_seq <- R6Class(
           }
           cat("\n")
         },
+
         contourMaskAndExpression = function (mask_apermed, reconst_apermed, main, xlab, ylab, zlim) {
+          label_list <- seq(zlim[1], floor(zlim[2]), length=6) %>% round()
+          position_list <- label_list / zlim[2]
           cat("generating")
           for (i in seq_along(mask_apermed[1, 1, ])) {
             cat("...")
-            image(reconst_apermed[, , i], zlim=zlim, breaks=seq(zlim[1], zlim[2], length=floor(zlim[2])), col=hcl.colors(floor(zlim[2])-1, palette="Oslo"))
+            # image.plot(reconst_apermed[, , i], zlim=zlim, breaks=seq(zlim[1], zlim[2], length=floor(zlim[2])), col=hcl.colors(floor(zlim[2])-1, palette="Oslo"))
+            collist <- hcl.colors(floor(zlim[2])-1, palette="Oslo")
+            ColorRamp<-colorRampPalette(collist)(100)
+            ColorLevels<-seq(from=zlim[1], to=zlim[2], length=10000)
+            par(mar=c(2,3,2,2), oma=c(0,0,0,0))
+            layout(matrix(seq(2),nrow=2,ncol=1),widths=c(1),heights=c(3,0.5))
+            image(reconst_apermed[, , i], zlim=zlim, xlab=xlab, ylab=ylab, breaks=seq(zlim[1], zlim[2], length=floor(zlim[2])), col=hcl.colors(floor(zlim[2])-1, palette="Oslo"), asp=1, axes=F)
+            axis(1, seq(0, 1.0, by=0.2), seq(0, 1, by=0.2))
+            axis(2, seq(0, 1.0, by=0.2), seq(0, 1, by=0.2), pos=0)
+            mtext(xlab, side = 1, line = 2)
+            mtext(ylab, side = 2, line = 1)
             par(new=T)
-            image(mask_apermed[,,i], col=c("#000000", "#FFFFFF00"), main=paste(main, "_", i, seq=""), xlab=xlab, ylab=ylab)
+            image(mask_apermed[,,i], col=c("#000000", "#FFFFFF00"), main=paste(main, "_", i, seq=""), xlab=xlab, ylab=ylab, asp=1, axes=F)
+            image(as.matrix(ColorLevels),col=ColorRamp, xlab="",ylab="",cex.axis=1,xaxt="n",yaxt="n")
+            axis(1, position_list, label_list)
           }
           cat("\n")
         },
