@@ -2,7 +2,7 @@
 % Please edit documentation in R/run_function.R
 \name{plotLossFunction}
 \alias{plotLossFunction}
-\title{plots the trend of the value of the loss function.}
+\title{Plot the trend of the value of the loss function.}
 \usage{
 plotLossFunction(tomo_obj, gene_ID)
 }
@@ -12,5 +12,9 @@ plotLossFunction(tomo_obj, gene_ID)
 \item{gene_ID}{single gene ID (string)}
 }
 \description{
-plots the trend of the value of the loss function.
+Plot the trend of the value of the loss function.
+}
+\note{
+You can do the same things with
+\code{tomo_obj$plotLossFunction(gene_ID)}.
 }

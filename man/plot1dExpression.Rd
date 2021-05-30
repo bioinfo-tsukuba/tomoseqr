@@ -2,7 +2,7 @@
 % Please edit documentation in R/run_function.R
 \name{plot1dExpression}
 \alias{plot1dExpression}
-\title{plot expression of single gene along axes}
+\title{Plot expression of single gene along axes}
 \usage{
 plot1dExpression(tomo_obj, gene_ID, axes)
 }
@@ -14,5 +14,9 @@ plot1dExpression(tomo_obj, gene_ID, axes)
 \item{axes}{axes (1, 2 or 3)}
 }
 \description{
-plot expression of single gene along axes
+Plot expression of single gene along axes
+}
+\note{
+You can do the same things with
+\code{tomo_obj$plot1dExpression(gene_ID, axes)}.
 }

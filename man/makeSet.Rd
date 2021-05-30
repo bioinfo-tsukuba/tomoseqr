@@ -2,7 +2,7 @@
 % Please edit documentation in R/run_function.R
 \name{makeSet}
 \alias{makeSet}
-\title{make set of tomoseq objects}
+\title{Make set of tomoseq objects}
 \usage{
 makeSet(x, y, z, mask_shape = "rectangle", species = "")
 }
@@ -18,5 +18,5 @@ makeSet(x, y, z, mask_shape = "rectangle", species = "")
 \item{species}{scientific name}
 }
 \description{
-make set of tomoseq objects
+Make set of tomoseq objects
 }
