@@ -2,7 +2,7 @@
 % Please edit documentation in R/run_function.R
 \name{animate2d}
 \alias{animate2d}
-\title{Animate 2D expressions along axes}
+\title{Animate 2D expressions along one axis and generate GIF file.}
 \usage{
 animate2d(
   tomo_obj,
@@ -23,12 +23,28 @@ animate2d(
 
 \item{gene_ID}{single gene ID (string)}
 
-\item{target}{"expression" or "mask"}
+\item{target}{"expression", "mask" or "unite" (combination of expression and mask). Default is \code{expression}.}
+
+\item{axes1}{Number to specify as x-axis (1, 2 or 3). Default is \code{1}.}
+
+\item{axes2}{Number to specify as y-axis (1, 2 or 3). Default is \code{2}.}
+
+\item{main}{A string used for the title of the plot. Default is \code{gene_ID}.}
+
+\item{xlab}{Label of x axis. Default is \code{axes1}.}
+
+\item{ylab}{Label of y axis. Default is \code{axes2}.}
+
+\item{file}{Path of GIF file.}
+
+\item{zlim}{Limit of value of heatmap. If target="mask", it is ignored.}
+
+\item{interval}{interval of GIF animation.}
 }
 \description{
-Animate 2D expressions along axes
+Animate 2D expressions along one axis and generate GIF file.
 }
 \note{
 You can do the same things with
-\code{tomo_obj$animate2d(gene_ID, target)}.
+\code{tomo_obj$animate2d(gene_ID, ...)}.
 }

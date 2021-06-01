@@ -33,13 +33,21 @@ plotLossFunction <- function(tomo_obj, gene_ID) {
   return(invisible(tomo_obj))
 }
 
-#' Animate 2D expressions along axes
+#' Animate 2D expressions along one axis and generate GIF file.
 #' @param tomo_obj tomo_seq object
 #' @param gene_ID single gene ID (string)
-#' @param  target "expression" or "mask"
+#' @param target "expression", "mask" or "unite" (combination of expression and mask). Default is `expression`.
+#' @param axes1 Number to specify as x-axis (1, 2 or 3). Default is `1`.
+#' @param axes2 Number to specify as y-axis (1, 2 or 3). Default is `2`.
+#' @param main A string used for the title of the plot. Default is `gene_ID`.
+#' @param xlab Label of x axis. Default is `axes1`.
+#' @param ylab Label of y axis. Default is `axes2`.
+#' @param file Path of GIF file.
+#' @param zlim Limit of value of heatmap. If target="mask", it is ignored.
+#' @param interval interval of GIF animation.
 #' @export 
 #' @note  You can do the same things with
-#' `tomo_obj$animate2d(gene_ID, target)`.
+#' `tomo_obj$animate2d(gene_ID, ...)`.
 animate2d <- function (tomo_obj, gene_ID, target="expression", axes1=1, axes2=2, main=gene_ID, xlab=axes1, ylab=axes2,
                        file=paste(gene_ID, "_", target, "_", axes1, "_", axes2, ".gif", sep=""), zlim=NA, interval=0.1)
                        {
