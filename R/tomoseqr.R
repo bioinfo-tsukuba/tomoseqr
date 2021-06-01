@@ -327,12 +327,12 @@ tomo_seq <- R6Class(
           label_list <- seq(zlim[1], floor(zlim[2]), length=6) %>% round()
           position_list <- label_list / zlim[2]
           cat("generating")
+            collist <- hcl.colors(floor(zlim[2])-1, palette="Oslo")
+            ColorRamp<-colorRampPalette(collist)(100)
+            ColorLevels<-seq(from=zlim[1], to=zlim[2], length=100)
           for (i in seq_along(mask_apermed[1, 1, ])) {
             cat("...")
             # image.plot(reconst_apermed[, , i], zlim=zlim, breaks=seq(zlim[1], zlim[2], length=floor(zlim[2])), col=hcl.colors(floor(zlim[2])-1, palette="Oslo"))
-            collist <- hcl.colors(floor(zlim[2])-1, palette="Oslo")
-            ColorRamp<-colorRampPalette(collist)(100)
-            ColorLevels<-seq(from=zlim[1], to=zlim[2], length=10000)
             par(mar=c(2,3,2,2), oma=c(0,0,0,0))
             layout(matrix(seq(2),nrow=2,ncol=1),widths=c(1),heights=c(3,0.5))
             image(reconst_apermed[, , i], zlim=zlim, xlab=xlab, ylab=ylab, breaks=seq(zlim[1], zlim[2], length=floor(zlim[2])), col=hcl.colors(floor(zlim[2])-1, palette="Oslo"), asp=1, axes=F)
