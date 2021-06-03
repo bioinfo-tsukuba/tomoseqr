@@ -2,7 +2,7 @@
 
 export(animate2d)
 export(estimate3dExpressions)
-export(makeSet)
+export(makeTomoObjSet)
 export(plot1dAllExpression)
 export(plot1dExpression)
 export(plotLossFunction)
