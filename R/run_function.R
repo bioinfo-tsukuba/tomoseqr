@@ -5,7 +5,7 @@
 #' @param mask_shape shape of mask.
 #' @param species scientific name
 #' @export
-makeSet <- function (x, y, z, mask_shape="rectangle", species="") {
+makeTomoObjSet <- function (x, y, z, mask_shape="rectangle", species="") {
   return(tomo_seq$new(x=x, y=y,z=z, mask_shape=mask_shape, species=species))
 }
 
