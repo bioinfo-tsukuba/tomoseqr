@@ -19,3 +19,7 @@ animate2d(tomo_obj, "gene1", target="unite")
 ```
 
 ![example](./inst/gene1_unite_1_2.gif)
+
+## Contact
+
+Ryosuke Matsuzawa / [shingenmochi](https://github.com/shingenmochi)
