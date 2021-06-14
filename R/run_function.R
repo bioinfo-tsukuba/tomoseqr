@@ -3,10 +3,10 @@
 #' @param y marginal data (y axes)
 #' @param z marginal data (z axes)
 #' @param mask_shape shape of mask.
-#' @param species scientific name
+# #' @param species scientific name
 #' @export
-makeTomoObjSet <- function (x, y, z, mask_shape="rectangle", species="") {
-  return(tomo_seq$new(x=x, y=y,z=z, mask_shape=mask_shape, species=species))
+makeTomoObjSet <- function (x, y, z, mask_shape="rectangle") {#, species="") {
+  return(tomo_seq$new(x=x, y=y,z=z, mask_shape=mask_shape))#, species=species))
 }
 
 #' Estimate 3d expression
