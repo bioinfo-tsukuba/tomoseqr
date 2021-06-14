@@ -4,7 +4,7 @@
 tomo_seq <- R6Class(
   classname = "tomoSeq",
   public = list(
-    initialize = function (x, y, z, mask_shape="rectangle", species="") {
+    initialize = function (x, y, z, mask_shape="rectangle") {#, species="") {
       # x, y, z: 各軸のtomo-seqデータ（全遺伝子分）
       # mask_shape: maskの形状の指定（"rectangle", "round", "halfround")
       # species: 種名（属名頭文字 + 種小名、いずれも小文字）
@@ -27,16 +27,16 @@ tomo_seq <- R6Class(
       # 1列目の遺伝子IDを除外するから、長さはそれぞれ -1
       private$mask <- MASK_SHAPE[[mask_shape]](length(x) - 1, length(y) - 1, length(z) - 1)
 
-      if (species != "") {
-        private$species <- species
-        cat("Fetching from ensembl.....\n")
-        data_name <- paste(species, "_gene_ensembl", sep="")
-        data_base <- biomaRt::useMart("ENSEMBL_MART_ENSEMBL")
-        dataset <- biomaRt::useDataset(data_name, mart=data_base)
-        private$gene_ID_name <- biomaRt::getBM(attributes = c("ensembl_gene_id", "external_gene_name"), filters = "ensembl_gene_id",
-                                               value = private$gene_list, mart = dataset)
-        private$has_species_name <- TRUE
-      }
+      # if (species != "") {
+      #   private$species <- species
+      #   cat("Fetching from ensembl.....\n")
+      #   data_name <- paste(species, "_gene_ensembl", sep="")
+      #   data_base <- biomaRt::useMart("ENSEMBL_MART_ENSEMBL")
+      #   dataset <- biomaRt::useDataset(data_name, mart=data_base)
+      #   private$gene_ID_name <- biomaRt::getBM(attributes = c("ensembl_gene_id", "external_gene_name"), filters = "ensembl_gene_id",
+      #                                          value = private$gene_list, mart = dataset)
+      #   private$has_species_name <- TRUE
+      # }
     },
 
     # 各種getter ----------------------
@@ -56,9 +56,9 @@ tomo_seq <- R6Class(
       return(private$mask)
     },
 
-    getSpecies = function () {
-      return(private$species)
-    },
+    # getSpecies = function () {
+    #   return(private$species)
+    # },
 
     getIDandName = function() {
       return(private$gene_ID_name)
@@ -278,7 +278,7 @@ tomo_seq <- R6Class(
           #                       values = private$query, mart = private$gene_list)
           #     gene_name <- gene_name$external_gene_name
           #   } else {
-              gene_name <- ""
+              # gene_name <- ""
           #   }
           if (is.na(zlim[1]) == TRUE) {
             real_zlim <- range(self$reconst)
@@ -286,7 +286,8 @@ tomo_seq <- R6Class(
             real_zlim <- zlim
           }
             self$animate2d(self$reconst, axes1=axes1, axes2=axes2,
-                           main=paste(main, "(", gene_name, ")", sep=""), xlab=xlab, ylab=ylab, file=file,
+                          #  main=paste(main, "(", gene_name, ")", sep=""), xlab=xlab, ylab=ylab, file=file,
+                           main=main, xlab=xlab, ylab=ylab, file=file,
                            zlim=real_zlim, interval=interval)
           # } else {
           #   cat("Before animate, please run estimateExpression().")

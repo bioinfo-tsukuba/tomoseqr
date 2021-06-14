@@ -4,7 +4,7 @@
 \alias{makeTomoObjSet}
 \title{Make set of tomoseq objects}
 \usage{
-makeTomoObjSet(x, y, z, mask_shape = "rectangle", species = "")
+makeTomoObjSet(x, y, z, mask_shape = "rectangle")
 }
 \arguments{
 \item{x}{marginal data (x axes)}
@@ -14,8 +14,6 @@ makeTomoObjSet(x, y, z, mask_shape = "rectangle", species = "")
 \item{z}{marginal data (z axes)}
 
 \item{mask_shape}{shape of mask.}
-
-\item{species}{scientific name}
 }
 \description{
 Make set of tomoseq objects
