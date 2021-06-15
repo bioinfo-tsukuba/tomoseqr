@@ -352,14 +352,14 @@ tomo_seq <- R6Class(
         animate2d = function (array3d, axes1, axes2, main, xlab, ylab, file, zlim, interval) {
           array3d_apermed <- aperm(array3d, perm=c(axes1, axes2, 6 - (axes1 + axes2)))
           saveGIF(self$contourForAnimate(array_3d=array3d_apermed, main=main, xlab=xlab, ylab=ylab, zlim=zlim),
-                  movie.name=file, interval=interval)
+                  movie.name=file, interval=interval, autobrowse=FALSE)
         },
 
         animateMaskAndExpression = function (axes1, axes2, main, xlab, ylab, file, zlim, interval) {
           mask_apermed <- aperm(self$mask, perm=c(axes1, axes2, 6 - (axes1 + axes2)))
           reconst_apermed <- aperm(self$reconst, perm=c(axes1, axes2, 6 - (axes1 + axes2)))
           saveGIF(self$contourMaskAndExpression(mask_apermed = mask_apermed, reconst_apermed = reconst_apermed, main=main, xlab=xlab, ylab=ylab, zlim=zlim),
-                  movie.name=file, interval=interval)
+                  movie.name=file, interval=interval, autobrowse=FALSE)
         },
 
         plot1dExpression = function (axes) {
