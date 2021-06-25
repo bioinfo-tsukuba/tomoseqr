@@ -4,10 +4,9 @@
 tomo_seq <- R6Class(
   classname = "tomoSeq",
   public = list(
-    initialize = function (x, y, z, mask_shape="rectangle") {#, species="") {
-      # x, y, z: 各軸のtomo-seqデータ（全遺伝子分）
-      # mask_shape: maskの形状の指定（"rectangle", "round", "halfround")
-      # species: 種名（属名頭文字 + 種小名、いずれも小文字）
+    initialize = function (x, y, z, mask_shape="rectangle") {
+      # x, y, z: Tomo-seq data (about all genes) of each axes.
+      # mask_shape: The shape of mask （"rectangle", "round" or "halfround").
       MASK_SHAPE <- list(private$makeRectangle, private$makeRound, private$makeHalfRound)
       names(MASK_SHAPE) <- c("rectangle", "round", "halfround")
 
@@ -16,30 +15,19 @@ tomo_seq <- R6Class(
       private$z <- z
       private$gene_list <- private$extractGeneList()
 
-      # 各single_geneオブジェクトを作成・辞書化
+      # make each single_gene objects and compile as dictionary.
       for (gene in private$gene_list) {
         single_gene_object <- private$single_gene$new(x, y, z, gene)
         private$objects_each_gene <- private$objects_each_gene %>% append(single_gene_object)
       }
       names(private$objects_each_gene) <- private$gene_list
 
-      # maskの作成
-      # 1列目の遺伝子IDを除外するから、長さはそれぞれ -1
+      # Create mask.
+      # Each length must be 1 shorter because first column (gene ID) is excluded from reconstruction.
       private$mask <- MASK_SHAPE[[mask_shape]](length(x) - 1, length(y) - 1, length(z) - 1)
-
-      # if (species != "") {
-      #   private$species <- species
-      #   cat("Fetching from ensembl.....\n")
-      #   data_name <- paste(species, "_gene_ensembl", sep="")
-      #   data_base <- biomaRt::useMart("ENSEMBL_MART_ENSEMBL")
-      #   dataset <- biomaRt::useDataset(data_name, mart=data_base)
-      #   private$gene_ID_name <- biomaRt::getBM(attributes = c("ensembl_gene_id", "external_gene_name"), filters = "ensembl_gene_id",
-      #                                          value = private$gene_list, mart = dataset)
-      #   private$has_species_name <- TRUE
-      # }
     },
 
-    # 各種getter ----------------------
+    # getter ----------------------
     getGeneList = function () {
       return(private$gene_list)
     },
@@ -55,10 +43,6 @@ tomo_seq <- R6Class(
     getMask = function () {
       return(private$mask)
     },
-
-    # getSpecies = function () {
-    #   return(private$species)
-    # },
 
     getIDandName = function() {
       return(private$gene_ID_name)
@@ -131,7 +115,7 @@ tomo_seq <- R6Class(
       return(intersect(x_and_y, z_gene))
     },
 
-    # 各種mask作成-------------------------------------------------------
+    # Mask-create functions -------------------------------------------------------
     makeRectangle = function (x_len, y_len, z_len) {
       return(array(1, dim=c(x_len, y_len, z_len)))
     },
@@ -169,7 +153,7 @@ tomo_seq <- R6Class(
     },
     # ---------------------------------------------------------------------
 
-    # 各遺伝子についての推定結果等を保持するオブジェクト
+    # This object has reconstruction result about a gene.
     single_gene = R6Class(
       classname = "singleGene",
       public = list(
@@ -188,7 +172,7 @@ tomo_seq <- R6Class(
           self$gene_ID <- gene_ID
         },
 
-        # estimate3dExpression()内で用いる関数
+        # This function is used in estimate3dExpression().
         getGeneExpression = function (tomoseq_data, gene_ID) {
           retval_matrix <- tomoseq_data[tomoseq_data[, 1] == gene_ID,]
           retval_matrix <- retval_matrix[, -1] %>% as.matrix()
@@ -207,7 +191,7 @@ tomo_seq <- R6Class(
           return(rep_3d)
         },
 
-        # 3次元発現パターンを推定
+        # Reconstruct 3D expression pattern.
         estimate3dExpression = function(X, Y, Z, mask, num_iter = 100) {
           self$mask <- mask
           sum_x <- X[, -1] %>% colSums()
@@ -273,20 +257,12 @@ tomo_seq <- R6Class(
         animate2dExpression = function(axes1, axes2, main, xlab, ylab, file, zlim, interval)
         {
           # if (self$already_reconstructed == TRUE) {
-          #   if (private$has_species_name == TRUE) {
-          #     gene_name <- getBM(attributes = c("ensembl_gene_id", "external_gene_name"), filters = "ensembl_gene_id",
-          #                       values = private$query, mart = private$gene_list)
-          #     gene_name <- gene_name$external_gene_name
-          #   } else {
-              # gene_name <- ""
-          #   }
           if (is.na(zlim[1]) == TRUE) {
             real_zlim <- range(self$reconst)
           } else {
             real_zlim <- zlim
           }
             self$animate2d(self$reconst, axes1=axes1, axes2=axes2,
-                          #  main=paste(main, "(", gene_name, ")", sep=""), xlab=xlab, ylab=ylab, file=file,
                            main=main, xlab=xlab, ylab=ylab, file=file,
                            zlim=real_zlim, interval=interval)
           # } else {
@@ -336,7 +312,6 @@ tomo_seq <- R6Class(
             ColorLevels<-seq(from=zlim[1], to=zlim[2], length=100)
           for (i in seq_along(mask_apermed[1, 1, ])) {
             cat("...")
-            # image.plot(reconst_apermed[, , i], zlim=zlim, breaks=seq(zlim[1], zlim[2], length=floor(zlim[2])), col=hcl.colors(floor(zlim[2])-1, palette="Oslo"))
             par(mar=c(2,3,2,2), oma=c(0,0,0,0))
             layout(matrix(seq(2),nrow=2,ncol=1),widths=c(1),heights=c(3,0.5))
             image(reconst_apermed[, , i], zlim=zlim, xlab=xlab, ylab=ylab, breaks=seq(zlim[1], zlim[2], length=floor(zlim[2])), col=hcl.colors(floor(zlim[2])-1, palette="Oslo"), asp=reconst_dim[2] / reconst_dim[1], axes=F)
