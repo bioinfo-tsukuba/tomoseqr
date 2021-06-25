@@ -1,13 +1,13 @@
 Package: tomoseqr
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: R Package for Analyzing Tomo-seq Data
+Version: 0.1.0
 Authors@R: 
     person(given = "Ryosuke",
            family = "Matsuzawa",
            role = c("aut", "cre"),
            email = "kinakomochi.work@gmail.com",
            comment = c(ORCID = "0000-0003-2999-4734"))
-Description: What the package does (one paragraph).
+Description: `tomoseqr` is an R package for analyzing Tomo-seq (a method to obtain genome-wide expression data with spatial resolution) data.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
