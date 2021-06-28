@@ -1,12 +1,17 @@
 #' Make set of tomoseq objects
-#' @param x marginal data (x axes)
-#' @param y marginal data (y axes)
-#' @param z marginal data (z axes)
+#' @param x A data.frame object containing a simulated Tomo-seq data for x-axis sections.
+#'          The rows represent genes. The first column contains gene IDs and the second and
+#'          subsequent columns contain gene expression levels in sections.
+#' @param y A data.frame object containing a simulated Tomo-seq data for y-axis sections.
+#'          The rows represent genes. The first column contains gene IDs and the second and
+#'          subsequent columns contain gene expression levels in sections.
+#' @param z A data.frame object containing a simulated Tomo-seq data for z-axis sections.
+#'          The rows represent genes. The first column contains gene IDs and the second and
+#'          subsequent columns contain gene expression levels in sections.
 #' @param mask_shape shape of mask.
-# #' @param species scientific name
 #' @export
-makeTomoObjSet <- function (x, y, z, mask_shape="rectangle") {#, species="") {
-  return(tomo_seq$new(x=x, y=y,z=z, mask_shape=mask_shape))#, species=species))
+makeTomoObjSet <- function (x, y, z, mask_shape="rectangle") {
+  return(tomo_seq$new(x=x, y=y,z=z, mask_shape=mask_shape))
 }
 
 #' Estimate 3d expression

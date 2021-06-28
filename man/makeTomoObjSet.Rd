@@ -7,11 +7,17 @@
 makeTomoObjSet(x, y, z, mask_shape = "rectangle")
 }
 \arguments{
-\item{x}{marginal data (x axes)}
+\item{x}{A data.frame object containing a simulated Tomo-seq data for x-axis sections.
+The rows represent genes. The first column contains gene IDs and the second and
+subsequent columns contain gene expression levels in sections.}
 
-\item{y}{marginal data (y axes)}
+\item{y}{A data.frame object containing a simulated Tomo-seq data for y-axis sections.
+The rows represent genes. The first column contains gene IDs and the second and
+subsequent columns contain gene expression levels in sections.}
 
-\item{z}{marginal data (z axes)}
+\item{z}{A data.frame object containing a simulated Tomo-seq data for z-axis sections.
+The rows represent genes. The first column contains gene IDs and the second and
+subsequent columns contain gene expression levels in sections.}
 
 \item{mask_shape}{shape of mask.}
 }
