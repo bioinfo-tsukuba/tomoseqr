@@ -28,25 +28,25 @@ tomo_seq <- R6Class(
     },
 
     # getter ----------------------
-    getGeneList = function () {
-      return(private$gene_list)
+    gene_list = function () {
+      return(private$val_gene_list)
     },
 
-    getGene = function () {
-      return(private$objects_each_gene)
-    },
+    # gene = function () {
+    #   return(private$objects_each_gene)
+    # },
 
-    getRaw = function () {
+    exp_mat_original = function () {
       return(list(private$x, private$y, private$z))
     },
 
-    getMask = function () {
+    mask = function () {
       return(private$mask)
     },
 
-    getIDandName = function() {
-      return(private$gene_ID_name)
-    },
+    # getAlternativeGeneName = function() {
+    #   return(private$alternative_gene_name)
+    # },
     # ---------------------------------
 
     estimate3dExpressions = function (queries=c()) {
@@ -62,6 +62,10 @@ tomo_seq <- R6Class(
     toDataFrame = function(gene_ID) {
       private$objects_each_gene[[gene_ID]]$toDataFrame()
     },
+
+    getReconstructedResult = function(gene_ID) {
+      private$objects_each_gene[[gene_ID]]$getReconstructedResult()
+    }
 
     animate2d = function (gene_ID, target, axes1, axes2, main, xlab, ylab, file, zlim, interval) {
       if (target == "expression") {
@@ -102,7 +106,7 @@ tomo_seq <- R6Class(
     mask = array(0, dim=c(1,1,1)),
     gene_list = c(),
     objects_each_gene = c(),
-    gene_ID_name = c(),
+    # alternative_gene_name = c(),
     has_species_name = FALSE,
     species = "",
 
@@ -364,6 +368,14 @@ tomo_seq <- R6Class(
               sapply(function(p){rep(p, xlen * ylen)}) %>%
               as.vector()
             data.frame(x=x_index, y=y_index, z=z_index, value=vec_reconst) %>% return()
+          } else {
+             cat("have not reconstructed yet.")
+          }
+        },
+
+        getReconstructedResult = function () {
+          if (self$already_reconstructed == TRUE) {
+            return(self$reconst)
           } else {
              cat("have not reconstructed yet.")
           }
