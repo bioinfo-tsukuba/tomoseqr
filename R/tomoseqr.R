@@ -43,7 +43,7 @@ tomo_seq <- R6Class(
 
     getReconstructedResult = function(gene_ID) {
       private$objects_each_gene[[gene_ID]]$getReconstructedResult()
-    }
+    },
 
     animate2d = function (gene_ID, target, axes1, axes2, main, xlab, ylab, file, zlim, interval) {
       if (target == "expression") {
@@ -80,21 +80,33 @@ tomo_seq <- R6Class(
   active = list(
 
     # getter ----------------------
-    gene_list = function () {
-      return(private$val_gene_list)
+    gene_list = function (value) {
+      if (missing(value)) {
+        return(private$val_gene_list)
+      } else {
+        stop("gene_list is read-only.")
+      }
     },
 
     # gene = function () {
     #   return(private$objects_each_gene)
     # },
 
-    exp_mat_original = function () {
+    exp_mat_original = function (value) {
+      if (missing(value)) {
       return(list(private$x, private$y, private$z))
+      } else {
+        stop("Original matrices are read-only.")
+      }
     },
 
-    mask = function () {
+    mask = function (value) {
+      if (missing(value)) {
       return(private$val_mask)
-    },
+      } else {
+        stop("mask is read-only.")
+      }
+    }
 
     # getAlternativeGeneName = function() {
     #   return(private$alternative_gene_name)
