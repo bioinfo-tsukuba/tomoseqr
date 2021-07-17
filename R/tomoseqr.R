@@ -13,45 +13,23 @@ tomo_seq <- R6Class(
       private$x <- x
       private$y <- y
       private$z <- z
-      private$gene_list <- private$extractGeneList()
+      private$val_gene_list <- private$extractGeneList()
 
       # make each single_gene objects and compile as dictionary.
-      for (gene in private$gene_list) {
+      for (gene in private$val_gene_list) {
         single_gene_object <- private$single_gene$new(x, y, z, gene)
         private$objects_each_gene <- private$objects_each_gene %>% append(single_gene_object)
       }
-      names(private$objects_each_gene) <- private$gene_list
+      names(private$objects_each_gene) <- private$val_gene_list
 
       # Create mask.
       # Each length must be 1 shorter because first column (gene ID) is excluded from reconstruction.
-      private$mask <- MASK_SHAPE[[mask_shape]](length(x) - 1, length(y) - 1, length(z) - 1)
+      private$val_mask <- MASK_SHAPE[[mask_shape]](length(x) - 1, length(y) - 1, length(z) - 1)
     },
-
-    # getter ----------------------
-    gene_list = function () {
-      return(private$val_gene_list)
-    },
-
-    # gene = function () {
-    #   return(private$objects_each_gene)
-    # },
-
-    exp_mat_original = function () {
-      return(list(private$x, private$y, private$z))
-    },
-
-    mask = function () {
-      return(private$mask)
-    },
-
-    # getAlternativeGeneName = function() {
-    #   return(private$alternative_gene_name)
-    # },
-    # ---------------------------------
 
     estimate3dExpressions = function (queries=c()) {
       for (gene_ID in queries) {
-        private$objects_each_gene[[gene_ID]]$estimate3dExpression(private$x, private$y, private$z, private$mask)
+        private$objects_each_gene[[gene_ID]]$estimate3dExpression(private$x, private$y, private$z, private$val_mask)
       }
     },
 
@@ -99,12 +77,36 @@ tomo_seq <- R6Class(
       }
     }
   ),
+  active = list(
+
+    # getter ----------------------
+    gene_list = function () {
+      return(private$val_gene_list)
+    },
+
+    # gene = function () {
+    #   return(private$objects_each_gene)
+    # },
+
+    exp_mat_original = function () {
+      return(list(private$x, private$y, private$z))
+    },
+
+    mask = function () {
+      return(private$val_mask)
+    },
+
+    # getAlternativeGeneName = function() {
+    #   return(private$alternative_gene_name)
+    # },
+    # ---------------------------------
+  ),
   private = list(
     x = data.frame(),
     y = data.frame(),
     z = data.frame(),
-    mask = array(0, dim=c(1,1,1)),
-    gene_list = c(),
+    val_mask = array(0, dim=c(1,1,1)),
+    val_gene_list = c(),
     objects_each_gene = c(),
     # alternative_gene_name = c(),
     has_species_name = FALSE,
