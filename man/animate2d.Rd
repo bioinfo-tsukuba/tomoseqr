@@ -15,7 +15,8 @@ animate2d(
   ylab = axes2,
   file = paste(gene_ID, "_", target, "_", axes1, "_", axes2, ".gif", sep = ""),
   zlim = NA,
-  interval = 0.1
+  interval = 0.1,
+  aspect_ratio = c()
 )
 }
 \arguments{
@@ -40,6 +41,10 @@ animate2d(
 \item{zlim}{Limit of value of heatmap. If target="mask", it is ignored.}
 
 \item{interval}{interval of GIF animation.}
+
+\item{aspect_ratio}{A 2D vector of aspect ratio of animation. You can specify the ratio as \code{c(width, height)}.
+If you don't specify the value of this parameter,
+the ratio is calculated based on the number of segment along each axes.}
 }
 \description{
 Animate 2D expressions along one axis and generate GIF file.

@@ -50,17 +50,20 @@ plotLossFunction <- function(tomo_obj, gene_ID) {
 #' @param file Path of GIF file.
 #' @param zlim Limit of value of heatmap. If target="mask", it is ignored.
 #' @param interval interval of GIF animation.
+#' @param aspect_ratio A 2D vector of aspect ratio of animation. You can specify the ratio as `c(width, height)`.
+#' If you don't specify the value of this parameter,
+#' the ratio is calculated based on the number of segment along each axes.
 #' @export 
 #' @note  You can do the same things with
 #' `tomo_obj$animate2d(gene_ID, ...)`.
 animate2d <- function (tomo_obj, gene_ID, target="expression", axes1=1, axes2=2, main=gene_ID, xlab=axes1, ylab=axes2,
-                       file=paste(gene_ID, "_", target, "_", axes1, "_", axes2, ".gif", sep=""), zlim=NA, interval=0.1)
+                       file=paste(gene_ID, "_", target, "_", axes1, "_", axes2, ".gif", sep=""), zlim=NA, interval=0.1, aspect_ratio=c())
                        {
                          if (target == "mask" & is.na(zlim[1]) == FALSE) {
                            warning('If target = "mask", parameter "zlim" is ignored.')
                          }
                          tomo_obj$animate2d(gene_ID=gene_ID, target=target, axes1=axes1, axes2=axes2, main=main, xlab=xlab, ylab=ylab,
-                                            file=file, zlim=zlim, interval=interval)
+                                            file=file, zlim=zlim, interval=interval, aspect_ratio=aspect_ratio)
                                             return(invisible(tomo_obj))
 }
 
