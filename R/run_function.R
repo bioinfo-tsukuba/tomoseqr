@@ -59,6 +59,9 @@ plotLossFunction <- function(tomo_obj, gene_ID) {
 animate2d <- function (tomo_obj, gene_ID, target="expression", axes1=1, axes2=2, main=gene_ID, xlab=axes1, ylab=axes2,
                        file=paste(gene_ID, "_", target, "_", axes1, "_", axes2, ".gif", sep=""), zlim=NA, interval=0.1, aspect_ratio=c())
                        {
+                         if (length(aspect_ratio) != 0 & length(aspect_ratio) != 2) {
+                             stop("`aspect_ratio` should be a 2D vector.")
+                           }
                          if (target == "mask" & is.na(zlim[1]) == FALSE) {
                            warning('If target = "mask", parameter "zlim" is ignored.')
                          }

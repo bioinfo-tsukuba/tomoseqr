@@ -64,6 +64,9 @@ tomo_seq <- R6Class(
     },
 
     animate2d = function (gene_ID, target, axes1, axes2, main, xlab, ylab, file, zlim, interval, aspect_ratio=c()) {
+      if (length(aspect_ratio) != 0 & length(aspect_ratio) != 2) {
+        stop("`aspect_ratio` should be a 2D vector.")
+      }
       if (target == "expression") {
         private$objects_each_gene[[gene_ID]]$animate2dExpression(axes1=axes1, axes2=axes2, main=main, xlab=xlab, ylab=ylab,
                                                                  zlim=zlim, file=file, interval=interval, aspect_ratio=aspect_ratio)
