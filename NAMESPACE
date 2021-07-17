@@ -2,6 +2,7 @@
 
 export(animate2d)
 export(estimate3dExpressions)
+export(getReconstructedResult)
 export(makeTomoObjSet)
 export(plot1dAllExpression)
 export(plot1dExpression)
