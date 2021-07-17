@@ -95,3 +95,13 @@ plot1dAllExpression <- function(tomo_obj, axes) {
 toDataFrame <- function(tomo_obj, gene_ID) {
   tomo_obj$toDataFrame(gene_ID)
 }
+
+#' Get reconstructed matrix
+#' @param tomo_obj tomo_seq object
+#' @param gene_ID single gene ID
+#' @export
+#' @note  You can do the same things with
+#' `tomo_obj$getReconstructedResult(gene_ID)`.
+getReconstructedResult <- function(tomo_obj, gene_ID) {
+  tomo_obj$getReconstructedResult(gene_ID)
+}
