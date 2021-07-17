@@ -45,16 +45,19 @@ tomo_seq <- R6Class(
       private$objects_each_gene[[gene_ID]]$getReconstructedResult()
     },
 
-    animate2d = function (gene_ID, target, axes1, axes2, main, xlab, ylab, file, zlim, interval) {
+    animate2d = function (gene_ID, target, axes1, axes2, main, xlab, ylab, file, zlim, interval, aspect_ratio=c()) {
+      if (length(aspect_ratio) != 0 & length(aspect_ratio) != 2) {
+        stop("`aspect_ratio` should be a 2D vector.")
+      }
       if (target == "expression") {
         private$objects_each_gene[[gene_ID]]$animate2dExpression(axes1=axes1, axes2=axes2, main=main, xlab=xlab, ylab=ylab,
-                                                                 zlim=zlim, file=file, interval=interval)
+                                                                 zlim=zlim, file=file, interval=interval, aspect_ratio=aspect_ratio)
       } else if (target == "mask") {
         private$objects_each_gene[[gene_ID]]$animate2dMask(axes1=axes1, axes2=axes2, main=main, xlab=xlab, ylab=ylab,
-                                                           file=file, interval=interval)
+                                                           file=file, interval=interval, aspect_ratio=aspect_ratio)
       } else if (target == "unite") {
         private$objects_each_gene[[gene_ID]]$animate2dUnite(axes1=axes1, axes2=axes2, main=main, xlab=xlab, ylab=ylab,
-                                                                 zlim=zlim, file=file, interval=interval)
+                                                                 zlim=zlim, file=file, interval=interval, aspect_ratio=aspect_ratio)
       } else {
         cat("ERROR: animate2d\n")
         cat(paste("Invalid option: target =", target, "\n"))
@@ -272,7 +275,7 @@ tomo_seq <- R6Class(
           plot(self$loss, type="l", main=self$gene_ID, xlab="Iteration number", ylab="Loss")
         },
 
-        animate2dExpression = function(axes1, axes2, main, xlab, ylab, file, zlim, interval)
+        animate2dExpression = function(axes1, axes2, main, xlab, ylab, file, zlim, interval, aspect_ratio)
         {
           # if (self$already_reconstructed == TRUE) {
           if (is.na(zlim[1]) == TRUE) {
@@ -282,21 +285,21 @@ tomo_seq <- R6Class(
           }
             self$animate2d(self$reconst, axes1=axes1, axes2=axes2,
                            main=main, xlab=xlab, ylab=ylab, file=file,
-                           zlim=real_zlim, interval=interval)
+                           zlim=real_zlim, interval=interval, aspect_ratio=aspect_ratio)
           # } else {
           #   cat("Before animate, please run estimateExpression().")
           #   return(1)
           # }
         },
 
-        animate2dMask = function(axes1, axes2, main, xlab, ylab, file, interval)
+        animate2dMask = function(axes1, axes2, main, xlab, ylab, file, interval, aspect_ratio)
         {
           self$animate2d(self$mask, axes1=axes1, axes2=axes2,
                          main=main, xlab=xlab, ylab=ylab, file=file,
-                         zlim=c(0, 1), interval=interval)
+                         zlim=c(0, 1), interval=interval, aspect_ratio=aspect_ratio)
         },
 
-        animate2dUnite = function(axes1, axes2, main, xlab, ylab, file, zlim, interval)
+        animate2dUnite = function(axes1, axes2, main, xlab, ylab, file, zlim, interval, aspect_ratio)
         {
           if (is.na(zlim[1]) == TRUE) {
             real_zlim <- range(self$reconst)
@@ -305,23 +308,33 @@ tomo_seq <- R6Class(
           }
           self$animateMaskAndExpression(axes1=axes1, axes2=axes2,
                          main=main, xlab=xlab, ylab=ylab, file=file,
-                         zlim=real_zlim, interval=interval)
+                         zlim=real_zlim, interval=interval, aspect_ratio=aspect_ratio)
         },
 
-        contourForAnimate = function (array_3d, main, xlab, ylab, zlim) {
+        contourForAnimate = function (array_3d, main, xlab, ylab, zlim, aspect_ratio) {
+          if (length(aspect_ratio) < 2) {
+            array_dim <- dim(array_3d)
+            asp <- array_dim[2] / array_dim[1]
+          } else {
+            asp <- aspect_ratio[2] / aspect_ratio[1]
+          }
           cat("generating")
-          array_dim <- dim(array_3d)
           for (i in seq_along(array_3d[1, 1, ])) {
             cat("...")
             filled.contour(array_3d[, , i], main=paste(main, "_", i, sep=""), xlab=xlab,
-                           ylab=ylab, zlim=zlim, asp=array_dim[2] / array_dim[1], frame.plot=F)
+                           ylab=ylab, zlim=zlim, asp=asp, frame.plot=F)
           }
           cat("\n")
         },
 
-        contourMaskAndExpression = function (mask_apermed, reconst_apermed, main, xlab, ylab, zlim) {
-          mask_dim <- dim(mask_apermed)
-          reconst_dim <- dim(reconst_apermed)
+        contourMaskAndExpression = function (mask_apermed, reconst_apermed, main, xlab, ylab, zlim, aspect_ratio) {
+          if (length(aspect_ratio) < 2) {
+            # Dim of reconstructed matrix should be equal to that of mask.
+            plot_dim <- dim(mask_apermed)
+            asp <- plot_dim[2] / plot_dim[1]
+          } else {
+            asp <- aspect_ratio[2] / aspect_ratio[1]
+          }
           label_list <- seq(zlim[1], floor(zlim[2]), length=6) %>% round()
           position_list <- label_list / zlim[2]
           cat("generating")
@@ -332,29 +345,32 @@ tomo_seq <- R6Class(
             cat("...")
             par(mar=c(2,3,2,2), oma=c(0,0,0,0))
             layout(matrix(seq(2),nrow=2,ncol=1),widths=c(1),heights=c(3,0.5))
-            image(reconst_apermed[, , i], zlim=zlim, xlab=xlab, ylab=ylab, breaks=seq(zlim[1], zlim[2], length=floor(zlim[2])), col=hcl.colors(floor(zlim[2])-1, palette="Oslo"), asp=reconst_dim[2] / reconst_dim[1], axes=F)
+            image(reconst_apermed[, , i], zlim=zlim, xlab=xlab, ylab=ylab,
+                  breaks=seq(zlim[1], zlim[2], length=floor(zlim[2])),
+                  col=hcl.colors(floor(zlim[2])-1, palette="Oslo"), asp=asp, axes=F)
             axis(1, seq(0, 1.0, by=0.2), seq(0, 1, by=0.2))
             axis(2, seq(0, 1.0, by=0.2), seq(0, 1, by=0.2), pos=0)
             mtext(xlab, side = 1, line = 2)
             mtext(ylab, side = 2, line = 1)
             par(new=T)
-            image(mask_apermed[,,i], col=c("#000000", "#FFFFFF00"), main=paste(main, "_", i, seq=""), xlab=xlab, ylab=ylab, asp=mask_dim[2] / mask_dim[1], axes=F)
+            image(mask_apermed[,,i], col=c("#000000", "#FFFFFF00"),
+                  main=paste(main, "_", i, seq=""), xlab=xlab, ylab=ylab, asp=asp, axes=F)
             image(as.matrix(ColorLevels),col=ColorRamp, xlab="",ylab="",cex.axis=1,xaxt="n",yaxt="n")
             axis(1, position_list, label_list)
           }
           cat("\n")
         },
 
-        animate2d = function (array3d, axes1, axes2, main, xlab, ylab, file, zlim, interval) {
+        animate2d = function (array3d, axes1, axes2, main, xlab, ylab, file, zlim, interval, aspect_ratio) {
           array3d_apermed <- aperm(array3d, perm=c(axes1, axes2, 6 - (axes1 + axes2)))
-          saveGIF(self$contourForAnimate(array_3d=array3d_apermed, main=main, xlab=xlab, ylab=ylab, zlim=zlim),
+          saveGIF(self$contourForAnimate(array_3d=array3d_apermed, main=main, xlab=xlab, ylab=ylab, zlim=zlim, aspect_ratio=aspect_ratio),
                   movie.name=file, interval=interval, autobrowse=FALSE)
         },
 
-        animateMaskAndExpression = function (axes1, axes2, main, xlab, ylab, file, zlim, interval) {
+        animateMaskAndExpression = function (axes1, axes2, main, xlab, ylab, file, zlim, interval, aspect_ratio) {
           mask_apermed <- aperm(self$mask, perm=c(axes1, axes2, 6 - (axes1 + axes2)))
           reconst_apermed <- aperm(self$reconst, perm=c(axes1, axes2, 6 - (axes1 + axes2)))
-          saveGIF(self$contourMaskAndExpression(mask_apermed = mask_apermed, reconst_apermed = reconst_apermed, main=main, xlab=xlab, ylab=ylab, zlim=zlim),
+          saveGIF(self$contourMaskAndExpression(mask_apermed = mask_apermed, reconst_apermed = reconst_apermed, main=main, xlab=xlab, ylab=ylab, zlim=zlim, aspect_ratio=aspect_ratio),
                   movie.name=file, interval=interval, autobrowse=FALSE)
         },
 
