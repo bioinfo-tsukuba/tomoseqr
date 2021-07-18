@@ -1,9 +1,22 @@
+#' The class that contain hogefuga
 #' @importFrom R6 R6Class
 #' @importFrom dplyr %>%
 #' @importFrom animation saveGIF
 tomo_seq <- R6Class(
   classname = "tomoSeq",
   public = list(
+
+#' @description Make tomoSeq object. Please see also [makeTomoObjSet()]
+#' @param x A data.frame object containing a simulated Tomo-seq data for x-axis sections.
+#'          The rows represent genes. The first column contains gene IDs and the second and
+#'          subsequent columns contain gene expression levels in sections.
+#' @param y A data.frame object containing a simulated Tomo-seq data for y-axis sections.
+#'          The rows represent genes. The first column contains gene IDs and the second and
+#'          subsequent columns contain gene expression levels in sections.
+#' @param z A data.frame object containing a simulated Tomo-seq data for z-axis sections.
+#'          The rows represent genes. The first column contains gene IDs and the second and
+#'          subsequent columns contain gene expression levels in sections.
+#' @param mask_shape shape of mask.
     initialize = function (x, y, z, mask_shape="rectangle") {
       # x, y, z: Tomo-seq data (about all genes) of each axes.
       # mask_shape: The shape of mask （"rectangle", "round" or "halfround").
