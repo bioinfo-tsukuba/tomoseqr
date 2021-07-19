@@ -8,6 +8,13 @@ The class that contain hogefuga
 
 The class that contain hogefuga
 }
+\section{Active bindings}{
+\if{html}{\out{<div class="r6-active-bindings">}}
+\describe{
+\item{\code{gene_list}}{hogefuga}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -26,7 +33,8 @@ The class that contain hogefuga
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Make tomoSeq object. Please see also \code{\link[=makeTomoObjSet]{makeTomoObjSet()}}
+Make tomoSeq object. This method is not available to users. Instead of it,
+\code{\link[=makeTomoObjSet]{makeTomoObjSet()}} is available.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{tomo_seq$new(x, y, z, mask_shape = "rectangle")}\if{html}{\out{</div>}}
 }
@@ -46,7 +54,7 @@ subsequent columns contain gene expression levels in sections.}
 The rows represent genes. The first column contains gene IDs and the second and
 subsequent columns contain gene expression levels in sections.}
 
-\item{\code{mask_shape}}{shape of mask.}
+\item{\code{mask_shape}}{Shape of mask. You can choose the value from \code{"rectangle"}, \code{"round"} or \code{"halfround"}. The default is \code{"rectangle"}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -55,19 +63,35 @@ subsequent columns contain gene expression levels in sections.}
 \if{html}{\out{<a id="method-estimate3dExpressions"></a>}}
 \if{latex}{\out{\hypertarget{method-estimate3dExpressions}{}}}
 \subsection{Method \code{estimate3dExpressions()}}{
+Reconstructs 3D expression patterns of genes which are specified. See also \code{\link[=estimate3dExpressions]{estimate3dExpressions()}}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{tomo_seq$estimate3dExpressions(queries = c())}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{queries}}{A vector consists of gene IDs.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-plotLossFunction"></a>}}
 \if{latex}{\out{\hypertarget{method-plotLossFunction}{}}}
 \subsection{Method \code{plotLossFunction()}}{
+Plot the transition of the value of the loss function.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{tomo_seq$plotLossFunction(gene_ID)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{gene_ID}}{a gene ID as string.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-toDataFrame"></a>}}

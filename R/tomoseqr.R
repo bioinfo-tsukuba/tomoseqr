@@ -6,7 +6,8 @@ tomo_seq <- R6Class(
   classname = "tomoSeq",
   public = list(
 
-#' @description Make tomoSeq object. Please see also [makeTomoObjSet()]
+#' @description Make tomoSeq object. This method is not available to users. Instead of it, 
+#' [makeTomoObjSet()] is available.
 #' @param x A data.frame object containing a simulated Tomo-seq data for x-axis sections.
 #'          The rows represent genes. The first column contains gene IDs and the second and
 #'          subsequent columns contain gene expression levels in sections.
@@ -16,7 +17,7 @@ tomo_seq <- R6Class(
 #' @param z A data.frame object containing a simulated Tomo-seq data for z-axis sections.
 #'          The rows represent genes. The first column contains gene IDs and the second and
 #'          subsequent columns contain gene expression levels in sections.
-#' @param mask_shape shape of mask.
+#' @param mask_shape Shape of mask. You can choose the value from `"rectangle"`, `"round"` or `"halfround"`. The default is `"rectangle"`.
     initialize = function (x, y, z, mask_shape="rectangle") {
       # x, y, z: Tomo-seq data (about all genes) of each axes.
       # mask_shape: The shape of mask （"rectangle", "round" or "halfround").
@@ -40,12 +41,16 @@ tomo_seq <- R6Class(
       private$val_mask <- MASK_SHAPE[[mask_shape]](length(x) - 1, length(y) - 1, length(z) - 1)
     },
 
+#' @description Reconstructs 3D expression patterns of genes which are specified. See also [estimate3dExpressions()].
+#' @param queries A vector consists of gene IDs.
     estimate3dExpressions = function (queries=c()) {
       for (gene_ID in queries) {
         private$objects_each_gene[[gene_ID]]$estimate3dExpression(private$x, private$y, private$z, private$val_mask)
       }
     },
 
+#' @description Plot the transition of the value of the loss function.
+#' @param gene_ID a gene ID as string.
     plotLossFunction = function(gene_ID) {
       private$objects_each_gene[[gene_ID]]$plotLossFunction()
     },
@@ -96,6 +101,7 @@ tomo_seq <- R6Class(
   active = list(
 
     # getter ----------------------
+#' @field gene_list hogefuga
     gene_list = function (value) {
       if (missing(value)) {
         return(private$val_gene_list)
