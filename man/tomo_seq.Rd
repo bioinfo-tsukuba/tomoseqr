@@ -2,16 +2,19 @@
 % Please edit documentation in R/tomoseqr.R
 \name{tomo_seq}
 \alias{tomo_seq}
-\title{The class that contain hogefuga}
+\title{tomoSeq object}
 \description{
-The class that contain hogefuga
-
-The class that contain hogefuga
+The class that contains a list of information about each genes.
 }
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{gene_list}}{hogefuga}
+\item{\code{gene_list}}{A list of gene ID. It's read-only.}
+
+\item{\code{exp_mat_original}}{Original expression matrices along each axes. It's read-only.}
+
+\item{\code{mask}}{3D matrix, whose elements are 0 (not included in sample)
+or 1 (included in sample). It's read-only.}
 }
 \if{html}{\out{</div>}}
 }
@@ -88,7 +91,7 @@ Plot the transition of the value of the loss function.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{gene_ID}}{a gene ID as string.}
+\item{\code{gene_ID}}{A gene ID as string.}
 }
 \if{html}{\out{</div>}}
 }
@@ -97,24 +100,41 @@ Plot the transition of the value of the loss function.
 \if{html}{\out{<a id="method-toDataFrame"></a>}}
 \if{latex}{\out{\hypertarget{method-toDataFrame}{}}}
 \subsection{Method \code{toDataFrame()}}{
+Export a result of reconstruction as data.frame.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{tomo_seq$toDataFrame(gene_ID)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{gene_ID}}{A gene ID as string.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-getReconstructedResult"></a>}}
 \if{latex}{\out{\hypertarget{method-getReconstructedResult}{}}}
 \subsection{Method \code{getReconstructedResult()}}{
+Export a result of reconstruction as 3D matrix.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{tomo_seq$getReconstructedResult(gene_ID)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{gene_ID}}{A gene ID as string.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-animate2d"></a>}}
 \if{latex}{\out{\hypertarget{method-animate2d}{}}}
 \subsection{Method \code{animate2d()}}{
+Reconstruct a 3D expression pattern of a gene.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{tomo_seq$animate2d(
   gene_ID,
@@ -131,24 +151,82 @@ Plot the transition of the value of the loss function.
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{gene_ID}}{A gene ID as string.}
+
+\item{\code{target}}{A target of exportation. You can choose from "expression",
+"mask" or "unite". The default value is "expression".}
+
+\item{\code{axes1}}{One of the axes of reconstructed matrix,
+which is used the x-axis of the animation. You can choose from 1, 2 or 3.
+The default value is 1.}
+
+\item{\code{axes2}}{One of the axes of reconstructed matrix,
+which is used the y-axis of the animation. You can choose from 1, 2 or 3.
+The default value is 2.}
+
+\item{\code{main}}{The title of animation. It is NOT the file name. The default value
+is same as gene_ID.}
+
+\item{\code{xlab}}{A string, that is a label of x-axis. The default value is same
+as \code{axes1}.}
+
+\item{\code{ylab}}{A string, that is a label of y-axis. The default value is same
+as \code{axes2}.}
+
+\item{\code{file}}{A name of GIF file that is exported. The default value is
+generated using gene_ID, axes1 and axes2.}
+
+\item{\code{zlim}}{Limits of expression levels that is displayed. You can specify
+it as \code{c(min, max)}. The default value is automatically calculated using
+the result of reconstruction.}
+
+\item{\code{interval}}{An interval of GIF animation. The default value is 0.1.}
+
+\item{\code{aspect_ratio}}{A 2D vector of aspect ratio of animation. You can specify the ratio as \code{c(width, height)}.
+If you don't specify the value of this parameter,
+the ratio is calculated based on the number of segment along each axes.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-plot1dExpression"></a>}}
 \if{latex}{\out{\hypertarget{method-plot1dExpression}{}}}
 \subsection{Method \code{plot1dExpression()}}{
+Plot expression of single gene along axes
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{tomo_seq$plot1dExpression(gene_ID, axes)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{gene_ID}}{A gene ID as string}
+
+\item{\code{axes}}{An axis of which you want to plot expression (1, 2 or 3).}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-plot1dAllExpression"></a>}}
 \if{latex}{\out{\hypertarget{method-plot1dAllExpression}{}}}
 \subsection{Method \code{plot1dAllExpression()}}{
+Plot expressions of all genes along an axis
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{tomo_seq$plot1dAllExpression(axes)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{axes}}{An axis of which you want to plot expression (1, 2 or 3).}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}
