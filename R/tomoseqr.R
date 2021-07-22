@@ -1,9 +1,24 @@
+#' tomoSeq object
+#' @description The class that contains a list of information about each genes.
 #' @importFrom R6 R6Class
 #' @importFrom dplyr %>%
 #' @importFrom animation saveGIF
 tomo_seq <- R6Class(
   classname = "tomoSeq",
   public = list(
+
+#' @description Make tomoSeq object. This method is not available to users. Instead of it,
+#' [makeTomoObjSet()] is available.
+#' @param x A data.frame object containing a simulated Tomo-seq data for x-axis sections.
+#'          The rows represent genes. The first column contains gene IDs and the second and
+#'          subsequent columns contain gene expression levels in sections.
+#' @param y A data.frame object containing a simulated Tomo-seq data for y-axis sections.
+#'          The rows represent genes. The first column contains gene IDs and the second and
+#'          subsequent columns contain gene expression levels in sections.
+#' @param z A data.frame object containing a simulated Tomo-seq data for z-axis sections.
+#'          The rows represent genes. The first column contains gene IDs and the second and
+#'          subsequent columns contain gene expression levels in sections.
+#' @param mask_shape Shape of mask. You can choose the value from `"rectangle"`, `"round"` or `"halfround"`. The default is `"rectangle"`.
     initialize = function (x, y, z, mask_shape="rectangle") {
       # x, y, z: Tomo-seq data (about all genes) of each axes.
       # mask_shape: The shape of mask （"rectangle", "round" or "halfround").
@@ -27,24 +42,57 @@ tomo_seq <- R6Class(
       private$val_mask <- MASK_SHAPE[[mask_shape]](length(x) - 1, length(y) - 1, length(z) - 1)
     },
 
+#' @description Reconstructs 3D expression patterns of genes which are specified. See also [estimate3dExpressions()].
+#' @param queries A vector consists of gene IDs.
     estimate3dExpressions = function (queries=c()) {
       for (gene_ID in queries) {
         private$objects_each_gene[[gene_ID]]$estimate3dExpression(private$x, private$y, private$z, private$val_mask)
       }
     },
 
+#' @description Plot the transition of the value of the loss function.
+#' @param gene_ID A gene ID as string.
     plotLossFunction = function(gene_ID) {
       private$objects_each_gene[[gene_ID]]$plotLossFunction()
     },
 
+#' @description Export a result of reconstruction as data.frame.
+#' @param gene_ID A gene ID as string.
     toDataFrame = function(gene_ID) {
       private$objects_each_gene[[gene_ID]]$toDataFrame()
     },
 
+#' @description Export a result of reconstruction as 3D matrix.
+#' @param gene_ID A gene ID as string.
     getReconstructedResult = function(gene_ID) {
       private$objects_each_gene[[gene_ID]]$getReconstructedResult()
     },
 
+#' @description Reconstruct a 3D expression pattern of a gene.
+#' @param gene_ID A gene ID as string.
+#' @param target A target of exportation. You can choose from "expression",
+#' "mask" or "unite". The default value is "expression".
+#' @param axes1 One of the axes of reconstructed matrix,
+#' which is used the x-axis of the animation. You can choose from 1, 2 or 3.
+#' The default value is 1.
+#' @param axes2 One of the axes of reconstructed matrix,
+#' which is used the y-axis of the animation. You can choose from 1, 2 or 3.
+#' The default value is 2.
+#' @param main The title of animation. It is NOT the file name. The default value
+#' is same as gene_ID.
+#' @param xlab A string, that is a label of x-axis. The default value is same
+#' as `axes1`.
+#' @param ylab A string, that is a label of y-axis. The default value is same
+#' as `axes2`.
+#' @param file A name of GIF file that is exported. The default value is
+#' generated using gene_ID, axes1 and axes2.
+#' @param zlim Limits of expression levels that is displayed. You can specify
+#' it as `c(min, max)`. The default value is automatically calculated using
+#' the result of reconstruction.
+#' @param interval An interval of GIF animation. The default value is 0.1.
+#' @param aspect_ratio A 2D vector of aspect ratio of animation. You can specify the ratio as `c(width, height)`.
+#' If you don't specify the value of this parameter,
+#' the ratio is calculated based on the number of segment along each axes.
     animate2d = function (gene_ID, target, axes1, axes2, main, xlab, ylab, file, zlim, interval, aspect_ratio=c()) {
       if (length(aspect_ratio) != 0 & length(aspect_ratio) != 2) {
         stop("`aspect_ratio` should be a 2D vector.")
@@ -64,10 +112,15 @@ tomo_seq <- R6Class(
       }
     },
 
+#' @description Plot expression of single gene along axes
+#' @param gene_ID A gene ID as string
+#' @param axes An axis of which you want to plot expression (1, 2 or 3).
     plot1dExpression = function (gene_ID, axes) {
       private$objects_each_gene[[gene_ID]]$plot1dExpression(axes)
     },
 
+#' @description Plot expressions of all genes along an axis
+#' @param axes An axis of which you want to plot expression (1, 2 or 3).
     plot1dAllExpression = function (axes) {
       if (axes==1) {
         private$x[, -1] %>% colSums() %>% plot(type="l")
@@ -83,6 +136,8 @@ tomo_seq <- R6Class(
   active = list(
 
     # getter ----------------------
+
+#' @field gene_list A list of gene ID. It's read-only.
     gene_list = function (value) {
       if (missing(value)) {
         return(private$val_gene_list)
@@ -95,6 +150,7 @@ tomo_seq <- R6Class(
     #   return(private$objects_each_gene)
     # },
 
+#' @field exp_mat_original Original expression matrices along each axes. It's read-only.
     exp_mat_original = function (value) {
       if (missing(value)) {
       return(list(private$x, private$y, private$z))
@@ -103,6 +159,8 @@ tomo_seq <- R6Class(
       }
     },
 
+#' @field mask 3D matrix, whose elements are 0 (not included in sample)
+#' or 1 (included in sample). It's read-only.
     mask = function (value) {
       if (missing(value)) {
       return(private$val_mask)
