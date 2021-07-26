@@ -52,7 +52,7 @@ plotLossFunction <- function(tomo_obj, gene_ID) {
 #' @param interval interval of GIF animation.
 #' @param aspect_ratio A 2D vector of aspect ratio of animation. You can specify the ratio as `c(width, height)`.
 #' If you don't specify the value of this parameter,
-#' the ratio is calculated based on the number of segment along each axes.
+#' the ratio is calculated based on the number of sections along each axes.
 #' @export 
 #' @note  You can do the same things with
 #' `tomo_obj$animate2d(gene_ID, ...)`.
