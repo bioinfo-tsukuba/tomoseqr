@@ -25,7 +25,7 @@ the order of the sections.
 #### Data example
 
 ```{r}
-  gene_ID   segment1 segment2   segment3   segment4
+  gene_ID   section1 section2   section3   section4
 1   gene1   0.000000   0.0000 2867.75420 9086.81135
 2   gene2 440.599448 531.7915   36.91591  484.06813
 3   gene3  75.446821 833.9432  736.82367  559.89157

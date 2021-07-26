@@ -92,7 +92,7 @@ tomo_seq <- R6Class(
 #' @param interval An interval of GIF animation. The default value is 0.1.
 #' @param aspect_ratio A 2D vector of aspect ratio of animation. You can specify the ratio as `c(width, height)`.
 #' If you don't specify the value of this parameter,
-#' the ratio is calculated based on the number of segment along each axes.
+#' the ratio is calculated based on the number of sections along each axes.
     animate2d = function (gene_ID, target, axes1, axes2, main, xlab, ylab, file, zlim, interval, aspect_ratio=c()) {
       if (length(aspect_ratio) != 0 & length(aspect_ratio) != 2) {
         stop("`aspect_ratio` should be a 2D vector.")
