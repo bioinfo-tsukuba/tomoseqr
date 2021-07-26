@@ -15,9 +15,11 @@ install_github("bioinfo-tsukuba/tomoseqr")
 
 Please prepare Tomo-seq data that meets the following requirements.
 
-1. It is a `data.frame` object.
+1. It is a `data.frame` object for each axis.
 1. Its **first cloumn** has gene ID. It's not enough that only row
 names indicate gene ID.
+1. The order of the second and subsequent columns should be the same as
+the order of the sections.
 1. It has a header.
 
 #### Data example
