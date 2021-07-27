@@ -24,7 +24,8 @@ animate2d(
 
 \item{gene_ID}{single gene ID (string)}
 
-\item{target}{"expression", "mask" or "unite" (combination of expression and mask). Default is \code{expression}.}
+\item{target}{"expression", "mask" or "unite" (combination of expression and
+mask). Default is \code{expression}.}
 
 \item{axes1}{Number to specify as x-axis (1, 2 or 3). Default is \code{1}.}
 
@@ -42,14 +43,14 @@ animate2d(
 
 \item{interval}{interval of GIF animation.}
 
-\item{aspect_ratio}{A 2D vector of aspect ratio of animation. You can specify the ratio as \code{c(width, height)}.
-If you don't specify the value of this parameter,
-the ratio is calculated based on the number of sections along each axes.}
+\item{aspect_ratio}{A 2D vector that represents the ratio of figure. You can
+specify the ratio as \code{c(width, height)}. If you don't specify the value of
+this parameter, the ratio is calculated based on the number of sections
+along each axis.}
 }
 \description{
 Animate 2D expressions along one axis and generate GIF file.
 }
 \note{
-You can do the same things with
-\code{tomo_obj$animate2d(gene_ID, ...)}.
+You can do the same thing with \code{tomo_obj$animate2d(gene_ID, ...)}.
 }

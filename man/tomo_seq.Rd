@@ -11,7 +11,8 @@ The class that contains a list of information about each genes.
 \describe{
 \item{\code{gene_list}}{A list of gene ID. It's read-only.}
 
-\item{\code{exp_mat_original}}{Original expression matrices along each axes. It's read-only.}
+\item{\code{exp_mat_original}}{Original expression matrices along each axis.
+It's read-only.}
 
 \item{\code{mask}}{3D matrix, whose elements are 0 (not included in sample)
 or 1 (included in sample). It's read-only.}
@@ -36,8 +37,8 @@ or 1 (included in sample). It's read-only.}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Make tomoSeq object. This method is not available to users. Instead of it,
-\code{\link[=makeTomoObjSet]{makeTomoObjSet()}} is available.
+Make tomoSeq object. This method is not available to users.
+Instead of it, \code{\link[=makeTomoObjSet]{makeTomoObjSet()}} is available.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{tomo_seq$new(x, y, z, mask_shape = "rectangle")}\if{html}{\out{</div>}}
 }
@@ -45,19 +46,21 @@ Make tomoSeq object. This method is not available to users. Instead of it,
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{x}}{A data.frame object containing a simulated Tomo-seq data for x-axis sections.
-The rows represent genes. The first column contains gene IDs and the second and
-subsequent columns contain gene expression levels in sections.}
+\item{\code{x}}{A data.frame object containing a simulated Tomo-seq data for
+x-axis sections. The rows represent genes. The first column contains gene IDs
+and the second and subsequent columns contain gene expression levels
+in sections.}
 
-\item{\code{y}}{A data.frame object containing a simulated Tomo-seq data for y-axis sections.
-The rows represent genes. The first column contains gene IDs and the second and
-subsequent columns contain gene expression levels in sections.}
+\item{\code{y}}{A data.frame object containing a simulated Tomo-seq data for y-axis
+sections. The rows represent genes. The first column contains gene IDs and
+the second and subsequent columns contain gene expression levels in sections.}
 
-\item{\code{z}}{A data.frame object containing a simulated Tomo-seq data for z-axis sections.
-The rows represent genes. The first column contains gene IDs and the second and
-subsequent columns contain gene expression levels in sections.}
+\item{\code{z}}{A data.frame object containing a simulated Tomo-seq data for z-axis
+sections. The rows represent genes. The first column contains gene IDs and
+the second and subsequent columns contain gene expression levels in sections.}
 
-\item{\code{mask_shape}}{Shape of mask. You can choose the value from \code{"rectangle"}, \code{"round"} or \code{"halfround"}. The default is \code{"rectangle"}.}
+\item{\code{mask_shape}}{Shape of mask. You can choose the value from
+\code{"rectangle"}, \code{"round"} or \code{"halfround"}. The default is \code{"rectangle"}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -66,7 +69,8 @@ subsequent columns contain gene expression levels in sections.}
 \if{html}{\out{<a id="method-estimate3dExpressions"></a>}}
 \if{latex}{\out{\hypertarget{method-estimate3dExpressions}{}}}
 \subsection{Method \code{estimate3dExpressions()}}{
-Reconstructs 3D expression patterns of genes which are specified. See also \code{\link[=estimate3dExpressions]{estimate3dExpressions()}}.
+Reconstructs 3D expression patterns of genes which are
+specified. See also \code{\link[=estimate3dExpressions]{estimate3dExpressions()}}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{tomo_seq$estimate3dExpressions(queries = c())}\if{html}{\out{</div>}}
 }
@@ -167,8 +171,8 @@ The default value is 1.}
 which is used the y-axis of the animation. You can choose from 1, 2 or 3.
 The default value is 2.}
 
-\item{\code{main}}{The title of animation. It is NOT the file name. The default value
-is same as gene_ID.}
+\item{\code{main}}{The title of animation. It is NOT the file name.
+The default value is same as gene_ID.}
 
 \item{\code{xlab}}{A string, that is a label of x-axis. The default value is same
 as \code{axes1}.}
@@ -185,9 +189,10 @@ the result of reconstruction.}
 
 \item{\code{interval}}{An interval of GIF animation. The default value is 0.1.}
 
-\item{\code{aspect_ratio}}{A 2D vector of aspect ratio of animation. You can specify the ratio as \code{c(width, height)}.
-If you don't specify the value of this parameter,
-the ratio is calculated based on the number of sections along each axes.}
+\item{\code{aspect_ratio}}{A 2D vector of aspect ratio of animation.
+You can specify the ratio as \code{c(width, height)}. If you don't specify
+the value of this parameter, the ratio is calculated based on
+the number of sections along each axis.}
 }
 \if{html}{\out{</div>}}
 }
@@ -196,7 +201,7 @@ the ratio is calculated based on the number of sections along each axes.}
 \if{html}{\out{<a id="method-plot1dExpression"></a>}}
 \if{latex}{\out{\hypertarget{method-plot1dExpression}{}}}
 \subsection{Method \code{plot1dExpression()}}{
-Plot expression of single gene along axes
+Plot expression of single gene along axis
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{tomo_seq$plot1dExpression(gene_ID, axes)}\if{html}{\out{</div>}}
 }

@@ -15,6 +15,6 @@ getReconstructedResult(tomo_obj, gene_ID)
 Get reconstructed matrix
 }
 \note{
-You can do the same things with
+You can do the same thing with
 \code{tomo_obj$getReconstructedResult(gene_ID)}.
 }

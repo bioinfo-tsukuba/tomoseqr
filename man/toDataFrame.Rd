@@ -2,7 +2,7 @@
 % Please edit documentation in R/run_function.R
 \name{toDataFrame}
 \alias{toDataFrame}
-\title{Convert reconstructed matrix to data.frame}
+\title{Convert reconstructed matrix to data.frame.}
 \usage{
 toDataFrame(tomo_obj, gene_ID)
 }
@@ -12,9 +12,9 @@ toDataFrame(tomo_obj, gene_ID)
 \item{gene_ID}{single gene ID}
 }
 \description{
-Convert reconstructed matrix to data.frame
+Convert reconstructed matrix to data.frame.
 }
 \note{
-You can do the same things with
+You can do the same thing with
 \code{tomo_obj$toDataFrame(gene_ID)}.
 }
