@@ -22,7 +22,7 @@ tomo_seq <- R6Class(
 #' @param mask_shape Shape of mask. You can choose the value from
 #' `"rectangle"`, `"round"` or `"halfround"`. The default is `"rectangle"`.
         initialize = function (x, y, z, mask_shape="rectangle") {
-            ## x, y, z: Tomo-seq data (about all genes) of each axes.
+            ## x, y, z: Tomo-seq data (about all genes) of each axis.
             ## mask_shape: The shape of mask 
             ## ("rectangle", "round" or "halfround").
             MASK_SHAPE <- list(private$makeRectangle, private$makeRound,
@@ -106,7 +106,7 @@ tomo_seq <- R6Class(
 #' @param aspect_ratio A 2D vector of aspect ratio of animation.
 #' You can specify the ratio as `c(width, height)`. If you don't specify
 #' the value of this parameter, the ratio is calculated based on
-#' the number of sections along each axes.
+#' the number of sections along each axis.
         animate2d = function (gene_ID, target, axes1, axes2, main, xlab, ylab,
                               file, zlim, interval, aspect_ratio=c()) {
             if (length(aspect_ratio) != 0 & length(aspect_ratio) != 2) {
@@ -135,7 +135,7 @@ tomo_seq <- R6Class(
             }
         },
 
-#' @description Plot expression of single gene along axes
+#' @description Plot expression of single gene along axis
 #' @param gene_ID A gene ID as string
 #' @param axes An axis of which you want to plot expression (1, 2 or 3).
         plot1dExpression = function (gene_ID, axes) {
@@ -169,7 +169,7 @@ tomo_seq <- R6Class(
             }
         },
 
-#' @field exp_mat_original Original expression matrices along each axes.
+#' @field exp_mat_original Original expression matrices along each axis.
 #' It's read-only.
         exp_mat_original = function (value) {
             if (missing(value)) {
