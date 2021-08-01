@@ -23,7 +23,7 @@ makeTomoObjSet <- function (x, y, z, mask_shape="rectangle") {
 #' @export
 #' @note  You can do the same things with
 #' `tomo_obj$estimate3dExpressions(query)`.
-estimate3dExpressions <- function(tomo_obj, query) {
+estimate3dExpressions <- function (tomo_obj, query) {
     tomo_obj$estimate3dExpressions(queries=query)
     return(invisible(tomo_obj))
     }
@@ -35,7 +35,7 @@ estimate3dExpressions <- function(tomo_obj, query) {
 #' @export
 #' @note  You can do the same things with
 #' `tomo_obj$plotLossFunction(gene_ID)`.
-plotLossFunction <- function(tomo_obj, gene_ID) {
+plotLossFunction <- function (tomo_obj, gene_ID) {
     tomo_obj$plotLossFunction(gene_ID=gene_ID)
     return(invisible(tomo_obj))
     }
@@ -59,20 +59,36 @@ plotLossFunction <- function(tomo_obj, gene_ID) {
 #' along each axis.
 #' @export
 #' @note  You can do the same thing with `tomo_obj$animate2d(gene_ID, ...)`.
-animate2d <- function (tomo_obj, gene_ID, target="expression", xaxis=1, yaxis=2,
-                       main=gene_ID, xlab=xaxis, ylab=yaxis,
-                       file=paste(gene_ID, "_", target, "_", xaxis, "_", yaxis,
-                                  ".gif", sep=""),
-                       zlim=NA, interval=0.1, aspect_ratio=c()) {
+animate2d <- function (tomo_obj,
+                       gene_ID,
+                       target="expression",
+                       xaxis=1, yaxis=2,
+                       main=gene_ID,
+                       xlab=xaxis, ylab=yaxis,
+                       file=paste(gene_ID, "_", target, "_",
+                                  xaxis, "_", yaxis, ".gif",
+                                  sep=""
+                       ),
+                       zlim=NA,
+                       interval=0.1,
+                       aspect_ratio=c()
+             ) {
     if (length(aspect_ratio) != 0 & length(aspect_ratio) != 2) {
         stop("`aspect_ratio` should be a 2D vector.")
         }
     if (target == "mask" & is.na(zlim[1]) == FALSE) {
         warning('If target = "mask", parameter "zlim" is ignored.')
         }
-    tomo_obj$animate2d(gene_ID=gene_ID, target=target, xaxis=xaxis, yaxis=yaxis,
-                       main=main, xlab=xlab, ylab=ylab, file=file, zlim=zlim,
-                       interval=interval, aspect_ratio=aspect_ratio)
+    tomo_obj$animate2d(gene_ID=gene_ID,
+                       target=target,
+                       xaxis=xaxis, yaxis=yaxis,
+                       main=main,
+                       xlab=xlab, ylab=ylab,
+                       file=file,
+                       zlim=zlim,
+                       interval=interval,
+                       aspect_ratio=aspect_ratio
+    )
     return(invisible(tomo_obj))
     }
 
