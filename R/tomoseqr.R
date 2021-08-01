@@ -85,20 +85,20 @@ tomo_seq <- R6Class(
 #' @param gene_ID A gene ID as string.
 #' @param target A target of exportation. You can choose from "expression",
 #' "mask" or "unite". The default value is "expression".
-#' @param axes1 One of the axes of reconstructed matrix,
+#' @param xaxis One of the axes of reconstructed matrix,
 #' which is used the x-axis of the animation. You can choose from 1, 2 or 3.
 #' The default value is 1.
-#' @param axes2 One of the axes of reconstructed matrix,
+#' @param yaxis One of the axes of reconstructed matrix,
 #' which is used the y-axis of the animation. You can choose from 1, 2 or 3.
 #' The default value is 2.
 #' @param main The title of animation. It is NOT the file name.
 #' The default value is same as gene_ID.
 #' @param xlab A string, that is a label of x-axis. The default value is same
-#' as `axes1`.
+#' as `xaxis`.
 #' @param ylab A string, that is a label of y-axis. The default value is same
-#' as `axes2`.
+#' as `yaxis`.
 #' @param file A name of GIF file that is exported. The default value is
-#' generated using gene_ID, axes1 and axes2.
+#' generated using gene_ID, xaxis and yaxis.
 #' @param zlim Limits of expression levels that is displayed. You can specify
 #' it as `c(min, max)`. The default value is automatically calculated using
 #' the result of reconstruction.
@@ -107,25 +107,25 @@ tomo_seq <- R6Class(
 #' You can specify the ratio as `c(width, height)`. If you don't specify
 #' the value of this parameter, the ratio is calculated based on
 #' the number of sections along each axis.
-        animate2d = function (gene_ID, target, axes1, axes2, main, xlab, ylab,
+        animate2d = function (gene_ID, target, xaxis, yaxis, main, xlab, ylab,
                               file, zlim, interval, aspect_ratio=c()) {
             if (length(aspect_ratio) != 0 & length(aspect_ratio) != 2) {
                 stop("`aspect_ratio` should be a 2D vector.")
             }
             if (target == "expression") {
                 private$objects_each_gene[[gene_ID]]$animate2dExpression(
-                    axes1=axes1, axes2=axes2, main=main, xlab=xlab, ylab=ylab,
+                    xaxis=xaxis, yaxis=yaxis, main=main, xlab=xlab, ylab=ylab,
                     zlim=zlim, file=file, interval=interval,
                     aspect_ratio=aspect_ratio
                 )
             } else if (target == "mask") {
                 private$objects_each_gene[[gene_ID]]$animate2dMask(
-                    axes1=axes1, axes2=axes2, main=main, xlab=xlab, ylab=ylab,
+                    xaxis=xaxis, yaxis=yaxis, main=main, xlab=xlab, ylab=ylab,
                     file=file, interval=interval, aspect_ratio=aspect_ratio
                 )
             } else if (target == "unite") {
                 private$objects_each_gene[[gene_ID]]$animate2dUnite(
-                    axes1=axes1, axes2=axes2, main=main, xlab=xlab, ylab=ylab,
+                    xaxis=xaxis, yaxis=yaxis, main=main, xlab=xlab, ylab=ylab,
                     zlim=zlim, file=file, interval=interval,
                     aspect_ratio=aspect_ratio
                 )
@@ -375,7 +375,7 @@ tomo_seq <- R6Class(
                     )
                 },
 
-                animate2dExpression = function (axes1, axes2, main, xlab, ylab,
+                animate2dExpression = function (xaxis, yaxis, main, xlab, ylab,
                                                 file, zlim, interval,
                                                 aspect_ratio) {
                     if (is.na(zlim[1]) == TRUE) {
@@ -383,22 +383,22 @@ tomo_seq <- R6Class(
                     } else {
                         real_zlim <- zlim
                     }
-                    self$animate2d (self$reconst, axes1=axes1, axes2=axes2,
+                    self$animate2d (self$reconst, xaxis=xaxis, yaxis=yaxis,
                                 main=main, xlab=xlab, ylab=ylab, file=file,
                                 zlim=real_zlim, interval=interval,
                                 aspect_ratio=aspect_ratio)
                 },
 
-                animate2dMask = function(axes1, axes2, main, xlab, ylab, file,
+                animate2dMask = function(xaxis, yaxis, main, xlab, ylab, file,
                                          interval, aspect_ratio) {
-                    self$animate2d(self$mask, axes1=axes1, axes2=axes2,
+                    self$animate2d(self$mask, xaxis=xaxis, yaxis=yaxis,
                             main=main, xlab=xlab, ylab=ylab, file=file,
                             zlim=c(0, 1), interval=interval,
                             aspect_ratio=aspect_ratio
                     )
                 },
 
-                animate2dUnite = function(axes1, axes2, main, xlab, ylab,
+                animate2dUnite = function(xaxis, yaxis, main, xlab, ylab,
                                           file, zlim, interval,
                                           aspect_ratio) {
                     if (is.na(zlim[1]) == TRUE) {
@@ -406,7 +406,7 @@ tomo_seq <- R6Class(
                     } else {
                         real_zlim <- zlim
                     }
-                    self$animateMaskAndExpression(axes1=axes1, axes2=axes2,
+                    self$animateMaskAndExpression(xaxis=xaxis, yaxis=yaxis,
                             main=main, xlab=xlab, ylab=ylab, file=file,
                             zlim=real_zlim, interval=interval,
                             aspect_ratio=aspect_ratio
@@ -482,11 +482,11 @@ tomo_seq <- R6Class(
                     cat("\n")
                 },
 
-                animate2d = function (array3d, axes1, axes2, main, xlab, ylab,
+                animate2d = function (array3d, xaxis, yaxis, main, xlab, ylab,
                                       file, zlim, interval, aspect_ratio) {
                     array3d_apermed <- aperm(array3d,
-                                             perm=c(axes1, axes2,
-                                                    6 - (axes1 + axes2)
+                                             perm=c(xaxis, yaxis,
+                                                    6 - (xaxis + yaxis)
                                              )
                                        )
                     saveGIF(self$contourForAnimate(array_3d=array3d_apermed,
@@ -502,17 +502,17 @@ tomo_seq <- R6Class(
                     )
                 },
 
-                animateMaskAndExpression = function (axes1, axes2, main, xlab,
+                animateMaskAndExpression = function (xaxis, yaxis, main, xlab,
                                                      ylab, file, zlim, interval,
                                                      aspect_ratio) {
                     mask_apermed <- aperm(self$mask,
-                                          perm=c(axes1, axes2,
-                                                 6 - (axes1 + axes2)
+                                          perm=c(xaxis, yaxis,
+                                                 6 - (xaxis + yaxis)
                                           )
                                     )
                     reconst_apermed <- aperm(self$reconst,
-                                             perm=c(axes1, axes2,
-                                                    6 - (axes1 + axes2)
+                                             perm=c(xaxis, yaxis,
+                                                    6 - (xaxis + yaxis)
                                              )
                                        )
                     saveGIF(self$contourMaskAndExpression(

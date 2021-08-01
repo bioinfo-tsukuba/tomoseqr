@@ -143,8 +143,8 @@ Reconstruct a 3D expression pattern of a gene.
 \if{html}{\out{<div class="r">}}\preformatted{tomo_seq$animate2d(
   gene_ID,
   target,
-  axes1,
-  axes2,
+  xaxis,
+  yaxis,
   main,
   xlab,
   ylab,
@@ -163,11 +163,11 @@ Reconstruct a 3D expression pattern of a gene.
 \item{\code{target}}{A target of exportation. You can choose from "expression",
 "mask" or "unite". The default value is "expression".}
 
-\item{\code{axes1}}{One of the axes of reconstructed matrix,
+\item{\code{xaxis}}{One of the axes of reconstructed matrix,
 which is used the x-axis of the animation. You can choose from 1, 2 or 3.
 The default value is 1.}
 
-\item{\code{axes2}}{One of the axes of reconstructed matrix,
+\item{\code{yaxis}}{One of the axes of reconstructed matrix,
 which is used the y-axis of the animation. You can choose from 1, 2 or 3.
 The default value is 2.}
 
@@ -175,13 +175,13 @@ The default value is 2.}
 The default value is same as gene_ID.}
 
 \item{\code{xlab}}{A string, that is a label of x-axis. The default value is same
-as \code{axes1}.}
+as \code{xaxis}.}
 
 \item{\code{ylab}}{A string, that is a label of y-axis. The default value is same
-as \code{axes2}.}
+as \code{yaxis}.}
 
 \item{\code{file}}{A name of GIF file that is exported. The default value is
-generated using gene_ID, axes1 and axes2.}
+generated using gene_ID, xaxis and yaxis.}
 
 \item{\code{zlim}}{Limits of expression levels that is displayed. You can specify
 it as \code{c(min, max)}. The default value is automatically calculated using

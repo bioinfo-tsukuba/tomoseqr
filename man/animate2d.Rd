@@ -8,12 +8,12 @@ animate2d(
   tomo_obj,
   gene_ID,
   target = "expression",
-  axes1 = 1,
-  axes2 = 2,
+  xaxis = 1,
+  yaxis = 2,
   main = gene_ID,
-  xlab = axes1,
-  ylab = axes2,
-  file = paste(gene_ID, "_", target, "_", axes1, "_", axes2, ".gif", sep = ""),
+  xlab = xaxis,
+  ylab = yaxis,
+  file = paste(gene_ID, "_", target, "_", xaxis, "_", yaxis, ".gif", sep = ""),
   zlim = NA,
   interval = 0.1,
   aspect_ratio = c()
@@ -27,15 +27,15 @@ animate2d(
 \item{target}{"expression", "mask" or "unite" (combination of expression and
 mask). Default is \code{expression}.}
 
-\item{axes1}{Number to specify as x-axis (1, 2 or 3). Default is \code{1}.}
+\item{xaxis}{Number to specify as x-axis (1, 2 or 3). Default is \code{1}.}
 
-\item{axes2}{Number to specify as y-axis (1, 2 or 3). Default is \code{2}.}
+\item{yaxis}{Number to specify as y-axis (1, 2 or 3). Default is \code{2}.}
 
 \item{main}{A string used for the title of the plot. Default is \code{gene_ID}.}
 
-\item{xlab}{Label of x axis. Default is \code{axes1}.}
+\item{xlab}{Label of x axis. Default is \code{xaxis}.}
 
-\item{ylab}{Label of y axis. Default is \code{axes2}.}
+\item{ylab}{Label of y axis. Default is \code{yaxis}.}
 
 \item{file}{Path of GIF file.}
 

@@ -45,11 +45,11 @@ plotLossFunction <- function(tomo_obj, gene_ID) {
 #' @param gene_ID single gene ID (string)
 #' @param target "expression", "mask" or "unite" (combination of expression and
 #' mask). Default is `expression`.
-#' @param axes1 Number to specify as x-axis (1, 2 or 3). Default is `1`.
-#' @param axes2 Number to specify as y-axis (1, 2 or 3). Default is `2`.
+#' @param xaxis Number to specify as x-axis (1, 2 or 3). Default is `1`.
+#' @param yaxis Number to specify as y-axis (1, 2 or 3). Default is `2`.
 #' @param main A string used for the title of the plot. Default is `gene_ID`.
-#' @param xlab Label of x axis. Default is `axes1`.
-#' @param ylab Label of y axis. Default is `axes2`.
+#' @param xlab Label of x axis. Default is `xaxis`.
+#' @param ylab Label of y axis. Default is `yaxis`.
 #' @param file Path of GIF file.
 #' @param zlim Limit of value of heatmap. If target="mask", it is ignored.
 #' @param interval interval of GIF animation.
@@ -59,9 +59,9 @@ plotLossFunction <- function(tomo_obj, gene_ID) {
 #' along each axis.
 #' @export
 #' @note  You can do the same thing with `tomo_obj$animate2d(gene_ID, ...)`.
-animate2d <- function (tomo_obj, gene_ID, target="expression", axes1=1, axes2=2,
-                       main=gene_ID, xlab=axes1, ylab=axes2,
-                       file=paste(gene_ID, "_", target, "_", axes1, "_", axes2,
+animate2d <- function (tomo_obj, gene_ID, target="expression", xaxis=1, yaxis=2,
+                       main=gene_ID, xlab=xaxis, ylab=yaxis,
+                       file=paste(gene_ID, "_", target, "_", xaxis, "_", yaxis,
                                   ".gif", sep=""),
                        zlim=NA, interval=0.1, aspect_ratio=c()) {
     if (length(aspect_ratio) != 0 & length(aspect_ratio) != 2) {
@@ -70,7 +70,7 @@ animate2d <- function (tomo_obj, gene_ID, target="expression", axes1=1, axes2=2,
     if (target == "mask" & is.na(zlim[1]) == FALSE) {
         warning('If target = "mask", parameter "zlim" is ignored.')
         }
-    tomo_obj$animate2d(gene_ID=gene_ID, target=target, axes1=axes1, axes2=axes2,
+    tomo_obj$animate2d(gene_ID=gene_ID, target=target, xaxis=xaxis, yaxis=yaxis,
                        main=main, xlab=xlab, ylab=ylab, file=file, zlim=zlim,
                        interval=interval, aspect_ratio=aspect_ratio)
     return(invisible(tomo_obj))
