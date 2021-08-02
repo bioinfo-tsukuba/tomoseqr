@@ -2,18 +2,18 @@
 % Please edit documentation in R/run_function.R
 \name{plot1dAllExpression}
 \alias{plot1dAllExpression}
-\title{Plot expressions of all genes along axes}
+\title{Plot expressions of all genes along an axis}
 \usage{
 plot1dAllExpression(tomo_obj, axes)
 }
 \arguments{
 \item{tomo_obj}{tomo_seq object}
 
-\item{axes}{axes (1, 2 or 3)}
+\item{axes}{axis (1, 2 or 3)}
 }
 \description{
-Plot expressions of all genes along axes
+Plot expressions of all genes along an axis
 }
 \note{
-You can do the same things with
+You can do the same thing with
 }

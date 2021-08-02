@@ -4,471 +4,640 @@
 #' @importFrom dplyr %>%
 #' @importFrom animation saveGIF
 tomo_seq <- R6Class(
-  classname = "tomoSeq",
-  public = list(
+    classname = "tomoSeq",
+    public = list(
 
-#' @description Make tomoSeq object. This method is not available to users. Instead of it,
-#' [makeTomoObjSet()] is available.
-#' @param x A data.frame object containing a simulated Tomo-seq data for x-axis sections.
-#'          The rows represent genes. The first column contains gene IDs and the second and
-#'          subsequent columns contain gene expression levels in sections.
-#' @param y A data.frame object containing a simulated Tomo-seq data for y-axis sections.
-#'          The rows represent genes. The first column contains gene IDs and the second and
-#'          subsequent columns contain gene expression levels in sections.
-#' @param z A data.frame object containing a simulated Tomo-seq data for z-axis sections.
-#'          The rows represent genes. The first column contains gene IDs and the second and
-#'          subsequent columns contain gene expression levels in sections.
-#' @param mask_shape Shape of mask. You can choose the value from `"rectangle"`, `"round"` or `"halfround"`. The default is `"rectangle"`.
-    initialize = function (x, y, z, mask_shape="rectangle") {
-      # x, y, z: Tomo-seq data (about all genes) of each axes.
-      # mask_shape: The shape of mask （"rectangle", "round" or "halfround").
-      MASK_SHAPE <- list(private$makeRectangle, private$makeRound, private$makeHalfRound)
-      names(MASK_SHAPE) <- c("rectangle", "round", "halfround")
+#' @description Make tomoSeq object. This method is not available to users.
+#' Instead of it, [makeTomoObjSet()] is available.
+#' @param x A data.frame object containing a simulated Tomo-seq data for
+#' x-axis sections. The rows represent genes. The first column contains gene IDs
+#' and the second and subsequent columns contain gene expression levels
+#' in sections.
+#' @param y A data.frame object containing a simulated Tomo-seq data for y-axis
+#' sections. The rows represent genes. The first column contains gene IDs and
+#' the second and subsequent columns contain gene expression levels in sections.
+#' @param z A data.frame object containing a simulated Tomo-seq data for z-axis
+#' sections. The rows represent genes. The first column contains gene IDs and
+#' the second and subsequent columns contain gene expression levels in sections.
+#' @param mask_shape Shape of mask. You can choose the value from
+#' `"rectangle"`, `"round"` or `"halfround"`. The default is `"rectangle"`.
+        initialize = function (x, y, z, mask_shape="rectangle") {
+            ## x, y, z: Tomo-seq data (about all genes) of each axis.
+            ## mask_shape: The shape of mask 
+            ## ("rectangle", "round" or "halfround").
+            MASK_SHAPE <- list(private$makeRectangle,
+                               private$makeRound,
+                               private$makeHalfRound
+            )
+            names(MASK_SHAPE) <- c("rectangle", "round", "halfround")
 
-      private$x <- x
-      private$y <- y
-      private$z <- z
-      private$val_gene_list <- private$extractGeneList()
+            private$x <- x
+            private$y <- y
+            private$z <- z
+            private$val_gene_list <- private$extractGeneList()
 
-      # make each single_gene objects and compile as dictionary.
-      for (gene in private$val_gene_list) {
-        single_gene_object <- private$single_gene$new(x, y, z, gene)
-        private$objects_each_gene <- private$objects_each_gene %>% append(single_gene_object)
-      }
-      names(private$objects_each_gene) <- private$val_gene_list
+            ## make each single_gene objects and compile as dictionary.
+            for (gene in private$val_gene_list) {
+                single_gene_object <- private$single_gene$new(x, y, z, gene)
+                private$objects_each_gene <- private$objects_each_gene %>%
+                    append(single_gene_object)
+            }
+            names(private$objects_each_gene) <- private$val_gene_list
 
-      # Create mask.
-      # Each length must be 1 shorter because first column (gene ID) is excluded from reconstruction.
-      private$val_mask <- MASK_SHAPE[[mask_shape]](length(x) - 1, length(y) - 1, length(z) - 1)
-    },
+            ## Create mask.
+            ## Each length must be 1 shorter because first column (gene ID) is
+            ## excluded from reconstruction.
+            private$val_mask <- MASK_SHAPE[[mask_shape]](
+                                                         length(x) - 1,
+                                                         length(y) - 1,
+                                                         length(z) - 1
+                                )
+        },
 
-#' @description Reconstructs 3D expression patterns of genes which are specified. See also [estimate3dExpressions()].
+#' @description Reconstructs 3D expression patterns of genes which are
+#' specified. See also [estimate3dExpressions()].
 #' @param queries A vector consists of gene IDs.
-    estimate3dExpressions = function (queries=c()) {
-      for (gene_ID in queries) {
-        private$objects_each_gene[[gene_ID]]$estimate3dExpression(private$x, private$y, private$z, private$val_mask)
-      }
-    },
+        estimate3dExpressions = function (queries=c()) {
+            for (gene_ID in queries) {
+                private$objects_each_gene[[gene_ID]]$estimate3dExpression(
+                    private$x, private$y, private$z, private$val_mask
+                )
+            }
+        },
 
 #' @description Plot the transition of the value of the loss function.
 #' @param gene_ID A gene ID as string.
-    plotLossFunction = function(gene_ID) {
-      private$objects_each_gene[[gene_ID]]$plotLossFunction()
-    },
+        plotLossFunction = function (gene_ID) {
+            private$objects_each_gene[[gene_ID]]$plotLossFunction()
+        },
 
 #' @description Export a result of reconstruction as data.frame.
 #' @param gene_ID A gene ID as string.
-    toDataFrame = function(gene_ID) {
-      private$objects_each_gene[[gene_ID]]$toDataFrame()
-    },
+        toDataFrame = function (gene_ID) {
+            private$objects_each_gene[[gene_ID]]$toDataFrame()
+        },
 
 #' @description Export a result of reconstruction as 3D matrix.
 #' @param gene_ID A gene ID as string.
-    getReconstructedResult = function(gene_ID) {
-      private$objects_each_gene[[gene_ID]]$getReconstructedResult()
-    },
+        getReconstructedResult = function (gene_ID) {
+            private$objects_each_gene[[gene_ID]]$getReconstructedResult()
+        },
 
 #' @description Reconstruct a 3D expression pattern of a gene.
 #' @param gene_ID A gene ID as string.
 #' @param target A target of exportation. You can choose from "expression",
 #' "mask" or "unite". The default value is "expression".
-#' @param axes1 One of the axes of reconstructed matrix,
+#' @param xaxis One of the axes of reconstructed matrix,
 #' which is used the x-axis of the animation. You can choose from 1, 2 or 3.
 #' The default value is 1.
-#' @param axes2 One of the axes of reconstructed matrix,
+#' @param yaxis One of the axes of reconstructed matrix,
 #' which is used the y-axis of the animation. You can choose from 1, 2 or 3.
 #' The default value is 2.
-#' @param main The title of animation. It is NOT the file name. The default value
-#' is same as gene_ID.
+#' @param main The title of animation. It is NOT the file name.
+#' The default value is same as gene_ID.
 #' @param xlab A string, that is a label of x-axis. The default value is same
-#' as `axes1`.
+#' as `xaxis`.
 #' @param ylab A string, that is a label of y-axis. The default value is same
-#' as `axes2`.
+#' as `yaxis`.
 #' @param file A name of GIF file that is exported. The default value is
-#' generated using gene_ID, axes1 and axes2.
+#' generated using gene_ID, xaxis and yaxis.
 #' @param zlim Limits of expression levels that is displayed. You can specify
 #' it as `c(min, max)`. The default value is automatically calculated using
 #' the result of reconstruction.
 #' @param interval An interval of GIF animation. The default value is 0.1.
-#' @param aspect_ratio A 2D vector of aspect ratio of animation. You can specify the ratio as `c(width, height)`.
-#' If you don't specify the value of this parameter,
-#' the ratio is calculated based on the number of sections along each axes.
-    animate2d = function (gene_ID, target, axes1, axes2, main, xlab, ylab, file, zlim, interval, aspect_ratio=c()) {
-      if (length(aspect_ratio) != 0 & length(aspect_ratio) != 2) {
-        stop("`aspect_ratio` should be a 2D vector.")
-      }
-      if (target == "expression") {
-        private$objects_each_gene[[gene_ID]]$animate2dExpression(axes1=axes1, axes2=axes2, main=main, xlab=xlab, ylab=ylab,
-                                                                 zlim=zlim, file=file, interval=interval, aspect_ratio=aspect_ratio)
-      } else if (target == "mask") {
-        private$objects_each_gene[[gene_ID]]$animate2dMask(axes1=axes1, axes2=axes2, main=main, xlab=xlab, ylab=ylab,
-                                                           file=file, interval=interval, aspect_ratio=aspect_ratio)
-      } else if (target == "unite") {
-        private$objects_each_gene[[gene_ID]]$animate2dUnite(axes1=axes1, axes2=axes2, main=main, xlab=xlab, ylab=ylab,
-                                                                 zlim=zlim, file=file, interval=interval, aspect_ratio=aspect_ratio)
-      } else {
-        cat("ERROR: animate2d\n")
-        cat(paste("Invalid option: target =", target, "\n"))
-      }
-    },
+#' @param aspect_ratio A 2D vector of aspect ratio of animation.
+#' You can specify the ratio as `c(width, height)`. If you don't specify
+#' the value of this parameter, the ratio is calculated based on
+#' the number of sections along each axis.
+        animate2d = function (gene_ID,
+                              target,
+                              xaxis, yaxis,
+                              main,
+                              xlab, ylab,
+                              file,
+                              zlim,
+                              interval,
+                              aspect_ratio=c()
+                    ) {
+            if (length(aspect_ratio) != 0 & length(aspect_ratio) != 2) {
+                stop("`aspect_ratio` should be a 2D vector.")
+            }
+            if (target == "expression") {
+                private$objects_each_gene[[gene_ID]]$animate2dExpression(
+                    xaxis=xaxis, yaxis=yaxis,
+                    main=main,
+                    xlab=xlab, ylab=ylab,
+                    zlim=zlim,
+                    file=file,
+                    interval=interval,
+                    aspect_ratio=aspect_ratio
+                )
+            } else if (target == "mask") {
+                private$objects_each_gene[[gene_ID]]$animate2dMask(
+                    xaxis=xaxis, yaxis=yaxis,
+                    main=main,
+                    xlab=xlab, ylab=ylab,
+                    file=file,
+                    interval=interval,
+                    aspect_ratio=aspect_ratio
+                )
+            } else if (target == "unite") {
+                private$objects_each_gene[[gene_ID]]$animate2dUnite(
+                    xaxis=xaxis, yaxis=yaxis,
+                    main=main,
+                    xlab=xlab, ylab=ylab,
+                    zlim=zlim,
+                    file=file,
+                    interval=interval,
+                    aspect_ratio=aspect_ratio
+                )
+            } else {
+                cat("ERROR: animate2d\n")
+                cat(paste("Invalid option: target =", target, "\n"))
+            }
+        },
 
-#' @description Plot expression of single gene along axes
+#' @description Plot expression of single gene along axis
 #' @param gene_ID A gene ID as string
 #' @param axes An axis of which you want to plot expression (1, 2 or 3).
-    plot1dExpression = function (gene_ID, axes) {
-      private$objects_each_gene[[gene_ID]]$plot1dExpression(axes)
-    },
+        plot1dExpression = function (gene_ID, axes) {
+            private$objects_each_gene[[gene_ID]]$plot1dExpression(axes)
+        },
 
 #' @description Plot expressions of all genes along an axis
 #' @param axes An axis of which you want to plot expression (1, 2 or 3).
-    plot1dAllExpression = function (axes) {
-      if (axes==1) {
-        private$x[, -1] %>% colSums() %>% plot(type="l")
-      } else if (axes==2) {
-        private$y[, -1] %>% colSums() %>% plot(type="l")
-      } else if (axes==3) {
-        private$z[, -1] %>% colSums() %>% plot(type="l")
-      } else {
-        cat("axes must be 1, 2 or 3.\n")
-      }
-    }
-  ),
-  active = list(
+        plot1dAllExpression = function (axes) {
+            if (axes==1) {
+                private$x[, -1] %>% colSums() %>% plot(type="l")
+            } else if (axes==2) {
+                private$y[, -1] %>% colSums() %>% plot(type="l")
+            } else if (axes==3) {
+                private$z[, -1] %>% colSums() %>% plot(type="l")
+            } else {
+                cat("axes must be 1, 2 or 3.\n")
+            }
+        }
+    ),
+    active = list(
 
-    # getter ----------------------
+        ## getter ----------------------
 
 #' @field gene_list A list of gene ID. It's read-only.
-    gene_list = function (value) {
-      if (missing(value)) {
-        return(private$val_gene_list)
-      } else {
-        stop("gene_list is read-only.")
-      }
-    },
+        gene_list = function (value) {
+            if (missing(value)) {
+                return(private$val_gene_list)
+            } else {
+                stop("gene_list is read-only.")
+            }
+        },
 
-    # gene = function () {
-    #   return(private$objects_each_gene)
-    # },
-
-#' @field exp_mat_original Original expression matrices along each axes. It's read-only.
-    exp_mat_original = function (value) {
-      if (missing(value)) {
-      return(list(private$x, private$y, private$z))
-      } else {
-        stop("Original matrices are read-only.")
-      }
-    },
+#' @field exp_mat_original Original expression matrices along each axis.
+#' It's read-only.
+        exp_mat_original = function (value) {
+            if (missing(value)) {
+                return(list(private$x, private$y, private$z))
+            } else {
+                stop("Original matrices are read-only.")
+            }
+        },
 
 #' @field mask 3D matrix, whose elements are 0 (not included in sample)
 #' or 1 (included in sample). It's read-only.
-    mask = function (value) {
-      if (missing(value)) {
-      return(private$val_mask)
-      } else {
-        stop("mask is read-only.")
-      }
-    }
-
-    # getAlternativeGeneName = function() {
-    #   return(private$alternative_gene_name)
-    # },
-    # ---------------------------------
-  ),
-  private = list(
-    x = data.frame(),
-    y = data.frame(),
-    z = data.frame(),
-    val_mask = array(0, dim=c(1,1,1)),
-    val_gene_list = c(),
-    objects_each_gene = c(),
-    # alternative_gene_name = c(),
-    has_species_name = FALSE,
-    species = "",
-
-
-    extractGeneList = function () {
-      x_gene <- private$x[, 1] %>% t()
-      y_gene <- private$y[, 1] %>% t()
-      z_gene <- private$z[, 1] %>% t()
-      x_and_y <- intersect(x_gene, y_gene)
-      return(intersect(x_and_y, z_gene))
-    },
-
-    # Mask-create functions -------------------------------------------------------
-    makeRectangle = function (x_len, y_len, z_len) {
-      return(array(1, dim=c(x_len, y_len, z_len)))
-    },
-
-    makeRound = function (x_len, y_len, z_len) {
-      mask <- array(0, dim=c(x_len, y_len, z_len))
-      r <- mean(x_len, y_len, z_len) / 2
-      for (x in 1:x_len){
-        for (y in 1:y_len) {
-          for (z in 1:z_len) {
-            d <- (x - r)^2 + (y - r)^2 + (z - r)^2
-            if (d >= (r * 0.75)^2 && d <= (r * 0.9)^2) {
-              mask[x, y, z] <- 1
+        mask = function (value) {
+            if (missing(value)) {
+                return(private$val_mask)
+            } else {
+                stop("mask is read-only.")
             }
-          }
         }
-      }
-      return(mask)
-    },
+    ),
 
-    makeHalfRound = function (x_len, y_len, z_len) {
-      mask <- array(0, dim=c(x_len, y_len, z_len))
-      r <- mean(x_len, y_len, z_len) / 2
-      for (x in 1:x_len){
-        for (y in 1:y_len) {
-          for (z in 1:z_len) {
-            d <- (x - r)^2 + (y - r)^2 + (z - r)^2
-            if (d >= (r * 0.75)^2 && d <= (r * 0.9)^2 && x <= x_len / 2) {
-              mask[x, y, z] <- 1
+    private = list(
+        x = data.frame(),
+        y = data.frame(),
+        z = data.frame(),
+        val_mask = array(0, dim=c(1,1,1)),
+        val_gene_list = c(),
+        objects_each_gene = c(),
+        ## alternative_gene_name = c(),
+        has_species_name = FALSE,
+        species = "",
+
+
+        extractGeneList = function () {
+            x_gene <- private$x[, 1] %>% t()
+            y_gene <- private$y[, 1] %>% t()
+            z_gene <- private$z[, 1] %>% t()
+            x_and_y <- intersect(x_gene, y_gene)
+            return(intersect(x_and_y, z_gene))
+        },
+
+        ## Mask-create functions -----------------------------------------------
+        makeRectangle = function (x_len, y_len, z_len) {
+            return(array(1, dim=c(x_len, y_len, z_len)))
+        },
+
+        makeRound = function (x_len, y_len, z_len) {
+            mask <- array(0, dim=c(x_len, y_len, z_len))
+            r <- mean(x_len, y_len, z_len) / 2
+            for (x in 1:x_len) {
+                for (y in 1:y_len) {
+                    for (z in 1:z_len) {
+                        d <- (x - r)^2 + (y - r)^2 + (z - r)^2
+                        if (d >= (r * 0.75)^2 && d <= (r * 0.9)^2) {
+                            mask[x, y, z] <- 1
+                        }
+                    }
+                }
             }
-          }
-        }
-      }
-      return(mask)
-    },
-    # ---------------------------------------------------------------------
-
-    # This object has reconstruction result about a gene.
-    single_gene = R6Class(
-      classname = "singleGene",
-      public = list(
-        gene_ID = "gene ID",
-        X = matrix(0, nrow = 1, ncol = 1),
-        Y = matrix(0, nrow = 1, ncol = 1),
-        Z = matrix(0, nrow = 1, ncol = 1),
-        reconst = array(0, dim = c(1, 1, 1)),
-        mask = array(0, dim = c(1, 1, 1)),
-        loss = c(),
-        marginal_dist = array(0, dim=c(1,1,1)),
-        already_reconstructed = FALSE,
-
-
-        initialize = function (x, y, z, gene_ID) {
-          self$gene_ID <- gene_ID
+            return(mask)
         },
 
-        # This function is used in estimate3dExpression().
-        getGeneExpression = function (tomoseq_data, gene_ID) {
-          retval_matrix <- tomoseq_data[tomoseq_data[, 1] == gene_ID,]
-          retval_matrix <- retval_matrix[, -1] %>% as.matrix()
-          return(retval_matrix)
+        makeHalfRound = function (x_len, y_len, z_len) {
+            mask <- array(0, dim=c(x_len, y_len, z_len))
+            r <- mean(x_len, y_len, z_len) / 2
+            for (x in 1:x_len) {
+                for (y in 1:y_len) {
+                    for (z in 1:z_len) {
+                        d <- (x - r)^2 + (y - r)^2 + (z - r)^2
+                        if (d >= (r * 0.75)^2 &&
+                            d <= (r * 0.9)^2 &&
+                            x <= x_len / 2
+                            ) {
+                            mask[x, y, z] <- 1
+                        }
+                    }
+                }
+            }
+            return(mask)
         },
+        ## ---------------------------------------------------------------------
 
-        repMat = function (target_vector, n_times_repeat) {
-          len_x <- length(target_vector) * n_times_repeat[1]
-          len_y <- n_times_repeat[2]
-          len_z <- n_times_repeat[3]
-          rep_2d <- matrix(target_vector, nrow=len_x, ncol=len_y, byrow = F)
-          rep_3d <- array(NA, dim=c(len_x, len_y, len_z))
-          for (i in 1:len_z) {
-            rep_3d[, , i] <- rep_2d
-          }
-          return(rep_3d)
-        },
+        ## This object has reconstruction result about a gene.
+        single_gene = R6Class(
+            classname = "singleGene",
+            public = list(
+                gene_ID = "gene ID",
+                X = matrix(0, nrow = 1, ncol = 1),
+                Y = matrix(0, nrow = 1, ncol = 1),
+                Z = matrix(0, nrow = 1, ncol = 1),
+                reconst = array(0, dim = c(1, 1, 1)),
+                mask = array(0, dim = c(1, 1, 1)),
+                loss = c(),
+                marginal_dist = array(0, dim=c(1,1,1)),
+                already_reconstructed = FALSE,
 
-        # Reconstruct 3D expression pattern.
-        estimate3dExpression = function(X, Y, Z, mask, num_iter = 100) {
-          self$mask <- mask
-          sum_x <- X[, -1] %>% colSums()
-          sum_y <- Y[, -1] %>% colSums()
-          sum_z <- Z[, -1] %>% colSums()
+                initialize = function (x, y, z, gene_ID) {
+                    self$gene_ID <- gene_ID
+                },
 
-          x0 <- X %>% self$getGeneExpression(self$gene_ID)
-          y0 <- Y %>% self$getGeneExpression(self$gene_ID)
-          z0 <- Z %>% self$getGeneExpression(self$gene_ID)
-          x_len <- length(x0)
-          y_len <- length(y0)
-          z_len <- length(z0)
+                ## This function is used in estimate3dExpression().
+                getGeneExpression = function (tomoseq_data, gene_ID) {
+                    retval_matrix <- tomoseq_data[
+                        tomoseq_data[, 1] == gene_ID,
+                    ]
+                    retval_matrix <- retval_matrix[, -1] %>% as.matrix()
+                    return(retval_matrix)
+                },
 
-          mask_xproj <- self$mask %>% apply(1, sum)
-          mask_yproj <- self$mask %>% apply(2, sum)
-          mask_zproj <- self$mask %>% apply(3, sum)
+                repMat = function (target_vector, n_times_repeat) {
+                    len_x <- length(target_vector) * n_times_repeat[1]
+                    len_y <- n_times_repeat[2]
+                    len_z <- n_times_repeat[3]
+                    rep_2d <- matrix(target_vector, nrow=len_x,
+                                     ncol=len_y, byrow = F
+                              )
+                    rep_3d <- array(NA, dim=c(len_x, len_y, len_z))
+                    for (i in 1:len_z) {
+                        rep_3d[, , i] <- rep_2d
+                    }
+                    return(rep_3d)
+                },
 
-          x <- x0 / sum_x * mask_xproj
-          y <- y0 / sum_y * mask_yproj
-          z <- z0 / sum_z * mask_zproj
-          x[1, is.nan(x)] <- 0
-          y[1, is.nan(y)] <- 0
-          z[1, is.nan(z)] <- 0
-          x[is.infinite(x)] <- max(x[x < Inf])
-          y[is.infinite(y)] <- max(z[y < Inf])
-          z[is.infinite(z)] <- max(y[z < Inf])
+                ## Reconstruct 3D expression pattern.
+                estimate3dExpression = function (X, Y, Z, mask, num_iter = 100) {
+                    self$mask <- mask
+                    sum_x <- X[, -1] %>% colSums()
+                    sum_y <- Y[, -1] %>% colSums()
+                    sum_z <- Z[, -1] %>% colSums()
 
-          x_raw <- sum_x
-          y_raw <- sum_y
-          z_raw <- sum_z
+                    x0 <- X %>% self$getGeneExpression(self$gene_ID)
+                    y0 <- Y %>% self$getGeneExpression(self$gene_ID)
+                    z0 <- Z %>% self$getGeneExpression(self$gene_ID)
+                    x_len <- length(x0)
+                    y_len <- length(y0)
+                    z_len <- length(z0)
 
-          m <- mean(c(sum(x_raw), sum(y_raw), sum(z_raw)))
+                    mask_xproj <- self$mask %>% apply(1, sum)
+                    mask_yproj <- self$mask %>% apply(2, sum)
+                    mask_zproj <- self$mask %>% apply(3, sum)
 
-          x <- x / sum(x) * m
-          y <- y / sum(y) * m
-          z <- z / sum(z) * m
-          a <- self$mask
+                    x <- x0 / sum_x * mask_xproj
+                    y <- y0 / sum_y * mask_yproj
+                    z <- z0 / sum_z * mask_zproj
+                    x[1, is.nan(x)] <- 0
+                    y[1, is.nan(y)] <- 0
+                    z[1, is.nan(z)] <- 0
+                    x[is.infinite(x)] <- max(x[x < Inf])
+                    y[is.infinite(y)] <- max(z[y < Inf])
+                    z[is.infinite(z)] <- max(y[z < Inf])
 
-          er <- c()
+                    x_raw <- sum_x
+                    y_raw <- sum_y
+                    z_raw <- sum_z
 
-          for (i in 1:num_iter) {
-            xa <- a %>% apply(1, sum)
-            a <- a * self$repMat(x / xa, c(1, dim(self$mask)[2], dim(self$mask)[3]))
-            a[is.nan(a)] <- 0
-            ya <- a %>% apply(2, sum)
-            a <- a * aperm(self$repMat(y / ya, c(1, dim(self$mask)[1], dim(self$mask)[3])), perm = c(2, 1, 3))
-            a[is.nan(a)] <- 0
-            za <- a %>% apply(3, sum)
-            a <- a * aperm(self$repMat(z / za, c(1, dim(self$mask)[1], dim(self$mask)[2])), perm = c(2, 3, 1))
-            a[is.nan(a)] <- 0
-            er <- append(er, sum((xa - x)^2) + sum((ya - y)^2) + sum((za - z)^2))
-          }
-          self$reconst <- a
-          self$loss <- er
-          self$marginal_dist <- list(x[1, ], y[1, ], z[1, ])
-          self$already_reconstructed <- TRUE
-        },
+                    m <- mean(c(sum(x_raw), sum(y_raw), sum(z_raw)))
 
-        plotLossFunction = function () {
-          plot(self$loss, type="l", main=self$gene_ID, xlab="Iteration number", ylab="Loss")
-        },
+                    x <- x / sum(x) * m
+                    y <- y / sum(y) * m
+                    z <- z / sum(z) * m
+                    a <- self$mask
 
-        animate2dExpression = function(axes1, axes2, main, xlab, ylab, file, zlim, interval, aspect_ratio)
-        {
-          # if (self$already_reconstructed == TRUE) {
-          if (is.na(zlim[1]) == TRUE) {
-            real_zlim <- range(self$reconst)
-          } else {
-            real_zlim <- zlim
-          }
-            self$animate2d(self$reconst, axes1=axes1, axes2=axes2,
-                           main=main, xlab=xlab, ylab=ylab, file=file,
-                           zlim=real_zlim, interval=interval, aspect_ratio=aspect_ratio)
-          # } else {
-          #   cat("Before animate, please run estimateExpression().")
-          #   return(1)
-          # }
-        },
+                    er <- c()
 
-        animate2dMask = function(axes1, axes2, main, xlab, ylab, file, interval, aspect_ratio)
-        {
-          self$animate2d(self$mask, axes1=axes1, axes2=axes2,
-                         main=main, xlab=xlab, ylab=ylab, file=file,
-                         zlim=c(0, 1), interval=interval, aspect_ratio=aspect_ratio)
-        },
+                    for (i in 1:num_iter) {
+                        xa <- a %>% apply(1, sum)
+                        a <- a * self$repMat(x / xa, c(1,
+                                                       dim(self$mask)[2],
+                                                       dim(self$mask)[3]
+                                                     )
+                                 )
+                        a[is.nan(a)] <- 0
+                        ya <- a %>% apply(2, sum)
+                        a <- a * aperm(self$repMat(y / ya, c(1,
+                                                             dim(self$mask)[1],
+                                                             dim(self$mask)[3]
+                                                           )
+                                       ),
+                                       perm = c(2, 1, 3)
+                                 )
+                        a[is.nan(a)] <- 0
+                        za <- a %>% apply(3, sum)
+                        a <- a * aperm(self$repMat(z / za, c(1,
+                                                             dim(self$mask)[1],
+                                                             dim(self$mask)[2]
+                                                           )
+                                        ),
+                                        perm = c(2, 3, 1))
+                        a[is.nan(a)] <- 0
+                        er <- append(er, sum((xa - x)^2) +
+                                         sum((ya - y)^2) +
+                                         sum((za - z)^2)
+                              )
+                    }
+                    self$reconst <- a
+                    self$loss <- er
+                    self$marginal_dist <- list(x[1, ], y[1, ], z[1, ])
+                    self$already_reconstructed <- TRUE
+                },
 
-        animate2dUnite = function(axes1, axes2, main, xlab, ylab, file, zlim, interval, aspect_ratio)
-        {
-          if (is.na(zlim[1]) == TRUE) {
-            real_zlim <- range(self$reconst)
-          } else {
-            real_zlim <- zlim
-          }
-          self$animateMaskAndExpression(axes1=axes1, axes2=axes2,
-                         main=main, xlab=xlab, ylab=ylab, file=file,
-                         zlim=real_zlim, interval=interval, aspect_ratio=aspect_ratio)
-        },
+                plotLossFunction = function () {
+                    plot(self$loss, type="l", main=self$gene_ID,
+                         xlab="Iteration number", ylab="Loss"
+                    )
+                },
 
-        contourForAnimate = function (array_3d, main, xlab, ylab, zlim, aspect_ratio) {
-          if (length(aspect_ratio) < 2) {
-            array_dim <- dim(array_3d)
-            asp <- array_dim[2] / array_dim[1]
-          } else {
-            asp <- aspect_ratio[2] / aspect_ratio[1]
-          }
-          cat("generating")
-          for (i in seq_along(array_3d[1, 1, ])) {
-            cat("...")
-            filled.contour(array_3d[, , i], main=paste(main, "_", i, sep=""), xlab=xlab,
-                           ylab=ylab, zlim=zlim, asp=asp, frame.plot=F)
-          }
-          cat("\n")
-        },
+                animate2dExpression = function (xaxis, yaxis,
+                                                main,
+                                                xlab, ylab,
+                                                file,
+                                                zlim,
+                                                interval,
+                                                aspect_ratio
+                                      ) {
+                    if (is.na(zlim[1]) == TRUE) {
+                        real_zlim <- range(self$reconst)
+                    } else {
+                        real_zlim <- zlim
+                    }
+                    self$animate2d(self$reconst,
+                                   xaxis=xaxis, yaxis=yaxis,
+                                   main=main,
+                                   xlab=xlab, ylab=ylab,
+                                   file=file,
+                                   zlim=real_zlim,
+                                   interval=interval,
+                                   aspect_ratio=aspect_ratio
+                    )
+                },
 
-        contourMaskAndExpression = function (mask_apermed, reconst_apermed, main, xlab, ylab, zlim, aspect_ratio) {
-          if (length(aspect_ratio) < 2) {
-            # Dim of reconstructed matrix should be equal to that of mask.
-            plot_dim <- dim(mask_apermed)
-            asp <- plot_dim[2] / plot_dim[1]
-          } else {
-            asp <- aspect_ratio[2] / aspect_ratio[1]
-          }
-          label_list <- seq(zlim[1], floor(zlim[2]), length=6) %>% round()
-          position_list <- label_list / zlim[2]
-          cat("generating")
-            collist <- hcl.colors(floor(zlim[2])-1, palette="Oslo")
-            ColorRamp<-colorRampPalette(collist)(100)
-            ColorLevels<-seq(from=zlim[1], to=zlim[2], length=100)
-          for (i in seq_along(mask_apermed[1, 1, ])) {
-            cat("...")
-            par(mar=c(2,3,2,2), oma=c(0,0,0,0))
-            layout(matrix(seq(2),nrow=2,ncol=1),widths=c(1),heights=c(3,0.5))
-            image(reconst_apermed[, , i], zlim=zlim, xlab=xlab, ylab=ylab,
-                  breaks=seq(zlim[1], zlim[2], length=floor(zlim[2])),
-                  col=hcl.colors(floor(zlim[2])-1, palette="Oslo"), asp=asp, axes=F)
-            axis(1, seq(0, 1.0, by=0.2), seq(0, 1, by=0.2))
-            axis(2, seq(0, 1.0, by=0.2), seq(0, 1, by=0.2), pos=0)
-            mtext(xlab, side = 1, line = 2)
-            mtext(ylab, side = 2, line = 1)
-            par(new=T)
-            image(mask_apermed[,,i], col=c("#000000", "#FFFFFF00"),
-                  main=paste(main, "_", i, seq=""), xlab=xlab, ylab=ylab, asp=asp, axes=F)
-            image(as.matrix(ColorLevels),col=ColorRamp, xlab="",ylab="",cex.axis=1,xaxt="n",yaxt="n")
-            axis(1, position_list, label_list)
-          }
-          cat("\n")
-        },
+                animate2dMask = function (xaxis, yaxis,
+                                          main,
+                                          xlab, ylab,
+                                          file,
+                                          interval,
+                                          aspect_ratio
+                                ) {
+                    self$animate2d(self$mask,
+                                   xaxis=xaxis, yaxis=yaxis,
+                                   main=main,
+                                   xlab=xlab, ylab=ylab,
+                                   file=file,
+                                   zlim=c(0, 1),
+                                   interval=interval,
+                                   aspect_ratio=aspect_ratio
+                    )
+                },
 
-        animate2d = function (array3d, axes1, axes2, main, xlab, ylab, file, zlim, interval, aspect_ratio) {
-          array3d_apermed <- aperm(array3d, perm=c(axes1, axes2, 6 - (axes1 + axes2)))
-          saveGIF(self$contourForAnimate(array_3d=array3d_apermed, main=main, xlab=xlab, ylab=ylab, zlim=zlim, aspect_ratio=aspect_ratio),
-                  movie.name=file, interval=interval, autobrowse=FALSE)
-        },
+                animate2dUnite = function (xaxis, yaxis,
+                                           main,
+                                           xlab, ylab,
+                                           file,
+                                           zlim,
+                                           interval,
+                                           aspect_ratio
+                                 ) {
+                    if (is.na(zlim[1]) == TRUE) {
+                        real_zlim <- range(self$reconst)
+                    } else {
+                        real_zlim <- zlim
+                    }
+                    self$animateMaskAndExpression(xaxis=xaxis, yaxis=yaxis,
+                                                  main=main,
+                                                  xlab=xlab, ylab=ylab,
+                                                  file=file,
+                                                  zlim=real_zlim,
+                                                  interval=interval,
+                                                  aspect_ratio=aspect_ratio
+                    )
+                },
 
-        animateMaskAndExpression = function (axes1, axes2, main, xlab, ylab, file, zlim, interval, aspect_ratio) {
-          mask_apermed <- aperm(self$mask, perm=c(axes1, axes2, 6 - (axes1 + axes2)))
-          reconst_apermed <- aperm(self$reconst, perm=c(axes1, axes2, 6 - (axes1 + axes2)))
-          saveGIF(self$contourMaskAndExpression(mask_apermed = mask_apermed, reconst_apermed = reconst_apermed, main=main, xlab=xlab, ylab=ylab, zlim=zlim, aspect_ratio=aspect_ratio),
-                  movie.name=file, interval=interval, autobrowse=FALSE)
-        },
+                contourForAnimate = function (array_3d,
+                                              main,
+                                              xlab, ylab,
+                                              zlim,
+                                              aspect_ratio
+                                    ) {
+                    if (length(aspect_ratio) < 2) {
+                        array_dim <- dim(array_3d)
+                        asp <- array_dim[2] / array_dim[1]
+                    } else {
+                        asp <- aspect_ratio[2] / aspect_ratio[1]
+                    }
+                    cat("generating")
+                    for (i in seq_along(array_3d[1, 1, ])) {
+                        cat("...")
+                        filled.contour(array_3d[, , i],
+                                       main=paste(main, "_", i, sep=""),
+                                       xlab=xlab,
+                                       ylab=ylab, zlim=zlim, asp=asp,
+                                       frame.plot=F
+                        )
+                    }
+                    cat("\n")
+                },
 
-        plot1dExpression = function (axes) {
-          oldpar <- par(no.readonly=T)
-          marginal <- self$marginal_dist[[axes]]
-          plot(marginal, type="l", lty=3, axes=F, ann=F)
-          par(new=T)
-          plot(apply(self$reconst, axes, sum), type="l", lty=2, ylim=range(marginal), col="red")
-          par(oldpar)
-        },
+                contourMaskAndExpression = function (mask_apermed,
+                                                     reconst_apermed,
+                                                     main,
+                                                     xlab, ylab,
+                                                     zlim,
+                                                     aspect_ratio
+                                           ) {
+                    if (length(aspect_ratio) < 2) {
+                        ## Dim of reconstructed matrix should be equal to
+                        ## that of mask.
+                        plot_dim <- dim(mask_apermed)
+                        asp <- plot_dim[2] / plot_dim[1]
+                    } else {
+                        asp <- aspect_ratio[2] / aspect_ratio[1]
+                    }
+                    label_list <- seq(zlim[1], floor(zlim[2]), length=6) %>%
+                                      round()
+                    position_list <- label_list / zlim[2]
+                    cat("generating")
+                    collist <- hcl.colors(floor(zlim[2])-1, palette="Oslo")
+                    ColorRamp<-colorRampPalette(collist)(100)
+                    ColorLevels<-seq(from=zlim[1], to=zlim[2], length=100)
+                    for (i in seq_along(mask_apermed[1, 1, ])) {
+                        cat("...")
+                        par(mar=c(2,3,2,2), oma=c(0,0,0,0))
+                        layout(matrix(seq(2), nrow=2, ncol=1), widths=c(1),
+                               heights=c(3, 0.5)
+                        )
+                        image(reconst_apermed[, , i], zlim=zlim, xlab=xlab,
+                              ylab=ylab, breaks=seq(zlim[1], zlim[2],
+                              length=floor(zlim[2])),
+                              col=hcl.colors(floor(zlim[2])-1, palette="Oslo"),
+                              asp=asp, axes=F
+                        )
+                        axis(1, seq(0, 1.0, by=0.2), seq(0, 1, by=0.2))
+                        axis(2, seq(0, 1.0, by=0.2), seq(0, 1, by=0.2), pos=0)
+                        mtext(xlab, side = 1, line = 2)
+                        mtext(ylab, side = 2, line = 1)
+                        par(new=T)
+                        image(mask_apermed[,,i], col=c("#000000", "#FFFFFF00"),
+                              main=paste(main, "_", i, seq=""), xlab=xlab,
+                              ylab=ylab, asp=asp, axes=F
+                        )
+                        image(as.matrix(ColorLevels),col=ColorRamp, xlab="",
+                              ylab="", cex.axis=1, xaxt="n", yaxt="n"
+                        )
+                        axis(1, position_list, label_list)
+                    }
+                    cat("\n")
+                },
 
-        toDataFrame = function () {
-          if (self$already_reconstructed == TRUE) {
-            vec_reconst <- as.vector(self$reconst)
-            dim <- dim(self$reconst)
-            xlen <- dim[1]
-            ylen <- dim[2]
-            zlen <- dim[3]
-            x_index <- rep(1:xlen, ylen * zlen)
-            y_index <- 1:ylen %>%
-                       sapply(function(p){rep(p, xlen)}) %>%
-                       rep(zlen)
-            z_index <- 1:zlen %>%
-              sapply(function(p){rep(p, xlen * ylen)}) %>%
-              as.vector()
-            data.frame(x=x_index, y=y_index, z=z_index, value=vec_reconst) %>% return()
-          } else {
-             cat("have not reconstructed yet.")
-          }
-        },
+                animate2d = function (array3d,
+                                      xaxis, yaxis,
+                                      main,
+                                      xlab, ylab,
+                                      file,
+                                      zlim,
+                                      interval,
+                                      aspect_ratio
+                            ) {
+                    array3d_apermed <- aperm(array3d,
+                                             perm=c(xaxis, yaxis,
+                                                    6 - (xaxis + yaxis)
+                                             )
+                                       )
+                    saveGIF(self$contourForAnimate(array_3d=array3d_apermed,
+                                                   main=main,
+                                                   xlab=xlab,
+                                                   ylab=ylab,
+                                                   zlim=zlim,
+                                                   aspect_ratio=aspect_ratio
+                            ),
+                            movie.name=file,
+                            interval=interval,
+                            autobrowse=FALSE
+                    )
+                },
 
-        getReconstructedResult = function () {
-          if (self$already_reconstructed == TRUE) {
-            return(self$reconst)
-          } else {
-             cat("have not reconstructed yet.")
-          }
-        }
-      )
+                animateMaskAndExpression = function (xaxis, yaxis,
+                                                     main,
+                                                     xlab, ylab,
+                                                     file,
+                                                     zlim,
+                                                     interval,
+                                                     aspect_ratio
+                                           ) {
+                    mask_apermed <- aperm(self$mask,
+                                          perm=c(xaxis, yaxis,
+                                                 6 - (xaxis + yaxis)
+                                          )
+                                    )
+                    reconst_apermed <- aperm(self$reconst,
+                                             perm=c(xaxis, yaxis,
+                                                    6 - (xaxis + yaxis)
+                                             )
+                                       )
+                    saveGIF(self$contourMaskAndExpression(
+                                mask_apermed = mask_apermed,
+                                reconst_apermed = reconst_apermed,
+                                main=main,
+                                xlab=xlab, ylab=ylab,
+                                zlim=zlim,
+                                aspect_ratio=aspect_ratio
+                            ),
+                            movie.name=file,
+                            interval=interval,
+                            autobrowse=FALSE
+                    )
+                },
+
+                plot1dExpression = function (axes) {
+                    oldpar <- par(no.readonly=T)
+                    marginal <- self$marginal_dist[[axes]]
+                    plot(marginal, type="l", lty=3, axes=F, ann=F)
+                    par(new=T)
+                    plot(apply(self$reconst, axes, sum), type="l", lty=2,
+                         ylim=range(marginal), col="red"
+                    )
+                    par(oldpar)
+                },
+
+                toDataFrame = function () {
+                    if (self$already_reconstructed == TRUE) {
+                        vec_reconst <- as.vector(self$reconst)
+                        dim <- dim(self$reconst)
+                        xlen <- dim[1]
+                        ylen <- dim[2]
+                        zlen <- dim[3]
+                        x_index <- rep(1:xlen, ylen * zlen)
+                        y_index <- 1:ylen %>%
+                                sapply(function (p) {rep(p, xlen)}) %>%
+                                rep(zlen)
+                        z_index <- 1:zlen %>%
+                            sapply(function (p) {rep(p, xlen * ylen)}) %>%
+                            as.vector()
+                        data.frame(x=x_index, y=y_index, z=z_index,
+                                   value=vec_reconst
+                        ) %>% return()
+                    } else {
+                    cat("have not reconstructed yet.")
+                    }
+                },
+
+                getReconstructedResult = function () {
+                    if (self$already_reconstructed == TRUE) {
+                        return(self$reconst)
+                    } else {
+                        cat("have not reconstructed yet.")
+                    }
+                }
+            )
+        )
     )
-  )
 )

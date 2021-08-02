@@ -2,20 +2,20 @@
 % Please edit documentation in R/run_function.R
 \name{estimate3dExpressions}
 \alias{estimate3dExpressions}
-\title{Estimate 3d expression}
+\title{Estimate 3d expressions}
 \usage{
 estimate3dExpressions(tomo_obj, query)
 }
 \arguments{
 \item{tomo_obj}{tomo_seq object}
 
-\item{query}{Vector of gene ID}
+\item{query}{Vector of gene IDs}
 }
 \value{
 tomo_seq object
 }
 \description{
-Estimate 3d expression
+Estimate 3d expressions
 }
 \note{
 You can do the same things with
