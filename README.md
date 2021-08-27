@@ -1,6 +1,8 @@
 # tomoseqr
 
-`tomoseqr` is an R package for analyzing Tomo-seq (a method to obtain genome-wide expression data with spatial resolution) data.
+`tomoseqr` is an R package for analyzing Tomo-seq (a method to obtain
+genome-wide expression data with spatial resolution) data. The algorithm
+of image reconstruction is based on [Junker et al, 2014.](#reference)
 
 ## Usage
 
@@ -54,6 +56,12 @@ animate2d(tomo_obj2, "gene1", target="unite")
 ```
 
 ![example](./inst/gene1_unite_1_2.gif)
+
+## Reference
+
+Junker et al. Genome-wide RNA Tomography in the Zebrafish Embryo.
+*Cell*, 2014.  
+<https://doi.org/10.1016/j.cell.2014.09.038>
 
 ## Contact
 
