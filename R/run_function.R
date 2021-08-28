@@ -10,76 +10,76 @@
 #' z-axis sections. The rows represent genes. The first column
 #' contains gene IDs and the second and subsequent columns contain
 #' gene expression levels in sections.
-#' @param mask_shape shape of mask.
+#' @param maskShape shape of mask.
 #' @export
-makeTomoObjSet <- function (x, y, z, mask_shape="rectangle") {
-    return(tomo_seq$new(x=x, y=y,z=z, mask_shape=mask_shape))
+MakeTomoObjSet <- function (x, y, z, maskShape="rectangle") {
+    return(tomoSeq$new(x=x, y=y,z=z, maskShape=maskShape))
     }
 
 #' Estimate 3d expressions
-#' @param tomo_obj tomo_seq object
+#' @param tomoObj tomoSeq object
 #' @param query Vector of gene IDs
-#' @return tomo_seq object
+#' @return tomoSeq object
 #' @export
 #' @note  You can do the same things with
-#' `tomo_obj$estimate3dExpressions(query)`.
-estimate3dExpressions <- function (tomo_obj, query) {
-    tomo_obj$estimate3dExpressions(queries=query)
-    return(invisible(tomo_obj))
+#' `tomoObj$Estimate3dExpressions(query)`.
+Estimate3dExpressions <- function (tomoObj, query) {
+    tomoObj$Estimate3dExpressions(queries=query)
+    return(invisible(tomoObj))
     }
 
 
 #' Plot the trend of the value of the loss function.
-#' @param tomo_obj tomo_seq object
-#' @param gene_ID single gene ID (string)
+#' @param tomoObj tomoSeq object
+#' @param geneID single gene ID (string)
 #' @export
 #' @note  You can do the same things with
-#' `tomo_obj$plotLossFunction(gene_ID)`.
-plotLossFunction <- function (tomo_obj, gene_ID) {
-    tomo_obj$plotLossFunction(gene_ID=gene_ID)
-    return(invisible(tomo_obj))
+#' `tomoObj$PlotLossFunction(geneID)`.
+PlotLossFunction <- function (tomoObj, geneID) {
+    tomoObj$PlotLossFunction(geneID=geneID)
+    return(invisible(tomoObj))
     }
 
 #' Animate 2D expressions along one axis and generate GIF file.
-#' @param tomo_obj tomo_seq object
-#' @param gene_ID single gene ID (string)
+#' @param tomoObj tomoSeq object
+#' @param geneID single gene ID (string)
 #' @param target "expression", "mask" or "unite" (combination of expression and
 #' mask). Default is `expression`.
 #' @param xaxis Number to specify as x-axis (1, 2 or 3). Default is `1`.
 #' @param yaxis Number to specify as y-axis (1, 2 or 3). Default is `2`.
-#' @param main A string used for the title of the plot. Default is `gene_ID`.
+#' @param main A string used for the title of the plot. Default is `geneID`.
 #' @param xlab Label of x axis. Default is `xaxis`.
 #' @param ylab Label of y axis. Default is `yaxis`.
 #' @param file Path of GIF file.
 #' @param zlim Limit of value of heatmap. If target="mask", it is ignored.
 #' @param interval interval of GIF animation.
-#' @param aspect_ratio A 2D vector that represents the ratio of figure. You can
+#' @param aspectRatio A 2D vector that represents the ratio of figure. You can
 #' specify the ratio as `c(width, height)`. If you don't specify the value of
 #' this parameter, the ratio is calculated based on the number of sections
 #' along each axis.
 #' @export
-#' @note  You can do the same thing with `tomo_obj$animate2d(gene_ID, ...)`.
-animate2d <- function (tomo_obj,
-                       gene_ID,
+#' @note  You can do the same thing with `tomoObj$Animate2d(geneID, ...)`.
+Animate2d <- function (tomoObj,
+                       geneID,
                        target="expression",
                        xaxis=1, yaxis=2,
-                       main=gene_ID,
+                       main=geneID,
                        xlab=xaxis, ylab=yaxis,
-                       file=paste(gene_ID, "_", target, "_",
+                       file=paste(geneID, "_", target, "_",
                                   xaxis, "_", yaxis, ".gif",
                                   sep=""
                        ),
                        zlim=NA,
                        interval=0.1,
-                       aspect_ratio=c()
+                       aspectRatio=c()
              ) {
-    if (length(aspect_ratio) != 0 & length(aspect_ratio) != 2) {
-        stop("`aspect_ratio` should be a 2D vector.")
+    if (length(aspectRatio) != 0 & length(aspectRatio) != 2) {
+        stop("`aspectRatio` should be a 2D vector.")
         }
     if (target == "mask" & is.na(zlim[1]) == FALSE) {
         warning('If target = "mask", parameter "zlim" is ignored.')
         }
-    tomo_obj$animate2d(gene_ID=gene_ID,
+    tomoObj$Animate2d(geneID=geneID,
                        target=target,
                        xaxis=xaxis, yaxis=yaxis,
                        main=main,
@@ -87,49 +87,49 @@ animate2d <- function (tomo_obj,
                        file=file,
                        zlim=zlim,
                        interval=interval,
-                       aspect_ratio=aspect_ratio
+                       aspectRatio=aspectRatio
     )
-    return(invisible(tomo_obj))
+    return(invisible(tomoObj))
     }
 
 #' Plot expression of single gene along an axis
-#' @param tomo_obj tomo_seq object
-#' @param gene_ID single gene ID (string)
+#' @param tomoObj tomoSeq object
+#' @param geneID single gene ID (string)
 #' @param axes axis (1, 2 or 3)
 #' @export
 #' @note  You can do the same thing with
-#' `tomo_obj$plot1dExpression(gene_ID, axes)`.
-plot1dExpression <- function (tomo_obj, gene_ID, axes) {
-    tomo_obj$plot1dExpression(gene_ID, axes)
-    return(invisible(tomo_obj))
+#' `tomoObj$Plot1dExpression(geneID, axes)`.
+Plot1dExpression <- function (tomoObj, geneID, axes) {
+    tomoObj$Plot1dExpression(geneID, axes)
+    return(invisible(tomoObj))
     }
 
 #' Plot expressions of all genes along an axis
-#' @param tomo_obj tomo_seq object
+#' @param tomoObj tomoSeq object
 #' @param axes axis (1, 2 or 3)
 #' @export
 #' @note  You can do the same thing with
-plot1dAllExpression <- function (tomo_obj, axes) {
-    tomo_obj$plot1dAllExpression(axes)
-    return(invisible(tomo_obj))
+Plot1dAllExpression <- function (tomoObj, axes) {
+    tomoObj$Plot1dAllExpression(axes)
+    return(invisible(tomoObj))
     }
 
 #' Convert reconstructed matrix to data.frame.
-#' @param tomo_obj tomo_seq object
-#' @param gene_ID single gene ID
+#' @param tomoObj tomoSeq object
+#' @param geneID single gene ID
 #' @export
 #' @note  You can do the same thing with
-#' `tomo_obj$toDataFrame(gene_ID)`.
-toDataFrame <- function (tomo_obj, gene_ID) {
-    tomo_obj$toDataFrame(gene_ID)
+#' `tomoObj$ToDataFrame(geneID)`.
+ToDataFrame <- function (tomoObj, geneID) {
+    tomoObj$ToDataFrame(geneID)
     }
 
 #' Get reconstructed matrix
-#' @param tomo_obj tomo_seq object
-#' @param gene_ID single gene ID
+#' @param tomoObj tomoSeq object
+#' @param geneID single gene ID
 #' @export
 #' @note  You can do the same thing with
-#' `tomo_obj$getReconstructedResult(gene_ID)`.
-getReconstructedResult <- function (tomo_obj, gene_ID) {
-    tomo_obj$getReconstructedResult(gene_ID)
+#' `tomoObj$GetReconstructedResult(geneID)`.
+GetReconstructedResult <- function (tomoObj, geneID) {
+    tomoObj$GetReconstructedResult(geneID)
     }
