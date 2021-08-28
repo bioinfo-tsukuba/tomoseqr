@@ -152,8 +152,7 @@ tomo_seq <- R6Class(
                     aspect_ratio=aspect_ratio
                 )
             } else {
-                cat("ERROR: animate2d\n")
-                cat(paste("Invalid option: target =", target, "\n"))
+                stop(paste("Invalid option: target =", target, "\n"))
             }
         },
 
@@ -505,12 +504,12 @@ tomo_seq <- R6Class(
                     label_list <- seq(zlim[1], floor(zlim[2]), length=6) %>%
                                       round()
                     position_list <- label_list / zlim[2]
-                    cat("generating")
+                    message("generating", appendLF=FALSE)
                     collist <- hcl.colors(floor(zlim[2])-1, palette="Oslo")
                     ColorRamp<-colorRampPalette(collist)(100)
                     ColorLevels<-seq(from=zlim[1], to=zlim[2], length=100)
                     for (i in seq_along(mask_apermed[1, 1, ])) {
-                        cat("...")
+                        message(".", appendLF=FALSE)
                         par(mar=c(2,3,2,2), oma=c(0,0,0,0))
                         layout(matrix(seq(2), nrow=2, ncol=1), widths=c(1),
                                heights=c(3, 0.5)
@@ -535,7 +534,7 @@ tomo_seq <- R6Class(
                         )
                         axis(1, position_list, label_list)
                     }
-                    cat("\n")
+                    message("")
                 },
 
                 animate2d = function (array3d,
@@ -626,7 +625,7 @@ tomo_seq <- R6Class(
                                    value=vec_reconst
                         ) %>% return()
                     } else {
-                    cat("have not reconstructed yet.")
+                    stop("No result of reconstruction.")
                     }
                 },
 
@@ -634,7 +633,7 @@ tomo_seq <- R6Class(
                     if (self$already_reconstructed == TRUE) {
                         return(self$reconst)
                     } else {
-                        cat("have not reconstructed yet.")
+                    stop("No result of reconstruction.")
                     }
                 }
             )
