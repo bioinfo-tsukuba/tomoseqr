@@ -173,7 +173,7 @@ tomoSeq <- R6Class(
             } else if (axes==3) {
                 private$z[, -1] %>% colSums() %>% plot(type="l")
             } else {
-                cat("axes must be 1, 2 or 3.\n")
+                stop("axes must be 1, 2 or 3.\n")
             }
         }
     ),
@@ -386,7 +386,17 @@ tomoSeq <- R6Class(
                     self$alreadyReconstructed <- TRUE
                 },
 
+                CheckReconstructed = function () {
+                    if (self$alreadyReconstructed == FALSE) {
+                        stop(paste("No result of reconstruction.",
+                                   "You need to run Estimate3dExpressions()"
+                             )
+                        )
+                    }
+                },
+
                 PlotLossFunction = function () {
+                    self$CheckReconstructed()
                     plot(self$loss, type="l", main=self$geneID,
                          xlab="Iteration number", ylab="Loss"
                     )
@@ -400,6 +410,7 @@ tomoSeq <- R6Class(
                                                 interval,
                                                 aspectRatio
                                       ) {
+                    self$CheckReconstructed()
                     if (is.na(zlim[1]) == TRUE) {
                         realZlim <- range(self$reconst)
                     } else {
@@ -423,6 +434,7 @@ tomoSeq <- R6Class(
                                           interval,
                                           aspectRatio
                                 ) {
+                    self$CheckReconstructed()
                     self$Animate2d(self$mask,
                                    xaxis=xaxis, yaxis=yaxis,
                                    main=main,
@@ -442,6 +454,7 @@ tomoSeq <- R6Class(
                                            interval,
                                            aspectRatio
                                  ) {
+                    self$CheckReconstructed()
                     if (is.na(zlim[1]) == TRUE) {
                         realZlim <- range(self$reconst)
                     } else {
@@ -469,9 +482,9 @@ tomoSeq <- R6Class(
                     } else {
                         asp <- aspectRatio[2] / aspectRatio[1]
                     }
-                    cat("generating")
+                    message("generating", appendLF=FALSE)
                     for (i in seq_along(array3d[1, 1, ])) {
-                        cat("...")
+                        message(".", appendLF=FALSE)
                         filled.contour(array3d[, , i],
                                        main=paste(main, "_", i, sep=""),
                                        xlab=xlab,
@@ -479,7 +492,7 @@ tomoSeq <- R6Class(
                                        frame.plot=F
                         )
                     }
-                    cat("\n")
+                    message("")
                 },
 
                 ContourMaskAndExpression = function (maskApermed,
@@ -593,6 +606,7 @@ tomoSeq <- R6Class(
                 },
 
                 Plot1dExpression = function (axes) {
+                    self$CheckReconstructed()
                     oldpar <- par(no.readonly=T)
                     marginal <- self$marginalDist[[axes]]
                     plot(marginal, type="l", lty=3, axes=F, ann=F)
@@ -604,6 +618,7 @@ tomoSeq <- R6Class(
                 },
 
                 ToDataFrame = function () {
+                    self$CheckReconstructed()
                     if (self$alreadyReconstructed == TRUE) {
                         vecReconst <- as.vector(self$reconst)
                         dim <- dim(self$reconst)
@@ -626,6 +641,7 @@ tomoSeq <- R6Class(
                 },
 
                 GetReconstructedResult = function () {
+                    self$CheckReconstructed()
                     if (self$alreadyReconstructed == TRUE) {
                         return(self$reconst)
                     } else {
