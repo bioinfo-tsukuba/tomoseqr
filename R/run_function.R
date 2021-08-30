@@ -28,8 +28,10 @@ CheckParameters <- function(tomoObj, query) {
              )
         )
     }
-    if (is.element(query, tomoObj$geneList) == FALSE) {
-        stop(paste('gene "', query, '" is not in data.', sep=''))
+    if (is.element(query, tomoObj$geneList) %>% min() == 0) {
+        queryNotIn <- query[is.element(query, tomoObj$geneList) == FALSE]
+        queryNotInStr <- paste(queryNotIn, collapse=", ")
+        stop(paste(queryNotInStr, ' is not in data.', sep=''))
     }
 }
 #' Estimate 3d expressions
