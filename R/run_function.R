@@ -18,7 +18,7 @@ MakeTomoObjSet <- function (x, y, z, maskShape="rectangle") {
         stop('maskShape should be "rectangle", "round" or "halfround".')
     }
         return(tomoSeq$new(x=x, y=y,z=z, maskShape=maskShape))
-    }
+}
 
 #' @importFrom methods is
 CheckParameters <- function(tomoObj, query) {
@@ -45,7 +45,7 @@ Estimate3dExpressions <- function (tomoObj, query) {
     CheckParameters(tomoObj, query)
     tomoObj$Estimate3dExpressions(queries=query)
     return(invisible(tomoObj))
-    }
+}
 
 
 #' Plot the trend of the value of the loss function.
@@ -58,7 +58,7 @@ PlotLossFunction <- function (tomoObj, geneID) {
     CheckParameters(tomoObj, geneID)
     tomoObj$PlotLossFunction(geneID=geneID)
     return(invisible(tomoObj))
-    }
+}
 
 #' Animate 2D expressions along one axis and generate GIF file.
 #' @param tomoObj tomoSeq object
@@ -111,7 +111,7 @@ Animate2d <- function (tomoObj,
                        aspectRatio=aspectRatio
     )
     return(invisible(tomoObj))
-    }
+}
 
 #' Plot expression of single gene along an axis
 #' @param tomoObj tomoSeq object
@@ -124,7 +124,7 @@ Plot1dExpression <- function (tomoObj, geneID, axes) {
     CheckParameters(tomoObj, geneID)
     tomoObj$Plot1dExpression(geneID, axes)
     return(invisible(tomoObj))
-    }
+}
 
 #' Plot expressions of all genes along an axis
 #' @param tomoObj tomoSeq object
@@ -134,7 +134,7 @@ Plot1dExpression <- function (tomoObj, geneID, axes) {
 Plot1dAllExpression <- function (tomoObj, axes) {
     tomoObj$Plot1dAllExpression(axes)
     return(invisible(tomoObj))
-    }
+}
 
 #' Convert reconstructed matrix to data.frame.
 #' @param tomoObj tomoSeq object
@@ -145,7 +145,7 @@ Plot1dAllExpression <- function (tomoObj, axes) {
 ToDataFrame <- function (tomoObj, geneID) {
     CheckParameters(tomoObj, geneID)
     tomoObj$ToDataFrame(geneID)
-    }
+}
 
 #' Get reconstructed matrix
 #' @param tomoObj tomoSeq object
@@ -156,4 +156,4 @@ ToDataFrame <- function (tomoObj, geneID) {
 GetReconstructedResult <- function (tomoObj, geneID) {
     CheckParameters(tomoObj, geneID)
     tomoObj$GetReconstructedResult(geneID)
-    }
+}
