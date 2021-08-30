@@ -10,12 +10,30 @@
 #' z-axis sections. The rows represent genes. The first column
 #' contains gene IDs and the second and subsequent columns contain
 #' gene expression levels in sections.
-#' @param maskShape shape of mask.
+#' @param maskShape shape of mask. You can choose from "rectangle", "round" or
+#' "halfround". The default is "rectangle"
 #' @export
 MakeTomoObjSet <- function (x, y, z, maskShape="rectangle") {
-    return(tomoSeq$new(x=x, y=y,z=z, maskShape=maskShape))
+    if (is.element(maskShape, c("rectangle", "round", "halfround")) == FALSE) {
+        stop('maskShape should be "rectangle", "round" or "halfround".')
+    }
+        return(tomoSeq$new(x=x, y=y,z=z, maskShape=maskShape))
     }
 
+#' @importFrom methods is
+CheckParameters <- function(tomoObj, query) {
+    if (is(tomoObj, "tomoSeq") == FALSE) {
+        stop(paste("invalid class:", class(tomoObj),
+                   "\nFirst argument must be tomoSeq class object."
+             )
+        )
+    }
+    if (is.element(query, tomoObj$geneList) %>% min() == 0) {
+        queryNotIn <- query[is.element(query, tomoObj$geneList) == FALSE]
+        queryNotInStr <- paste(queryNotIn, collapse=", ")
+        stop(paste(queryNotInStr, ' is not in data.', sep=''))
+    }
+}
 #' Estimate 3d expressions
 #' @param tomoObj tomoSeq object
 #' @param query Vector of gene IDs
@@ -24,6 +42,7 @@ MakeTomoObjSet <- function (x, y, z, maskShape="rectangle") {
 #' @note  You can do the same things with
 #' `tomoObj$Estimate3dExpressions(query)`.
 Estimate3dExpressions <- function (tomoObj, query) {
+    CheckParameters(tomoObj, query)
     tomoObj$Estimate3dExpressions(queries=query)
     return(invisible(tomoObj))
     }
@@ -36,6 +55,7 @@ Estimate3dExpressions <- function (tomoObj, query) {
 #' @note  You can do the same things with
 #' `tomoObj$PlotLossFunction(geneID)`.
 PlotLossFunction <- function (tomoObj, geneID) {
+    CheckParameters(tomoObj, geneID)
     tomoObj$PlotLossFunction(geneID=geneID)
     return(invisible(tomoObj))
     }
@@ -73,6 +93,7 @@ Animate2d <- function (tomoObj,
                        interval=0.1,
                        aspectRatio=c()
              ) {
+    CheckParameters(tomoObj, geneID)
     if (length(aspectRatio) != 0 & length(aspectRatio) != 2) {
         stop("`aspectRatio` should be a 2D vector.")
         }
@@ -100,6 +121,7 @@ Animate2d <- function (tomoObj,
 #' @note  You can do the same thing with
 #' `tomoObj$Plot1dExpression(geneID, axes)`.
 Plot1dExpression <- function (tomoObj, geneID, axes) {
+    CheckParameters(tomoObj, geneID)
     tomoObj$Plot1dExpression(geneID, axes)
     return(invisible(tomoObj))
     }
@@ -121,6 +143,7 @@ Plot1dAllExpression <- function (tomoObj, axes) {
 #' @note  You can do the same thing with
 #' `tomoObj$ToDataFrame(geneID)`.
 ToDataFrame <- function (tomoObj, geneID) {
+    CheckParameters(tomoObj, geneID)
     tomoObj$ToDataFrame(geneID)
     }
 
@@ -131,5 +154,6 @@ ToDataFrame <- function (tomoObj, geneID) {
 #' @note  You can do the same thing with
 #' `tomoObj$GetReconstructedResult(geneID)`.
 GetReconstructedResult <- function (tomoObj, geneID) {
+    CheckParameters(tomoObj, geneID)
     tomoObj$GetReconstructedResult(geneID)
     }

@@ -18,4 +18,5 @@ Depends:
 Imports: 
     animation,
     dplyr,
-    R6
+    R6,
+    methods

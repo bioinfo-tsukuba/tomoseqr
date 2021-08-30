@@ -152,8 +152,7 @@ tomoSeq <- R6Class(
                     aspectRatio=aspectRatio
                 )
             } else {
-                cat("ERROR: Animate2d\n")
-                cat(paste("Invalid option: target =", target, "\n"))
+                stop(paste("Invalid option: target =", target, "\n"))
             }
         },
 
@@ -174,7 +173,7 @@ tomoSeq <- R6Class(
             } else if (axes==3) {
                 private$z[, -1] %>% colSums() %>% plot(type="l")
             } else {
-                cat("axes must be 1, 2 or 3.\n")
+                stop("axes must be 1, 2 or 3.\n")
             }
         }
     ),
@@ -387,7 +386,17 @@ tomoSeq <- R6Class(
                     self$alreadyReconstructed <- TRUE
                 },
 
+                CheckReconstructed = function () {
+                    if (self$alreadyReconstructed == FALSE) {
+                        stop(paste("No reconstructed results.",
+                                   "You need to run Estimate3dExpressions()"
+                             )
+                        )
+                    }
+                },
+
                 PlotLossFunction = function () {
+                    self$CheckReconstructed()
                     plot(self$loss, type="l", main=self$geneID,
                          xlab="Iteration number", ylab="Loss"
                     )
@@ -401,6 +410,7 @@ tomoSeq <- R6Class(
                                                 interval,
                                                 aspectRatio
                                       ) {
+                    self$CheckReconstructed()
                     if (is.na(zlim[1]) == TRUE) {
                         realZlim <- range(self$reconst)
                     } else {
@@ -424,6 +434,7 @@ tomoSeq <- R6Class(
                                           interval,
                                           aspectRatio
                                 ) {
+                    self$CheckReconstructed()
                     self$Animate2d(self$mask,
                                    xaxis=xaxis, yaxis=yaxis,
                                    main=main,
@@ -443,6 +454,7 @@ tomoSeq <- R6Class(
                                            interval,
                                            aspectRatio
                                  ) {
+                    self$CheckReconstructed()
                     if (is.na(zlim[1]) == TRUE) {
                         realZlim <- range(self$reconst)
                     } else {
@@ -470,9 +482,9 @@ tomoSeq <- R6Class(
                     } else {
                         asp <- aspectRatio[2] / aspectRatio[1]
                     }
-                    cat("generating")
+                    message("generating", appendLF=FALSE)
                     for (i in seq_along(array3d[1, 1, ])) {
-                        cat("...")
+                        message(".", appendLF=FALSE)
                         filled.contour(array3d[, , i],
                                        main=paste(main, "_", i, sep=""),
                                        xlab=xlab,
@@ -480,7 +492,7 @@ tomoSeq <- R6Class(
                                        frame.plot=F
                         )
                     }
-                    cat("\n")
+                    message("")
                 },
 
                 ContourMaskAndExpression = function (maskApermed,
@@ -500,13 +512,13 @@ tomoSeq <- R6Class(
                     }
                     labelList <- seq(zlim[1], floor(zlim[2]), length=6) %>%
                                       round()
-                    positionList <- labelList / zlim[2]
-                    cat("generating")
+                    position_list <- label_list / zlim[2]
+                    message("generating", appendLF=FALSE)
                     collist <- hcl.colors(floor(zlim[2])-1, palette="Oslo")
                     ColorRamp<-colorRampPalette(collist)(100)
                     ColorLevels<-seq(from=zlim[1], to=zlim[2], length=100)
-                    for (i in seq_along(maskApermed[1, 1, ])) {
-                        cat("...")
+                    for (i in seq_along(mask_apermed[1, 1, ])) {
+                        message(".", appendLF=FALSE)
                         par(mar=c(2,3,2,2), oma=c(0,0,0,0))
                         layout(matrix(seq(2), nrow=2, ncol=1), widths=c(1),
                                heights=c(3, 0.5)
@@ -531,7 +543,7 @@ tomoSeq <- R6Class(
                         )
                         axis(1, positionList, labelList)
                     }
-                    cat("\n")
+                    message("")
                 },
 
                 Animate2d = function (array3d,
@@ -594,6 +606,7 @@ tomoSeq <- R6Class(
                 },
 
                 Plot1dExpression = function (axes) {
+                    self$CheckReconstructed()
                     oldpar <- par(no.readonly=T)
                     marginal <- self$marginalDist[[axes]]
                     plot(marginal, type="l", lty=3, axes=F, ann=F)
@@ -605,6 +618,7 @@ tomoSeq <- R6Class(
                 },
 
                 ToDataFrame = function () {
+                    self$CheckReconstructed()
                     if (self$alreadyReconstructed == TRUE) {
                         vecReconst <- as.vector(self$reconst)
                         dim <- dim(self$reconst)
@@ -622,15 +636,16 @@ tomoSeq <- R6Class(
                                    value=vecReconst
                         ) %>% return()
                     } else {
-                    cat("have not reconstructed yet.")
+                    stop("No result of reconstruction.")
                     }
                 },
 
                 GetReconstructedResult = function () {
+                    self$CheckReconstructed()
                     if (self$alreadyReconstructed == TRUE) {
                         return(self$reconst)
                     } else {
-                        cat("have not reconstructed yet.")
+                    stop("No result of reconstruction.")
                     }
                 }
             )

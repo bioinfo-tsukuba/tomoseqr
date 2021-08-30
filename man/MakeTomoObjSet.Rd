@@ -21,7 +21,8 @@ z-axis sections. The rows represent genes. The first column
 contains gene IDs and the second and subsequent columns contain
 gene expression levels in sections.}
 
-\item{maskShape}{shape of mask.}
+\item{maskShape}{shape of mask. You can choose from "rectangle", "round" or
+"halfround". The default is "rectangle"}
 }
 \description{
 Make set of tomoseq objects
