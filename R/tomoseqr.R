@@ -388,7 +388,7 @@ tomoSeq <- R6Class(
 
                 CheckReconstructed = function () {
                     if (self$alreadyReconstructed == FALSE) {
-                        stop(paste("No result of reconstruction.",
+                        stop(paste("No reconstructed results.",
                                    "You need to run Estimate3dExpressions()"
                              )
                         )
