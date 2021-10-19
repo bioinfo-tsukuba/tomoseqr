@@ -40,7 +40,7 @@ or 1 (included in sample). It's read-only.}
 Make tomoSeq object. This method is not available to users.
 Instead of it, \code{\link[=MakeTomoObjSet]{MakeTomoObjSet()}} is available.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{tomoSeq$new(x, y, z, maskShape = "rectangle")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{tomoSeq$new(x, y, z, mask)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -59,8 +59,8 @@ the second and subsequent columns contain gene expression levels in sections.}
 sections. The rows represent genes. The first column contains gene IDs and
 the second and subsequent columns contain gene expression levels in sections.}
 
-\item{\code{maskShape}}{Shape of mask. You can choose the value from
-\code{"rectangle"}, \code{"round"} or \code{"halfround"}. The default is \code{"rectangle"}.}
+\item{\code{mask}}{A 3D array that represents if each boxel is included to sample.
+You can make a mask using \code{masker}.}
 }
 \if{html}{\out{</div>}}
 }

@@ -19,18 +19,10 @@ tomoSeq <- R6Class(
 #' @param z A data.frame object containing a simulated Tomo-seq data for z-axis
 #' sections. The rows represent genes. The first column contains gene IDs and
 #' the second and subsequent columns contain gene expression levels in sections.
-#' @param maskShape Shape of mask. You can choose the value from
-#' `"rectangle"`, `"round"` or `"halfround"`. The default is `"rectangle"`.
-        initialize = function (x, y, z, maskShape="rectangle") {
+#' @param mask A 3D array that represents if each boxel is included to sample.
+#' You can make a mask using `masker`.
+        initialize = function (x, y, z, mask) {
             ## x, y, z: Tomo-seq data (about all genes) of each axis.
-            ## maskShape: The shape of mask
-            ## ("rectangle", "round" or "halfround").
-            maskShapeList <- list(private$MakeRectangle,
-                               private$MakeRound,
-                               private$MakeHalfRound
-            )
-            names(maskShapeList) <- c("rectangle", "round", "halfround")
-
             private$x <- x
             private$y <- y
             private$z <- z
@@ -43,15 +35,6 @@ tomoSeq <- R6Class(
                     append(singleGeneObject)
             }
             names(private$objectsEachGene) <- private$valGeneList
-
-            ## Create mask.
-            ## Each length must be 1 shorter because first column (gene ID) is
-            ## excluded from reconstruction.
-            private$valMask <- maskShapeList[[maskShape]](
-                                                         length(x) - 1,
-                                                         length(y) - 1,
-                                                         length(z) - 1
-                                )
         },
 
 #' @description Reconstructs 3D expression patterns of genes which are
@@ -226,47 +209,6 @@ tomoSeq <- R6Class(
             xAndy <- intersect(xGene, yGene)
             return(intersect(xAndy, zGene))
         },
-
-        ## Mask-create functions -----------------------------------------------
-        MakeRectangle = function (xLen, yLen, zLen) {
-            return(array(1, dim=c(xLen, yLen, zLen)))
-        },
-
-        MakeRound = function (xLen, yLen, zLen) {
-            mask <- array(0, dim=c(xLen, yLen, zLen))
-            r <- mean(xLen, yLen, zLen) / 2
-            for (x in 1:xLen) {
-                for (y in 1:yLen) {
-                    for (z in 1:zLen) {
-                        d <- (x - r)^2 + (y - r)^2 + (z - r)^2
-                        if (d >= (r * 0.75)^2 && d <= (r * 0.9)^2) {
-                            mask[x, y, z] <- 1
-                        }
-                    }
-                }
-            }
-            return(mask)
-        },
-
-        MakeHalfRound = function (xLen, yLen, zLen) {
-            mask <- array(0, dim=c(xLen, yLen, zLen))
-            r <- mean(xLen, yLen, zLen) / 2
-            for (x in 1:xLen) {
-                for (y in 1:yLen) {
-                    for (z in 1:zLen) {
-                        d <- (x - r)^2 + (y - r)^2 + (z - r)^2
-                        if (d >= (r * 0.75)^2 &&
-                            d <= (r * 0.9)^2 &&
-                            x <= xLen / 2
-                            ) {
-                            mask[x, y, z] <- 1
-                        }
-                    }
-                }
-            }
-            return(mask)
-        },
-        ## ---------------------------------------------------------------------
 
         ## This object has reconstruction result about a gene.
         singleGene = R6Class(

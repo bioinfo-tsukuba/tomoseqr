@@ -10,14 +10,11 @@
 #' z-axis sections. The rows represent genes. The first column
 #' contains gene IDs and the second and subsequent columns contain
 #' gene expression levels in sections.
-#' @param maskShape shape of mask. You can choose from "rectangle", "round" or
-#' "halfround". The default is "rectangle"
+#' @param mask A 3D array that represents if each boxel is included to sample.
+#' You can make a mask using `masker`.
 #' @export
-MakeTomoObjSet <- function (x, y, z, maskShape="rectangle") {
-    if (is.element(maskShape, c("rectangle", "round", "halfround")) == FALSE) {
-        stop('maskShape should be "rectangle", "round" or "halfround".')
-    }
-        return(tomoSeq$new(x=x, y=y,z=z, maskShape=maskShape))
+MakeTomoObjSet <- function (x, y, z, mask) {
+        return(tomoSeq$new(x=x, y=y,z=z, mask=mask))
 }
 
 #' @importFrom methods is

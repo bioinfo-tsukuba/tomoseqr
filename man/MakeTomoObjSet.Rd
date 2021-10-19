@@ -4,7 +4,7 @@
 \alias{MakeTomoObjSet}
 \title{Make set of tomoseq objects}
 \usage{
-MakeTomoObjSet(x, y, z, maskShape = "rectangle")
+MakeTomoObjSet(x, y, z, mask)
 }
 \arguments{
 \item{x}{A data.frame object containing a simulated Tomo-seq data
@@ -21,8 +21,8 @@ z-axis sections. The rows represent genes. The first column
 contains gene IDs and the second and subsequent columns contain
 gene expression levels in sections.}
 
-\item{maskShape}{shape of mask. You can choose from "rectangle", "round" or
-"halfround". The default is "rectangle"}
+\item{mask}{A 3D array that represents if each boxel is included to sample.
+You can make a mask using \code{masker}.}
 }
 \description{
 Make set of tomoseq objects
