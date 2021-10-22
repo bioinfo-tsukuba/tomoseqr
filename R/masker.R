@@ -141,7 +141,7 @@ ui <- function () {
     filename = "mask.rda",
     content = function(file) {
       mask_matrix <- input$mask_matrix %>%
-        array(dim = input$mask_dim) %>%
+        array(dim = rev(input$mask_dim)) %>%
         aperm(perm = c(3,2,1))
       if(input$along_axis == "x"){
         mask_matrix <- aperm(mask_matrix, perm = c(3, 1, 2))
