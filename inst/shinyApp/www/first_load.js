@@ -5,10 +5,6 @@ Shiny.addCustomMessageHandler("existingData", ExistingData);
 
 const mainCanvas = document.getElementById("sample");
 const mainCtx = mainCanvas.getContext('2d');
-// const tmpCanvas = document.getElementById("tmpCanvas");
-// const tmpCtx = tmpCanvas.getContext('2d');
-// const tmpCanvas = document.getElementById("tmpCanvas");
-// const tmpCtx = tmpCanvas.getContext('2d');
 
 class MaskFigure {
   constructor(initData, maskDim, xRatio, yRatio, alongAxis) {
@@ -48,14 +44,11 @@ class MaskFigure {
     this.isDrawing = true;
     this.addGrid("white");
     this.addGrid("gray");
-    // this.SendToR();
   }
 
   _MouseMove(e) {
     const mX = Math.floor(e.offsetX / this.xRatio);
     const mY = Math.floor((this.yLen - e.offsetY) / this.yRatio);
-    // document.getElementById("txtX").value = mX + 1;
-    // document.getElementById("txtY").value = mY + 1;
     document.getElementById("txtY").innerHTML = 'Position: (' + (mX + 1) + ', ' + (mY + 1) + ')';
     if (this.isDrawing == true) {
       if (pencil == true) {
@@ -70,7 +63,6 @@ class MaskFigure {
     this.addGrid("white");
     this.addGrid("gray");
     }
-    // this.SendToR();
   }
 
   _MouseUp(e) {
@@ -99,37 +91,8 @@ class MaskFigure {
     mainCanvas.addEventListener('mousemove', this.mousemove);
     mainCanvas.addEventListener('mouseup', this.mouseup);
 
-
-    // mainCanvas.addEventListener('mousemove', e => {
-    //   const mX = Math.floor(e.offsetX / this.xRatio);
-    //   const mY = Math.floor((this.yLen - e.offsetY) / this.yRatio);
-    //   document.getElementById("txtX").value = mX + 1;
-    //   document.getElementById("txtY").value = mY + 1;
-    //   if (this.isDrawing == true) {
-    //     if (pencil == true) {
-    //     mainCtx.fillStyle = "black";
-    //     mainCtx.fillRect(mX*this.xRatio, -1 * (mY - (this.yLen / this.yRatio) + 1)*this.yRatio, this.xRatio, this.yRatio);
-    //     this.dataMatrix[mX][mY][this.position] = 1;
-    //   } else {
-    //     mainCtx.fillStyle = "white";
-    //     mainCtx.fillRect(mX*this.xRatio, -1 * (mY - (this.yLen / this.yRatio) + 1)*this.yRatio, this.xRatio, this.yRatio);
-    //     this.dataMatrix[mX][mY][this.position] = 0;
-    //   }
-    //   this.addGrid("white");
-    //   this.addGrid("gray");
-    //   }
-    //   // this.SendToR();
-    // });
-
-  //   mainCanvas.addEventListener('mouseup', e => {
-  //     this.isDrawing = false;
-  //     this.addGrid("white");
-  //     this.addGrid("gray");
-  //     this.SendToR();
-  //   })
   }
   addGrid(color) {
-    // const context = this.ctx;
     const x = this.xLen;
     const y = this.yLen;
     mainCtx.strokeStyle = color;
