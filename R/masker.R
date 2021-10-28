@@ -23,7 +23,10 @@
 #' @export
 Masker <- function () {
     ui <- function () {
-        addResourcePath('www', system.file("shinyApp/www", package="tomoseqr"))
+        addResourcePath(
+            'www',
+            system.file("shinyApp/www", package = "tomoseqr")
+        )
         on.exit(removeResourcePath('www'))
         fluidPage(
             tags$head(
@@ -113,7 +116,7 @@ Masker <- function () {
                 textOutput("h_axis"),
                 textOutput("v_axis"),
                 tags$p(
-                    tags$div(id = "txtY"),
+                    tags$div(id = "position"),
                     tags$div(id="nowPage"),
                 ),
                 tags$canvas(id="sample"),
@@ -236,7 +239,7 @@ Masker <- function () {
             content = function(file) {
                 mask_matrix <- input$mask_matrix %>%
                     array(dim = rev(input$mask_dim)) %>%
-                    aperm(perm = c(3,2,1))
+                    aperm(perm = c(3, 2, 1))
                 if (input$along_axis == "x") {
                     mask_matrix <- aperm(mask_matrix, perm = c(3, 1, 2))
                 } else if (input$along_axis == "y") {
