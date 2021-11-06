@@ -110,7 +110,9 @@ Masker <- function () {
                         tags$button("back", onclick = "back_click()"),
                         tags$button("next", onclick = "next_click()"),
                         tags$button("Pencil", onclick = "SetPencil()"),
-                        tags$button("Eraser", onclick = "SetEraser()")
+                        tags$button("Eraser", onclick = "SetEraser()"),
+                        tags$button("Copy", onclick = "CopyCanvas()"),
+                        tags$button("Paste", onclick = "PasteCanvas()")
                     )
                 ),
                 textOutput("h_axis"),
