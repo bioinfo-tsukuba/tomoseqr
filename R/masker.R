@@ -215,7 +215,7 @@ Masker <- function () {
                         message = list(
                             dataMatrix = data_matrix,
                             ratio = c(x_ratio, z_ratio),
-                            alongAxis = "x"
+                            alongAxis = "y"
                         )
                     )
                 } else {
@@ -227,7 +227,7 @@ Masker <- function () {
                         message = list(
                             dataMatrix = data_matrix,
                             ratio = c(x_ratio, y_ratio),
-                            alongAxis = "x"
+                            alongAxis = "z"
                         )
                     )
                 }
