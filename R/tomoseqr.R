@@ -454,12 +454,12 @@ tomoSeq <- R6Class(
                     }
                     labelList <- seq(zlim[1], floor(zlim[2]), length=6) %>%
                                       round()
-                    position_list <- label_list / zlim[2]
+                    positionList <- labelList / zlim[2]
                     message("generating", appendLF=FALSE)
                     collist <- hcl.colors(floor(zlim[2])-1, palette="Oslo")
                     ColorRamp<-colorRampPalette(collist)(100)
                     ColorLevels<-seq(from=zlim[1], to=zlim[2], length=100)
-                    for (i in seq_along(mask_apermed[1, 1, ])) {
+                    for (i in seq_along(maskApermed[1, 1, ])) {
                         message(".", appendLF=FALSE)
                         par(mar=c(2,3,2,2), oma=c(0,0,0,0))
                         layout(matrix(seq(2), nrow=2, ncol=1), widths=c(1),
