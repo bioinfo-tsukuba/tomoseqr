@@ -27,6 +27,7 @@ tomoSeq <- R6Class(
             private$y <- y
             private$z <- z
             private$valGeneList <- private$ExtractGeneList()
+            private$valMask <- mask
 
             ## make each singleGene objects and compile as dictionary.
             for (gene in private$valGeneList) {
