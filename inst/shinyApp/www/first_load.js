@@ -5,6 +5,8 @@ Shiny.addCustomMessageHandler("existingData", ExistingData);
 
 const mainCanvas = document.getElementById("sample");
 const mainCtx = mainCanvas.getContext('2d');
+let copiedCanvas;
+let copiedPosition;
 
 class MaskFigure {
     constructor(initData, maskDim, xRatio, yRatio, alongAxis) {
@@ -164,6 +166,33 @@ class MaskFigure {
         const nowPage = "Page: " + (this.position + 1) + ' / ' + this.numPage;
         document.getElementById("nowPage").innerHTML = nowPage;
     }
+
+    CopyCanvas() {
+        this.figureSet[this.position] = mainCtx.getImageData(
+            0,
+            0,
+            this.xLen,
+            this.yLen
+        );
+        copiedCanvas = this.figureSet[this.position];
+        copiedPosition = this.position;
+    }
+
+    PasteCanvas() {
+        const xLen = this.dataMatrix.length;
+        const yLen = this.dataMatrix[0].length;
+        mainCtx.putImageData(copiedCanvas, 0, 0);
+        for(let i = 0; i < xLen; i++) {
+            for(let j = 0; j < yLen; j++) {
+                if(this.dataMatrix[i][j][copiedPosition] == 1) {
+                    this.dataMatrix[i][j][this.position] = 1;
+                } else {
+                    this.dataMatrix[i][j][this.position] = 0;
+                }
+            }
+        }
+        this.SendToR();
+    }
 }
 
 function DeNovoFigure(initData, maskDim, xRatio, yRatio, alongAxis) {
@@ -283,4 +312,12 @@ function SetPencil(){
 }
 function SetEraser(){
     pencil = false;
+}
+
+function CopyCanvas() {
+    initCanvas.CopyCanvas();
+}
+
+function PasteCanvas() {
+    initCanvas.PasteCanvas();
 }
