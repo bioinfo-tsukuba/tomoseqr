@@ -63,6 +63,8 @@ tomoSeq <- R6Class(
                 if (length(normCount) != 3) {
                     stop(stopMsg)
                 }
+            } else {
+                stop(stopMsg)
             }
 
             if (is.logical(normMask) == FALSE) {
