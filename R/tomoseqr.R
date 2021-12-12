@@ -3,6 +3,7 @@
 #' @importFrom R6 R6Class
 #' @importFrom dplyr %>%
 #' @importFrom animation saveGIF
+#' @importFrom stringr str_c
 tomoSeq <- R6Class(
     classname = "tomoSeq",
     public = list(
@@ -41,10 +42,37 @@ tomoSeq <- R6Class(
 #' @description Reconstructs 3D expression patterns of genes which are
 #' specified. See also [Estimate3dExpressions()].
 #' @param queries A vector consists of gene IDs.
-        Estimate3dExpressions = function (queries=c()) {
+#' @param normCount Specifies the method to normalize
+#' the expression amount data.
+#' @param normMask Whether to normalize by mask or not
+        Estimate3dExpressions = function (
+            queries=c(),
+            normCount="countSum",
+            normMask=TRUE
+        ) {
+            ## Check normCount and normMask
+            stopMsg <- str_c(
+                'normCount must be either "countSum",',
+                '"none", or a list of length 3.'
+            )
+            if (is.character(normCount)) {
+                if (normCount != "countSum" & normCount != "none") {
+                    stop(stopMsg)
+                }
+            } else if (is.list(normCount)) {
+                if (length(normCount) != 3) {
+                    stop(stopMsg)
+                }
+            }
+
+            if (is.logical(normMask) == FALSE) {
+                stop("normMask must be a boolean.")
+            }
+
             for (geneID in queries) {
                 private$objectsEachGene[[geneID]]$Estimate3dExpression(
-                    private$x, private$y, private$z, private$valMask
+                    private$x, private$y, private$z, private$valMask,
+                    normCount=normCount, normMask=normMask
                 )
             }
         },
@@ -253,7 +281,15 @@ tomoSeq <- R6Class(
                 },
 
                 ## Reconstruct 3D expression pattern.
-                Estimate3dExpression = function (X, Y, Z, mask, numIter = 100) {
+                Estimate3dExpression = function (
+                    X,
+                    Y,
+                    Z,
+                    mask,
+                    normCount,
+                    normMask,
+                    numIter=100
+                ) {
                     self$mask <- mask
                     sumX <- X[, -1] %>% colSums()
                     sumY <- Y[, -1] %>% colSums()
@@ -270,9 +306,30 @@ tomoSeq <- R6Class(
                     maskY <- self$mask %>% apply(2, sum)
                     maskZ <- self$mask %>% apply(3, sum)
 
-                    x <- x0 / sumX * maskX
-                    y <- y0 / sumY * maskY
-                    z <- z0 / sumZ * maskZ
+                    if (normCount == "countSum") {
+                    x <- x0 / sumX
+                    y <- y0 / sumY
+                    z <- z0 / sumZ
+                    }
+                    
+                    if (is.list(normCount)) {
+                        x <- x0 / normCount[["x"]]
+                        y <- y0 / normCount[["y"]]
+                        z <- z0 / normCount[["z"]]
+                    }
+
+                    if (normCount == "none") {
+                        x <- x0
+                        y <- y0
+                        z <- z0
+                    }
+
+                    if (normMask) {
+                        x <- x * maskX
+                        y <- y * maskY
+                        z <- z * maskZ
+                    }
+
                     x[1, is.nan(x)] <- 0
                     y[1, is.nan(y)] <- 0
                     z[1, is.nan(z)] <- 0
