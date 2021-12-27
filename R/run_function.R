@@ -34,13 +34,25 @@ CheckParameters <- function(tomoObj, query) {
 #' Estimate 3d expressions
 #' @param tomoObj tomoSeq object
 #' @param query Vector of gene IDs
+#' @param normCount Specifies the method to normalize
+#' the expression amount data.
+#' @param normMask Whether to normalize by mask or not
 #' @return tomoSeq object
 #' @export
 #' @note  You can do the same things with
 #' `tomoObj$Estimate3dExpressions(query)`.
-Estimate3dExpressions <- function (tomoObj, query) {
+Estimate3dExpressions <- function (
+    tomoObj,
+    query,
+    normCount="countSum",
+    normMask=TRUE
+) {
     CheckParameters(tomoObj, query)
-    tomoObj$Estimate3dExpressions(queries=query)
+    tomoObj$Estimate3dExpressions(
+        queries=query,
+        normCount=normCount,
+        normMask=normMask
+    )
     return(invisible(tomoObj))
 }
 

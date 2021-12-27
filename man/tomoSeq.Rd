@@ -72,13 +72,22 @@ You can make a mask using \code{masker}.}
 Reconstructs 3D expression patterns of genes which are
 specified. See also \code{\link[=Estimate3dExpressions]{Estimate3dExpressions()}}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{tomoSeq$Estimate3dExpressions(queries = c())}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{tomoSeq$Estimate3dExpressions(
+  queries = c(),
+  normCount = "countSum",
+  normMask = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{queries}}{A vector consists of gene IDs.}
+
+\item{\code{normCount}}{Specifies the method to normalize
+the expression amount data.}
+
+\item{\code{normMask}}{Whether to normalize by mask or not}
 }
 \if{html}{\out{</div>}}
 }

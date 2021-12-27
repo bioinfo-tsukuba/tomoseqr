@@ -18,6 +18,7 @@ Depends:
 Imports: 
     animation,
     dplyr,
+    stringr,
     R6,
     methods,
     shiny,
