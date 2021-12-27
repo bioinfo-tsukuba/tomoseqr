@@ -4,12 +4,17 @@
 \alias{Estimate3dExpressions}
 \title{Estimate 3d expressions}
 \usage{
-Estimate3dExpressions(tomoObj, query)
+Estimate3dExpressions(tomoObj, query, normCount = "countSum", normMask = TRUE)
 }
 \arguments{
 \item{tomoObj}{tomoSeq object}
 
 \item{query}{Vector of gene IDs}
+
+\item{normCount}{Specifies the method to normalize
+the expression amount data.}
+
+\item{normMask}{Whether to normalize by mask or not}
 }
 \value{
 tomoSeq object
