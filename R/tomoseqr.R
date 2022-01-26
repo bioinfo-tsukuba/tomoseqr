@@ -123,51 +123,43 @@ tomoSeq <- R6Class(
 #' You can specify the ratio as `c(width, height)`. If you don't specify
 #' the value of this parameter, the ratio is calculated based on
 #' the number of sections along each axis.
-        Animate2d = function (geneID,
-                              target,
-                              xaxis, yaxis,
-                              main,
-                              xlab, ylab,
-                              file,
-                              zlim,
-                              interval,
-                              aspectRatio=c()
-                    ) {
+        Animate2d = function (
+            geneID,
+            target,
+            xaxis,
+            yaxis,
+            main,
+            xlab,
+            ylab,
+            file,
+            zlim,
+            interval,
+            aspectRatio=c()
+        ) {
             if (length(aspectRatio) != 0 & length(aspectRatio) != 2) {
                 stop("`aspectRatio` should be a 2D vector.")
             }
-            if (target == "expression") {
-                private$objectsEachGene[[geneID]]$Animate2dExpression(
-                    xaxis=xaxis, yaxis=yaxis,
-                    main=main,
-                    xlab=xlab, ylab=ylab,
-                    zlim=zlim,
-                    file=file,
-                    interval=interval,
-                    aspectRatio=aspectRatio
-                )
-            } else if (target == "mask") {
-                private$objectsEachGene[[geneID]]$Animate2dMask(
-                    xaxis=xaxis, yaxis=yaxis,
-                    main=main,
-                    xlab=xlab, ylab=ylab,
-                    file=file,
-                    interval=interval,
-                    aspectRatio=aspectRatio
-                )
-            } else if (target == "unite") {
-                private$objectsEachGene[[geneID]]$Animate2dUnite(
-                    xaxis=xaxis, yaxis=yaxis,
-                    main=main,
-                    xlab=xlab, ylab=ylab,
-                    zlim=zlim,
-                    file=file,
-                    interval=interval,
-                    aspectRatio=aspectRatio
-                )
-            } else {
-                stop(paste("Invalid option: target =", target, "\n"))
-            }
+            reconstArray <- private$objectsEachGene[[geneID]]$reconst %>%
+                aperm(perm=c(xaxis, yaxis, 6 - (xaxis + yaxis)))
+
+            maskArray <- private$valMask %>%
+                aperm(perm=c(xaxis, yaxis, 6 - (xaxis + yaxis)))
+
+            saveGIF(
+                AnimateForGIF(
+                    reconstArray = reconstArray,
+                    maskArray = maskArray,
+                    main = main,
+                    xlab = xlab,
+                    ylab = ylab,
+                    zlim = zlim,
+                    aspectRatio = aspectRatio,
+                    type = target
+                ),
+                movie.name=file,
+                interval=interval,
+                autobrowse=FALSE
+            )
         },
 
 #' @description Plot expression of single gene along axis
@@ -229,7 +221,7 @@ tomoSeq <- R6Class(
         x = data.frame(),
         y = data.frame(),
         z = data.frame(),
-        valMask = array(0, dim=c(1,1,1)),
+        valMask = array(0, dim=c(1, 1, 1)),
         valGeneList = c(),
         objectsEachGene = c(),
 
@@ -252,7 +244,7 @@ tomoSeq <- R6Class(
                 reconst = array(0, dim = c(1, 1, 1)),
                 mask = array(0, dim = c(1, 1, 1)),
                 loss = c(),
-                marginalDist = array(0, dim=c(1,1,1)),
+                marginalDist = array(0, dim=c(1, 1, 1)),
                 alreadyReconstructed = FALSE,
 
                 initialize = function (x, y, z, geneID) {
@@ -272,9 +264,12 @@ tomoSeq <- R6Class(
                     lenX <- length(targetVector) * nTimesRepeat[1]
                     lenY <- nTimesRepeat[2]
                     lenZ <- nTimesRepeat[3]
-                    rep2d <- matrix(targetVector, nrow=lenX,
-                                     ncol=lenY, byrow = F
-                              )
+                    rep2d <- matrix(
+                        targetVector,
+                        nrow=lenX,
+                        ncol=lenY,
+                        byrow = F
+                    )
                     rep3d <- array(NA, dim=c(lenX, lenY, lenZ))
                     for (i in 1:lenZ) {
                         rep3d[, , i] <- rep2d
@@ -354,33 +349,47 @@ tomoSeq <- R6Class(
 
                     for (i in 1:numIter) {
                         xa <- a %>% apply(1, sum)
-                        a <- a * self$RepMat(x / xa, c(1,
-                                                       dim(self$mask)[2],
-                                                       dim(self$mask)[3]
-                                                     )
-                                 )
+                        a <- a * self$RepMat(
+                            x / xa,
+                            c(
+                                1,
+                                dim(self$mask)[2],
+                                dim(self$mask)[3]
+                            )
+                        )
                         a[is.nan(a)] <- 0
                         ya <- a %>% apply(2, sum)
-                        a <- a * aperm(self$RepMat(y / ya, c(1,
-                                                             dim(self$mask)[1],
-                                                             dim(self$mask)[3]
-                                                           )
-                                       ),
-                                       perm = c(2, 1, 3)
-                                 )
+                        a <- a * aperm(
+                            self$RepMat(
+                                y / ya,
+                                c(
+                                    1,
+                                    dim(self$mask)[1],
+                                    dim(self$mask)[3]
+                                )
+                            ),
+                            perm = c(2, 1, 3)
+                        )
                         a[is.nan(a)] <- 0
                         za <- a %>% apply(3, sum)
-                        a <- a * aperm(self$RepMat(z / za, c(1,
-                                                             dim(self$mask)[1],
-                                                             dim(self$mask)[2]
-                                                           )
-                                        ),
-                                        perm = c(2, 3, 1))
+                        a <- a * aperm(
+                            self$RepMat(
+                                z / za,
+                                c(
+                                    1,
+                                    dim(self$mask)[1],
+                                    dim(self$mask)[2]
+                                )
+                            ),
+                            perm = c(2, 3, 1)
+                        )
                         a[is.nan(a)] <- 0
-                        er <- append(er, sum((xa - x)^2) +
-                                         sum((ya - y)^2) +
-                                         sum((za - z)^2)
-                              )
+                        er <- append(
+                            er,
+                            sum((xa - x)^2) +
+                                sum((ya - y)^2) +
+                                sum((za - z)^2)
+                        )
                     }
                     self$reconst <- a
                     self$loss <- er
@@ -390,220 +399,23 @@ tomoSeq <- R6Class(
 
                 CheckReconstructed = function () {
                     if (self$alreadyReconstructed == FALSE) {
-                        stop(paste("No reconstructed results.",
-                                   "You need to run Estimate3dExpressions()"
-                             )
+                        stop(
+                            paste(
+                                "No reconstructed results.",
+                                "You need to run Estimate3dExpressions()"
+                            )
                         )
                     }
                 },
 
                 PlotLossFunction = function () {
                     self$CheckReconstructed()
-                    plot(self$loss, type="l", main=self$geneID,
-                         xlab="Iteration number", ylab="Loss"
-                    )
-                },
-
-                Animate2dExpression = function (xaxis, yaxis,
-                                                main,
-                                                xlab, ylab,
-                                                file,
-                                                zlim,
-                                                interval,
-                                                aspectRatio
-                                      ) {
-                    self$CheckReconstructed()
-                    if (is.na(zlim[1]) == TRUE) {
-                        realZlim <- range(self$reconst)
-                    } else {
-                        realZlim <- zlim
-                    }
-                    self$Animate2d(self$reconst,
-                                   xaxis=xaxis, yaxis=yaxis,
-                                   main=main,
-                                   xlab=xlab, ylab=ylab,
-                                   file=file,
-                                   zlim=realZlim,
-                                   interval=interval,
-                                   aspectRatio=aspectRatio
-                    )
-                },
-
-                Animate2dMask = function (xaxis, yaxis,
-                                          main,
-                                          xlab, ylab,
-                                          file,
-                                          interval,
-                                          aspectRatio
-                                ) {
-                    self$CheckReconstructed()
-                    self$Animate2d(self$mask,
-                                   xaxis=xaxis, yaxis=yaxis,
-                                   main=main,
-                                   xlab=xlab, ylab=ylab,
-                                   file=file,
-                                   zlim=c(0, 1),
-                                   interval=interval,
-                                   aspectRatio=aspectRatio
-                    )
-                },
-
-                Animate2dUnite = function (xaxis, yaxis,
-                                           main,
-                                           xlab, ylab,
-                                           file,
-                                           zlim,
-                                           interval,
-                                           aspectRatio
-                                 ) {
-                    self$CheckReconstructed()
-                    if (is.na(zlim[1]) == TRUE) {
-                        realZlim <- range(self$reconst)
-                    } else {
-                        realZlim <- zlim
-                    }
-                    self$AnimateMaskAndExpression(xaxis=xaxis, yaxis=yaxis,
-                                                  main=main,
-                                                  xlab=xlab, ylab=ylab,
-                                                  file=file,
-                                                  zlim=realZlim,
-                                                  interval=interval,
-                                                  aspectRatio=aspectRatio
-                    )
-                },
-
-                ContourForAnimate = function (array3d,
-                                              main,
-                                              xlab, ylab,
-                                              zlim,
-                                              aspectRatio
-                                    ) {
-                    if (length(aspectRatio) < 2) {
-                        arrayDim <- dim(array3d)
-                        asp <- arrayDim[2] / arrayDim[1]
-                    } else {
-                        asp <- aspectRatio[2] / aspectRatio[1]
-                    }
-                    message("generating", appendLF=FALSE)
-                    for (i in seq_along(array3d[1, 1, ])) {
-                        message(".", appendLF=FALSE)
-                        filled.contour(array3d[, , i],
-                                       main=paste(main, "_", i, sep=""),
-                                       xlab=xlab,
-                                       ylab=ylab, zlim=zlim, asp=asp,
-                                       frame.plot=F
-                        )
-                    }
-                    message("")
-                },
-
-                ContourMaskAndExpression = function (maskApermed,
-                                                     reconstApermed,
-                                                     main,
-                                                     xlab, ylab,
-                                                     zlim,
-                                                     aspectRatio
-                                           ) {
-                    if (length(aspectRatio) < 2) {
-                        ## Dim of reconstructed matrix should be equal to
-                        ## that of mask.
-                        plotDim <- dim(maskApermed)
-                        asp <- plotDim[2] / plotDim[1]
-                    } else {
-                        asp <- aspectRatio[2] / aspectRatio[1]
-                    }
-                    labelList <- seq(zlim[1], floor(zlim[2]), length=6) %>%
-                                      round()
-                    positionList <- labelList / zlim[2]
-                    message("generating", appendLF=FALSE)
-                    collist <- hcl.colors(floor(zlim[2])-1, palette="Oslo")
-                    ColorRamp<-colorRampPalette(collist)(100)
-                    ColorLevels<-seq(from=zlim[1], to=zlim[2], length=100)
-                    for (i in seq_along(maskApermed[1, 1, ])) {
-                        message(".", appendLF=FALSE)
-                        par(mar=c(2,3,2,2), oma=c(0,0,0,0))
-                        layout(matrix(seq(2), nrow=2, ncol=1), widths=c(1),
-                               heights=c(3, 0.5)
-                        )
-                        image(reconstApermed[, , i], zlim=zlim, xlab=xlab,
-                              ylab=ylab, breaks=seq(zlim[1], zlim[2],
-                              length=floor(zlim[2])),
-                              col=hcl.colors(floor(zlim[2])-1, palette="Oslo"),
-                              asp=asp, axes=F
-                        )
-                        axis(1, seq(0, 1.0, by=0.2), seq(0, 1, by=0.2))
-                        axis(2, seq(0, 1.0, by=0.2), seq(0, 1, by=0.2), pos=0)
-                        mtext(xlab, side = 1, line = 2)
-                        mtext(ylab, side = 2, line = 1)
-                        par(new=T)
-                        image(maskApermed[,,i], col=c("#000000", "#FFFFFF00"),
-                              main=paste(main, "_", i, seq=""), xlab=xlab,
-                              ylab=ylab, asp=asp, axes=F
-                        )
-                        image(as.matrix(ColorLevels),col=ColorRamp, xlab="",
-                              ylab="", cex.axis=1, xaxt="n", yaxt="n"
-                        )
-                        axis(1, positionList, labelList)
-                    }
-                    message("")
-                },
-
-                Animate2d = function (array3d,
-                                      xaxis, yaxis,
-                                      main,
-                                      xlab, ylab,
-                                      file,
-                                      zlim,
-                                      interval,
-                                      aspectRatio
-                            ) {
-                    array3dApermed <- aperm(array3d,
-                                             perm=c(xaxis, yaxis,
-                                                    6 - (xaxis + yaxis)
-                                             )
-                                       )
-                    saveGIF(self$ContourForAnimate(array3d=array3dApermed,
-                                                   main=main,
-                                                   xlab=xlab,
-                                                   ylab=ylab,
-                                                   zlim=zlim,
-                                                   aspectRatio=aspectRatio
-                            ),
-                            movie.name=file,
-                            interval=interval,
-                            autobrowse=FALSE
-                    )
-                },
-
-                AnimateMaskAndExpression = function (xaxis, yaxis,
-                                                     main,
-                                                     xlab, ylab,
-                                                     file,
-                                                     zlim,
-                                                     interval,
-                                                     aspectRatio
-                                           ) {
-                    maskApermed <- aperm(self$mask,
-                                          perm=c(xaxis, yaxis,
-                                                 6 - (xaxis + yaxis)
-                                          )
-                                    )
-                    reconstApermed <- aperm(self$reconst,
-                                             perm=c(xaxis, yaxis,
-                                                    6 - (xaxis + yaxis)
-                                             )
-                                       )
-                    saveGIF(self$ContourMaskAndExpression(
-                                maskApermed = maskApermed,
-                                reconstApermed = reconstApermed,
-                                main=main,
-                                xlab=xlab, ylab=ylab,
-                                zlim=zlim,
-                                aspectRatio=aspectRatio
-                            ),
-                            movie.name=file,
-                            interval=interval,
-                            autobrowse=FALSE
+                    plot(
+                        self$loss,
+                        type="l",
+                        main=self$geneID,
+                        xlab="Iteration number",
+                        ylab="Loss"
                     )
                 },
 
@@ -613,8 +425,11 @@ tomoSeq <- R6Class(
                     marginal <- self$marginalDist[[axes]]
                     plot(marginal, type="l", lty=3, axes=F, ann=F)
                     par(new=T)
-                    plot(apply(self$reconst, axes, sum), type="l", lty=2,
-                         ylim=range(marginal), col="red"
+                    plot(
+                        apply(self$reconst, axes, sum),
+                        type="l",
+                        lty=2,
+                        ylim=range(marginal), col="red"
                     )
                     par(oldpar)
                 },
@@ -629,16 +444,20 @@ tomoSeq <- R6Class(
                         zlen <- dim[3]
                         xIndex <- rep(1:xlen, ylen * zlen)
                         yIndex <- 1:ylen %>%
-                                sapply(function (p) {rep(p, xlen)}) %>%
-                                rep(zlen)
+                            sapply(function (p) {rep(p, xlen)}) %>%
+                            rep(zlen)
                         zIndex <- 1:zlen %>%
                             sapply(function (p) {rep(p, xlen * ylen)}) %>%
                             as.vector()
-                        data.frame(x=xIndex, y=yIndex, z=zIndex,
-                                   value=vecReconst
-                        ) %>% return()
+                        data.frame(
+                            x=xIndex,
+                            y=yIndex,
+                            z=zIndex,
+                            value=vecReconst
+                        ) %>%
+                            return()
                     } else {
-                    stop("No result of reconstruction.")
+                        stop("No result of reconstruction.")
                     }
                 },
 
@@ -647,7 +466,7 @@ tomoSeq <- R6Class(
                     if (self$alreadyReconstructed == TRUE) {
                         return(self$reconst)
                     } else {
-                    stop("No result of reconstruction.")
+                        stop("No result of reconstruction.")
                     }
                 }
             )

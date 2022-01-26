@@ -14,15 +14,18 @@
 #' You can make a mask using `masker`.
 #' @export
 MakeTomoObjSet <- function (x, y, z, mask) {
-        return(tomoSeq$new(x=x, y=y,z=z, mask=mask))
+    return(tomoSeq$new(x=x, y=y,z=z, mask=mask))
 }
 
 #' @importFrom methods is
 CheckParameters <- function(tomoObj, query) {
     if (is(tomoObj, "tomoSeq") == FALSE) {
-        stop(paste("invalid class:", class(tomoObj),
-                   "\nFirst argument must be tomoSeq class object."
-             )
+        stop(
+            paste(
+                "invalid class:",
+                class(tomoObj),
+                "\nFirst argument must be tomoSeq class object."
+            )
         )
     }
     if (is.element(query, tomoObj$geneList) %>% min() == 0) {
@@ -88,36 +91,49 @@ PlotLossFunction <- function (tomoObj, geneID) {
 #' along each axis.
 #' @export
 #' @note  You can do the same thing with `tomoObj$Animate2d(geneID, ...)`.
-Animate2d <- function (tomoObj,
-                       geneID,
-                       target="expression",
-                       xaxis=1, yaxis=2,
-                       main=geneID,
-                       xlab=xaxis, ylab=yaxis,
-                       file=paste(geneID, "_", target, "_",
-                                  xaxis, "_", yaxis, ".gif",
-                                  sep=""
-                       ),
-                       zlim=NA,
-                       interval=0.1,
-                       aspectRatio=c()
-             ) {
+Animate2d <- function (
+    tomoObj,
+    geneID,
+    target="expression",
+    xaxis=1,
+    yaxis=2,
+    main=geneID,
+    xlab=xaxis,
+    ylab=yaxis,
+    file=paste(
+        geneID,
+        "_",
+        target,
+        "_",
+        xaxis,
+        "_",
+        yaxis,
+        ".gif",
+        sep=""
+    ),
+    zlim=NA,
+    interval=0.1,
+    aspectRatio=c()
+) {
     CheckParameters(tomoObj, geneID)
     if (length(aspectRatio) != 0 & length(aspectRatio) != 2) {
         stop("`aspectRatio` should be a 2D vector.")
-        }
+    }
     if (target == "mask" & is.na(zlim[1]) == FALSE) {
         warning('If target = "mask", parameter "zlim" is ignored.')
-        }
-    tomoObj$Animate2d(geneID=geneID,
-                       target=target,
-                       xaxis=xaxis, yaxis=yaxis,
-                       main=main,
-                       xlab=xlab, ylab=ylab,
-                       file=file,
-                       zlim=zlim,
-                       interval=interval,
-                       aspectRatio=aspectRatio
+    }
+    tomoObj$Animate2d(
+        geneID=geneID,
+        target=target,
+        xaxis=xaxis,
+        yaxis=yaxis,
+        main=main,
+        xlab=xlab,
+        ylab=ylab,
+        file=file,
+        zlim=zlim,
+        interval=interval,
+        aspectRatio=aspectRatio
     )
     return(invisible(tomoObj))
 }
