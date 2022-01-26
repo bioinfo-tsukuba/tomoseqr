@@ -251,32 +251,6 @@ tomoSeq <- R6Class(
                     self$geneID <- geneID
                 },
 
-                ## This function is used in Estimate3dExpression().
-                GetGeneExpression = function (tomoSeqData, geneID) {
-                    retvalMatrix <- tomoSeqData[
-                        tomoSeqData[, 1] == geneID,
-                    ]
-                    retvalMatrix <- retvalMatrix[, -1] %>% as.matrix()
-                    return(retvalMatrix)
-                },
-
-                RepMat = function (targetVector, nTimesRepeat) {
-                    lenX <- length(targetVector) * nTimesRepeat[1]
-                    lenY <- nTimesRepeat[2]
-                    lenZ <- nTimesRepeat[3]
-                    rep2d <- matrix(
-                        targetVector,
-                        nrow=lenX,
-                        ncol=lenY,
-                        byrow = F
-                    )
-                    rep3d <- array(NA, dim=c(lenX, lenY, lenZ))
-                    for (i in 1:lenZ) {
-                        rep3d[, , i] <- rep2d
-                    }
-                    return(rep3d)
-                },
-
                 ## Reconstruct 3D expression pattern.
                 Estimate3dExpression = function (
                     X,
@@ -292,9 +266,9 @@ tomoSeq <- R6Class(
                     sumY <- Y[, -1] %>% colSums()
                     sumZ <- Z[, -1] %>% colSums()
 
-                    x0 <- X %>% self$GetGeneExpression(self$geneID)
-                    y0 <- Y %>% self$GetGeneExpression(self$geneID)
-                    z0 <- Z %>% self$GetGeneExpression(self$geneID)
+                    x0 <- X %>% GetGeneExpression(self$geneID)
+                    y0 <- Y %>% GetGeneExpression(self$geneID)
+                    z0 <- Z %>% GetGeneExpression(self$geneID)
                     xLen <- length(x0)
                     yLen <- length(y0)
                     zLen <- length(z0)
@@ -349,7 +323,7 @@ tomoSeq <- R6Class(
 
                     for (i in 1:numIter) {
                         xa <- a %>% apply(1, sum)
-                        a <- a * self$RepMat(
+                        a <- a * RepMat(
                             x / xa,
                             c(
                                 1,
@@ -360,7 +334,7 @@ tomoSeq <- R6Class(
                         a[is.nan(a)] <- 0
                         ya <- a %>% apply(2, sum)
                         a <- a * aperm(
-                            self$RepMat(
+                            RepMat(
                                 y / ya,
                                 c(
                                     1,
@@ -373,7 +347,7 @@ tomoSeq <- R6Class(
                         a[is.nan(a)] <- 0
                         za <- a %>% apply(3, sum)
                         a <- a * aperm(
-                            self$RepMat(
+                            RepMat(
                                 z / za,
                                 c(
                                     1,

@@ -1,3 +1,24 @@
+
+## This function is used in Estimate3dExpression().
+GetGeneExpression <- function (tomoSeqData, geneID) {
+    retvalMatrix <- tomoSeqData[tomoSeqData[, 1] == geneID, ]
+    retvalMatrix <- retvalMatrix[, -1] %>% as.matrix()
+    return(retvalMatrix)
+}
+
+RepMat <- function (targetVector, nTimesRepeat) {
+    lenX <- length(targetVector) * nTimesRepeat[1]
+    lenY <- nTimesRepeat[2]
+    lenZ <- nTimesRepeat[3]
+    rep2d <- matrix(targetVector, nrow=lenX, ncol=lenY, byrow = F)
+    rep3d <- array(NA, dim=c(lenX, lenY, lenZ))
+    for (i in 1:lenZ) {
+        rep3d[, , i] <- rep2d
+    }
+    return(rep3d)
+}
+
+
 ColFunc <- function (n) {
     return(c("#000000", hcl.colors(n - 1, "Blues", rev = TRUE)))
 }
