@@ -139,44 +139,27 @@ tomoSeq <- R6Class(
             if (length(aspectRatio) != 0 & length(aspectRatio) != 2) {
                 stop("`aspectRatio` should be a 2D vector.")
             }
-            if (target == "expression") {
-                private$objectsEachGene[[geneID]]$Animate2dExpression(
-                    xaxis=xaxis,
-                    yaxis=yaxis,
-                    main=main,
-                    xlab=xlab,
-                    ylab=ylab,
-                    zlim=zlim,
-                    file=file,
-                    interval=interval,
-                    aspectRatio=aspectRatio
-                )
-            } else if (target == "mask") {
-                private$objectsEachGene[[geneID]]$Animate2dMask(
-                    xaxis=xaxis,
-                    yaxis=yaxis,
-                    main=main,
-                    xlab=xlab,
-                    ylab=ylab,
-                    file=file,
-                    interval=interval,
-                    aspectRatio=aspectRatio
-                )
-            } else if (target == "unite") {
-                private$objectsEachGene[[geneID]]$Animate2dUnite(
-                    xaxis=xaxis,
-                    yaxis=yaxis,
-                    main=main,
-                    xlab=xlab,
-                    ylab=ylab,
-                    zlim=zlim,
-                    file=file,
-                    interval=interval,
-                    aspectRatio=aspectRatio
-                )
-            } else {
-                stop(paste("Invalid option: target =", target, "\n"))
-            }
+            reconstArray <- private$objectsEachGene[[geneID]]$reconst %>%
+                aperm(perm=c(xaxis, yaxis, 6 - (xaxis + yaxis)))
+
+            maskArray <- private$valMask %>%
+                aperm(perm=c(xaxis, yaxis, 6 - (xaxis + yaxis)))
+
+            saveGIF(
+                AnimateForGIF(
+                    reconstArray = reconstArray,
+                    maskArray = maskArray,
+                    main = main,
+                    xlab = xlab,
+                    ylab = ylab,
+                    zlim = zlim,
+                    aspectRatio = aspectRatio,
+                    type = target
+                ),
+                movie.name=file,
+                interval=interval,
+                autobrowse=FALSE
+            )
         },
 
 #' @description Plot expression of single gene along axis
@@ -433,236 +416,6 @@ tomoSeq <- R6Class(
                         main=self$geneID,
                         xlab="Iteration number",
                         ylab="Loss"
-                    )
-                },
-
-                Animate2dExpression = function (
-                    xaxis,
-                    yaxis,
-                    main,
-                    xlab,
-                    ylab,
-                    file,
-                    zlim,
-                    interval,
-                    aspectRatio
-                ) {
-                    self$CheckReconstructed()
-                    if (is.na(zlim[1]) == TRUE) {
-                        realZlim <- range(self$reconst)
-                    } else {
-                        realZlim <- zlim
-                    }
-                    self$Animate2d(
-                        self$reconst,
-                        xaxis=xaxis,
-                        yaxis=yaxis,
-                        main=main,
-                        xlab=xlab,
-                        ylab=ylab,
-                        file=file,
-                        zlim=realZlim,
-                        interval=interval,
-                        aspectRatio=aspectRatio
-                    )
-                },
-
-                Animate2dMask = function (
-                    xaxis,
-                    yaxis,
-                    main,
-                    xlab,
-                    ylab,
-                    file,
-                    interval,
-                    aspectRatio
-                ) {
-                    self$CheckReconstructed()
-                    self$Animate2d(
-                        self$mask,
-                        xaxis=xaxis,
-                        yaxis=yaxis,
-                        main=main,
-                        xlab=xlab,
-                        ylab=ylab,
-                        file=file,
-                        zlim=c(0, 1),
-                        interval=interval,
-                        aspectRatio=aspectRatio
-                    )
-                },
-
-                Animate2dUnite = function (
-                    xaxis,
-                    yaxis,
-                    main,
-                    xlab,
-                    ylab,
-                    file,
-                    zlim,
-                    interval,
-                    aspectRatio
-                ) {
-                    self$CheckReconstructed()
-                    if (is.na(zlim[1]) == TRUE) {
-                        realZlim <- range(self$reconst)
-                    } else {
-                        realZlim <- zlim
-                    }
-                    self$AnimateMaskAndExpression(
-                        xaxis=xaxis,
-                        yaxis=yaxis,
-                        main=main,
-                        xlab=xlab,
-                        ylab=ylab,
-                        file=file,
-                        zlim=realZlim,
-                        interval=interval,
-                        aspectRatio=aspectRatio
-                    )
-                },
-
-                ContourForAnimate = function (
-                    array3d,
-                    main,
-                    xlab,
-                    ylab,
-                    zlim,
-                    aspectRatio
-                ) {
-                    if (length(aspectRatio) < 2) {
-                        arrayDim <- dim(array3d)
-                        asp <- arrayDim[2] / arrayDim[1]
-                    } else {
-                        asp <- aspectRatio[2] / aspectRatio[1]
-                    }
-                    message("generating", appendLF=FALSE)
-                    for (i in seq_along(array3d[1, 1, ])) {
-                        message(".", appendLF=FALSE)
-                        filled.contour(
-                            array3d[, , i],
-                            main=paste(main, "_", i, sep=""),
-                            xlab=xlab,
-                            ylab=ylab,
-                            zlim=zlim,
-                            asp=asp,
-                            frame.plot=F
-                        )
-                    }
-                    message("")
-                },
-
-                ContourMaskAndExpression = function (
-                    maskApermed,
-                    reconstApermed,
-                    main,
-                    xlab,
-                    ylab,
-                    zlim,
-                    aspectRatio
-                ) {
-                    if (length(aspectRatio) < 2) {
-                        ## Dim of reconstructed matrix should be equal to
-                        ## that of mask.
-                        plotDim <- dim(maskApermed)
-                        asp <- plotDim[2] / plotDim[1]
-                    } else {
-                        asp <- aspectRatio[2] / aspectRatio[1]
-                    }
-                    plotArray <- reconstApermed + maskApermed - 1
-                    ColFunc <- function (n) {
-                        return(
-                            c(
-                                "#000000",
-                                hcl.colors(
-                                    n - 1,
-                                    "Oslo",
-                                    rev = FALSE
-                                )
-                            )
-                        )
-                    }
-                    message("generating", appendLF=FALSE)
-                    for (i in seq_along(plotArray[1, 1, ])) {
-                        message(".", appendLF=FALSE)
-                        filled.contour(
-                            plotArray[, , i],
-                            zlim = c(-1, max(plotArray)),
-                            color.palette = ColFunc,
-                            main=paste(main, "_", i, sep=""),
-                            nlevel = 50,
-                            xlab=xlab,
-                            ylab=ylab,
-                            asp = asp,
-                            frame.plot = FALSE
-                        )
-                    }
-                    message("")
-                },
-
-                Animate2d = function (
-                    array3d,
-                    xaxis,
-                    yaxis,
-                    main,
-                    xlab,
-                    ylab,
-                    file,
-                    zlim,
-                    interval,
-                    aspectRatio
-                ) {
-                    array3dApermed <- aperm(
-                        array3d,
-                        perm=c(xaxis, yaxis, 6 - (xaxis + yaxis))
-                    )
-                    saveGIF(
-                        self$ContourForAnimate(
-                            array3d=array3dApermed,
-                            main=main,
-                            xlab=xlab,
-                            ylab=ylab,
-                            zlim=zlim,
-                            aspectRatio=aspectRatio
-                        ),
-                        movie.name=file,
-                        interval=interval,
-                        autobrowse=FALSE
-                    )
-                },
-
-                AnimateMaskAndExpression = function (
-                    xaxis,
-                    yaxis,
-                    main,
-                    xlab,
-                    ylab,
-                    file,
-                    zlim,
-                    interval,
-                    aspectRatio
-                ) {
-                    maskApermed <- aperm(
-                        self$mask,
-                        perm=c(xaxis, yaxis, 6 - (xaxis + yaxis))
-                    )
-                    reconstApermed <- aperm(
-                        self$reconst,
-                        perm=c(xaxis, yaxis, 6 - (xaxis + yaxis))
-                    )
-                    saveGIF(
-                        self$ContourMaskAndExpression(
-                            maskApermed = maskApermed,
-                            reconstApermed = reconstApermed,
-                            main=main,
-                            xlab=xlab,
-                            ylab=ylab,
-                            zlim=zlim,
-                            aspectRatio=aspectRatio
-                        ),
-                        movie.name=file,
-                        interval=interval,
-                        autobrowse=FALSE
                     )
                 },
 
