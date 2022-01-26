@@ -1,3 +1,17 @@
+#' Output the reconstructed expression pattern as an image.
+#' @param tomoObj tomoSeq object
+#' @param geneID geneID as string
+#' @importFrom shiny reactive
+#' @importFrom shiny animationOptions
+#' @importFrom shiny plotOutput
+#' @importFrom shiny renderPlot
+#' @importFrom shiny sidebarLayout
+#' @importFrom shiny sliderInput
+#' @importFrom shiny tabPanel
+#' @importFrom shiny tabsetPanel
+#' @importFrom shiny textInput
+#' @importFrom shiny hr
+#' @importFrom shiny h3
 #' @export
 ImageViewer <- function (tomoObj, geneID) {
     recResult <- tomoObj$GetReconstructedResult(geneID)
