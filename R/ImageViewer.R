@@ -14,271 +14,271 @@ ImageViewer <- function (tomoObj, geneID) {
     ui <- function () {
         fluidPage(
             titlePanel("Image viewer"),
-                tabsetPanel(
-                    type="tabs",
+            tabsetPanel(
+                type="tabs",
 
-                    ## Along x
-                    tabPanel(
-                        "Along x",
-                        hr(),
-                        sidebarLayout(
-                            sidebarPanel(
-                                # style = "overflow-y: scroll",
-                                radioButtons(
-                                    "x_type",
-                                    label = h3("Type"),
-                                    choices = list(
-                                        "Expression" = "expression",
-                                        "Mask" = "mask",
-                                        "Unite" = "unite"
-                                    ), 
-                                    selected = "expression"
-                                ),
-                                sliderInput(
-                                    "xSec",
-                                    "Section",
-                                    min=1,
-                                    max=dim(recResult)[3],
-                                    step=1,
-                                    value=1,
-                                    # animate=TRUE,
-                                    animate = animationOptions(
-                                        interval=100,
-                                        loop=TRUE
-                                    )
-                                ),
-                                h4("Aspect ratio"),
-                                inputPanel(
-                                    numericInput(
-                                        "x_asp_x",
-                                        label = "x",
-                                        value = dim(recAlongX)[1],
-                                        min=1,
-                                        width = 100
-                                    ),
-                                    numericInput(
-                                        "x_asp_y",
-                                        value = dim(recAlongX)[2],
-                                        label="y",
-                                        min=1,
-                                        width=100
-                                    )
-                                ),
-                                h4("Labels"),
-                                inputPanel(
-                                    textInput(
-                                        "x_main",
-                                        label="Title",
-                                        value=geneID
-                                    ),
-                                    textInput(
-                                        "x_xlab",
-                                        label="x label",
-                                        value="y"
-                                    ),
-                                    textInput(
-                                        "x_ylab",
-                                        label="y label",
-                                        value="z"
-                                    ),
-                                ),
-                                h4("zlim"),
-                                inputPanel(
-                                    sliderInput(
-                                        "x_zlim",
-                                        "zlim",
-                                        min=0,
-                                        max=sliderMax,
-                                        step=1,
-                                        value=c(1, sliderMax),
-                                    )
-                                ),
-                                downloadButton(
-                                    "XdownloadFig",
-                                    label = "Download figure"
+                ## Along x
+                tabPanel(
+                    "Along x",
+                    hr(),
+                    sidebarLayout(
+                        sidebarPanel(
+                            # style = "overflow-y: scroll",
+                            radioButtons(
+                                "x_type",
+                                label = h3("Type"),
+                                choices = list(
+                                    "Expression" = "expression",
+                                    "Mask" = "mask",
+                                    "Unite" = "unite"
+                                ), 
+                                selected = "expression"
+                            ),
+                            sliderInput(
+                                "xSec",
+                                "Section",
+                                min=1,
+                                max=dim(recResult)[3],
+                                step=1,
+                                value=1,
+                                # animate=TRUE,
+                                animate = animationOptions(
+                                    interval=100,
+                                    loop=TRUE
                                 )
                             ),
-                            mainPanel(
-                                plotOutput("xplot")
+                            h4("Aspect ratio"),
+                            inputPanel(
+                                numericInput(
+                                    "x_asp_x",
+                                    label = "x",
+                                    value = dim(recAlongX)[1],
+                                    min=1,
+                                    width = 100
+                                ),
+                                numericInput(
+                                    "x_asp_y",
+                                    value = dim(recAlongX)[2],
+                                    label="y",
+                                    min=1,
+                                    width=100
+                                )
+                            ),
+                            h4("Labels"),
+                            inputPanel(
+                                textInput(
+                                    "x_main",
+                                    label="Title",
+                                    value=geneID
+                                ),
+                                textInput(
+                                    "x_xlab",
+                                    label="x label",
+                                    value="y"
+                                ),
+                                textInput(
+                                    "x_ylab",
+                                    label="y label",
+                                    value="z"
+                                ),
+                            ),
+                            h4("zlim"),
+                            inputPanel(
+                                sliderInput(
+                                    "x_zlim",
+                                    "zlim",
+                                    min=0,
+                                    max=sliderMax,
+                                    step=1,
+                                    value=c(1, sliderMax),
+                                )
+                            ),
+                            downloadButton(
+                                "XdownloadFig",
+                                label = "Download figure"
                             )
+                        ),
+                        mainPanel(
+                            plotOutput("xplot")
                         )
-                    ),
+                    )
+                ),
 
-                    ## Along y
-                    tabPanel(
-                        "Along y",
-                        hr(),
-                        sidebarLayout(
-                            sidebarPanel(
-                                # style = "overflow-y: scroll",
-                                radioButtons(
-                                    "y_type",
-                                    label = h3("Type"),
-                                    choices = list(
-                                        "Expression" = "expression",
-                                        "Mask" = "mask",
-                                        "Unite" = "unite"
-                                    ), 
-                                    selected = "expression"
-                                ),
-                                sliderInput(
-                                    "ySec",
-                                    "Section",
-                                    min=1,
-                                    max=dim(recResult)[3],
-                                    step=1,
-                                    value=1,
-                                    # animate=TRUE,
-                                    animate = animationOptions(
-                                        interval=100,
-                                        loop=TRUE
-                                    )
-                                ),
-                                h4("Aspect ratio"),
-                                inputPanel(
-                                    numericInput(
-                                        "y_asp_x",
-                                        label = "x",
-                                        value = dim(recAlongY)[1],
-                                        min=1,
-                                        width = 100
-                                    ),
-                                    numericInput(
-                                        "y_asp_y",
-                                        value = dim(recAlongY)[2],
-                                        label="y",
-                                        min=1,
-                                        width=100
-                                    )
-                                ),
-                                h4("Labels"),
-                                inputPanel(
-                                    textInput(
-                                        "y_main",
-                                        label="Title",
-                                        value=geneID
-                                    ),
-                                    textInput(
-                                        "y_xlab",
-                                        label="x label",
-                                        value="x"
-                                    ),
-                                    textInput(
-                                        "y_ylab",
-                                        label="y label",
-                                        value="z"
-                                    ),
-                                ),
-                                h4("zlim"),
-                                inputPanel(
-                                    sliderInput(
-                                        "y_zlim",
-                                        "zlim",
-                                        min=0,
-                                        max=sliderMax,
-                                        step=1,
-                                        value=c(1, sliderMax),
-                                    )
-                                ),
-                                downloadButton(
-                                    "YdownloadFig",
-                                    label = "Download figure"
+                ## Along y
+                tabPanel(
+                    "Along y",
+                    hr(),
+                    sidebarLayout(
+                        sidebarPanel(
+                            # style = "overflow-y: scroll",
+                            radioButtons(
+                                "y_type",
+                                label = h3("Type"),
+                                choices = list(
+                                    "Expression" = "expression",
+                                    "Mask" = "mask",
+                                    "Unite" = "unite"
+                                ), 
+                                selected = "expression"
+                            ),
+                            sliderInput(
+                                "ySec",
+                                "Section",
+                                min=1,
+                                max=dim(recResult)[3],
+                                step=1,
+                                value=1,
+                                # animate=TRUE,
+                                animate = animationOptions(
+                                    interval=100,
+                                    loop=TRUE
                                 )
                             ),
-                            mainPanel(
-                                plotOutput("yplot")
+                            h4("Aspect ratio"),
+                            inputPanel(
+                                numericInput(
+                                    "y_asp_x",
+                                    label = "x",
+                                    value = dim(recAlongY)[1],
+                                    min=1,
+                                    width = 100
+                                ),
+                                numericInput(
+                                    "y_asp_y",
+                                    value = dim(recAlongY)[2],
+                                    label="y",
+                                    min=1,
+                                    width=100
+                                )
+                            ),
+                            h4("Labels"),
+                            inputPanel(
+                                textInput(
+                                    "y_main",
+                                    label="Title",
+                                    value=geneID
+                                ),
+                                textInput(
+                                    "y_xlab",
+                                    label="x label",
+                                    value="x"
+                                ),
+                                textInput(
+                                    "y_ylab",
+                                    label="y label",
+                                    value="z"
+                                ),
+                            ),
+                            h4("zlim"),
+                            inputPanel(
+                                sliderInput(
+                                    "y_zlim",
+                                    "zlim",
+                                    min=0,
+                                    max=sliderMax,
+                                    step=1,
+                                    value=c(1, sliderMax),
+                                )
+                            ),
+                            downloadButton(
+                                "YdownloadFig",
+                                label = "Download figure"
                             )
+                        ),
+                        mainPanel(
+                            plotOutput("yplot")
                         )
-                    ),
+                    )
+                ),
 
-                    ## Along z
-                    tabPanel(
-                        "Along z",
-                        hr(),
-                        sidebarLayout(
-                            sidebarPanel(
-                                # style = "overflow-y: scroll",
-                                radioButtons(
-                                    "z_type",
-                                    label = h3("Type"),
-                                    choices = list(
-                                        "Expression" = "expression",
-                                        "Mask" = "mask",
-                                        "Unite" = "unite"
-                                    ), 
-                                    selected = "expression"
-                                ),
-                                sliderInput(
-                                    "zSec",
-                                    "Section",
-                                    min=1,
-                                    max=dim(recResult)[3],
-                                    step=1,
-                                    value=1,
-                                    # animate=TRUE,
-                                    animate = animationOptions(
-                                        interval=100,
-                                        loop=TRUE
-                                    )
-                                ),
-                                h4("Aspect ratio"),
-                                inputPanel(
-                                    numericInput(
-                                        "z_asp_x",
-                                        label = "x",
-                                        value = dim(recAlongZ)[1],
-                                        min=1,
-                                        width = 100
-                                    ),
-                                    numericInput(
-                                        "z_asp_y",
-                                        value = dim(recAlongY)[2],
-                                        label="y",
-                                        min=1,
-                                        width=100
-                                    )
-                                ),
-                                h4("Labels"),
-                                inputPanel(
-                                    textInput(
-                                        "z_main",
-                                        label="Title",
-                                        value=geneID
-                                    ),
-                                    textInput(
-                                        "z_xlab",
-                                        label="x label",
-                                        value="x"
-                                    ),
-                                    textInput(
-                                        "z_ylab",
-                                        label="y label",
-                                        value="y"
-                                    ),
-                                ),
-                                h4("zlim"),
-                                inputPanel(
-                                    sliderInput(
-                                        "z_zlim",
-                                        "zlim",
-                                        min=0,
-                                        max=sliderMax,
-                                        step=1,
-                                        value=c(1, sliderMax),
-                                    )
-                                ),
-                                downloadButton(
-                                    "ZdownloadFig",
-                                    label = "Download figure"
+                ## Along z
+                tabPanel(
+                    "Along z",
+                    hr(),
+                    sidebarLayout(
+                        sidebarPanel(
+                            # style = "overflow-y: scroll",
+                            radioButtons(
+                                "z_type",
+                                label = h3("Type"),
+                                choices = list(
+                                    "Expression" = "expression",
+                                    "Mask" = "mask",
+                                    "Unite" = "unite"
+                                ), 
+                                selected = "expression"
+                            ),
+                            sliderInput(
+                                "zSec",
+                                "Section",
+                                min=1,
+                                max=dim(recResult)[3],
+                                step=1,
+                                value=1,
+                                # animate=TRUE,
+                                animate = animationOptions(
+                                    interval=100,
+                                    loop=TRUE
                                 )
                             ),
-                            mainPanel(
-                                plotOutput("zplot")
+                            h4("Aspect ratio"),
+                            inputPanel(
+                                numericInput(
+                                    "z_asp_x",
+                                    label = "x",
+                                    value = dim(recAlongZ)[1],
+                                    min=1,
+                                    width = 100
+                                ),
+                                numericInput(
+                                    "z_asp_y",
+                                    value = dim(recAlongY)[2],
+                                    label="y",
+                                    min=1,
+                                    width=100
+                                )
+                            ),
+                            h4("Labels"),
+                            inputPanel(
+                                textInput(
+                                    "z_main",
+                                    label="Title",
+                                    value=geneID
+                                ),
+                                textInput(
+                                    "z_xlab",
+                                    label="x label",
+                                    value="x"
+                                ),
+                                textInput(
+                                    "z_ylab",
+                                    label="y label",
+                                    value="y"
+                                ),
+                            ),
+                            h4("zlim"),
+                            inputPanel(
+                                sliderInput(
+                                    "z_zlim",
+                                    "zlim",
+                                    min=0,
+                                    max=sliderMax,
+                                    step=1,
+                                    value=c(1, sliderMax),
+                                )
+                            ),
+                            downloadButton(
+                                "ZdownloadFig",
+                                label = "Download figure"
                             )
+                        ),
+                        mainPanel(
+                            plotOutput("zplot")
                         )
                     )
                 )
             )
+        )
     }
     server <- function (input, output) {
 
