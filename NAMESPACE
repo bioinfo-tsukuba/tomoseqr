@@ -3,6 +3,7 @@
 export(Animate2d)
 export(Estimate3dExpressions)
 export(GetReconstructedResult)
+export(ImageViewer)
 export(MakeTomoObjSet)
 export(Masker)
 export(Plot1dAllExpression)
