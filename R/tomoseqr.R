@@ -72,10 +72,20 @@ tomoSeq <- R6Class(
             }
 
             for (geneID in queries) {
-                private$objectsEachGene[[geneID]]$Estimate3dExpression(
-                    private$x, private$y, private$z, private$valMask,
-                    normCount=normCount, normMask=normMask
+                estimatedResult <- Estimate3dExpression(
+                    private$x,
+                    private$y,
+                    private$z,
+                    geneID,
+                    private$valMask,
+                    normCount=normCount,
+                    normMask=normMask,
+                    numIter=100
                 )
+                private$objectsEachGene[[geneID]]$reconst <- estimatedResult[["reconst"]]
+                private$objectsEachGene[[geneID]]$alreadyReconstructed <- TRUE
+                private$objectsEachGene[[geneID]]$loss <- estimatedResult[["errFunc"]]
+                private$objectsEachGene[[geneID]]$marginalDist <- estimatedResult[["marginalDist"]]
             }
         },
 
@@ -238,137 +248,13 @@ tomoSeq <- R6Class(
             classname = "singleGene",
             public = list(
                 geneID = "gene ID",
-                X = matrix(0, nrow = 1, ncol = 1),
-                Y = matrix(0, nrow = 1, ncol = 1),
-                Z = matrix(0, nrow = 1, ncol = 1),
                 reconst = array(0, dim = c(1, 1, 1)),
-                mask = array(0, dim = c(1, 1, 1)),
                 loss = c(),
                 marginalDist = array(0, dim=c(1, 1, 1)),
                 alreadyReconstructed = FALSE,
 
                 initialize = function (x, y, z, geneID) {
                     self$geneID <- geneID
-                },
-
-                ## Reconstruct 3D expression pattern.
-                Estimate3dExpression = function (
-                    X,
-                    Y,
-                    Z,
-                    mask,
-                    normCount,
-                    normMask,
-                    numIter=100
-                ) {
-                    self$mask <- mask
-                    sumX <- X[, -1] %>% colSums()
-                    sumY <- Y[, -1] %>% colSums()
-                    sumZ <- Z[, -1] %>% colSums()
-
-                    x0 <- X %>% GetGeneExpression(self$geneID)
-                    y0 <- Y %>% GetGeneExpression(self$geneID)
-                    z0 <- Z %>% GetGeneExpression(self$geneID)
-                    xLen <- length(x0)
-                    yLen <- length(y0)
-                    zLen <- length(z0)
-
-                    maskX <- self$mask %>% apply(1, sum)
-                    maskY <- self$mask %>% apply(2, sum)
-                    maskZ <- self$mask %>% apply(3, sum)
-
-                    if (normCount == "countSum") {
-                    x <- x0 / sumX
-                    y <- y0 / sumY
-                    z <- z0 / sumZ
-                    }
-                    
-                    if (is.list(normCount)) {
-                        x <- x0 / normCount[["x"]]
-                        y <- y0 / normCount[["y"]]
-                        z <- z0 / normCount[["z"]]
-                    }
-
-                    if (normCount == "none") {
-                        x <- x0
-                        y <- y0
-                        z <- z0
-                    }
-
-                    if (normMask) {
-                        x <- x * maskX
-                        y <- y * maskY
-                        z <- z * maskZ
-                    }
-
-                    x[1, is.nan(x)] <- 0
-                    y[1, is.nan(y)] <- 0
-                    z[1, is.nan(z)] <- 0
-                    x[is.infinite(x)] <- max(x[x < Inf])
-                    y[is.infinite(y)] <- max(z[y < Inf])
-                    z[is.infinite(z)] <- max(y[z < Inf])
-
-                    xRaw <- sumX
-                    yRaw <- sumY
-                    zRaw <- sumZ
-
-                    m <- mean(c(sum(xRaw), sum(yRaw), sum(zRaw)))
-
-                    x <- x / sum(x) * m
-                    y <- y / sum(y) * m
-                    z <- z / sum(z) * m
-                    a <- self$mask
-
-                    er <- c()
-
-                    for (i in 1:numIter) {
-                        xa <- a %>% apply(1, sum)
-                        a <- a * RepMat(
-                            x / xa,
-                            c(
-                                1,
-                                dim(self$mask)[2],
-                                dim(self$mask)[3]
-                            )
-                        )
-                        a[is.nan(a)] <- 0
-                        ya <- a %>% apply(2, sum)
-                        a <- a * aperm(
-                            RepMat(
-                                y / ya,
-                                c(
-                                    1,
-                                    dim(self$mask)[1],
-                                    dim(self$mask)[3]
-                                )
-                            ),
-                            perm = c(2, 1, 3)
-                        )
-                        a[is.nan(a)] <- 0
-                        za <- a %>% apply(3, sum)
-                        a <- a * aperm(
-                            RepMat(
-                                z / za,
-                                c(
-                                    1,
-                                    dim(self$mask)[1],
-                                    dim(self$mask)[2]
-                                )
-                            ),
-                            perm = c(2, 3, 1)
-                        )
-                        a[is.nan(a)] <- 0
-                        er <- append(
-                            er,
-                            sum((xa - x)^2) +
-                                sum((ya - y)^2) +
-                                sum((za - z)^2)
-                        )
-                    }
-                    self$reconst <- a
-                    self$loss <- er
-                    self$marginalDist <- list(x[1, ], y[1, ], z[1, ])
-                    self$alreadyReconstructed <- TRUE
                 },
 
                 CheckReconstructed = function () {

@@ -18,6 +18,98 @@ RepMat <- function (targetVector, nTimesRepeat) {
     return(rep3d)
 }
 
+Estimate3dExpression <- function (
+    X,
+    Y,
+    Z,
+    geneID,
+    mask,
+    normCount,
+    normMask,
+    numIter
+) {
+    sumX <- X[, -1] %>% colSums()
+    sumY <- Y[, -1] %>% colSums()
+    sumZ <- Z[, -1] %>% colSums()
+
+    x0 <- X %>% GetGeneExpression(geneID)
+    y0 <- Y %>% GetGeneExpression(geneID)
+    z0 <- Z %>% GetGeneExpression(geneID)
+    xLen <- length(x0)
+    yLen <- length(y0)
+    zLen <- length(z0)
+
+    maskX <- mask %>% apply(1, sum)
+    maskY <- mask %>% apply(2, sum)
+    maskZ <- mask %>% apply(3, sum)
+
+    if (normCount == "countSum") {
+        x <- x0 / sumX
+        y <- y0 / sumY
+        z <- z0 / sumZ
+    }
+    
+    if (is.list(normCount)) {
+        x <- x0 / normCount[["x"]]
+        y <- y0 / normCount[["y"]]
+        z <- z0 / normCount[["z"]]
+    }
+
+    if (normCount == "none") {
+        x <- x0
+        y <- y0
+        z <- z0
+    }
+
+    if (normMask) {
+        x <- x * maskX
+        y <- y * maskY
+        z <- z * maskZ
+    }
+
+    x[1, is.nan(x)] <- 0
+    y[1, is.nan(y)] <- 0
+    z[1, is.nan(z)] <- 0
+    x[is.infinite(x)] <- max(x[x < Inf])
+    y[is.infinite(y)] <- max(z[y < Inf])
+    z[is.infinite(z)] <- max(y[z < Inf])
+
+    xRaw <- sumX
+    yRaw <- sumY
+    zRaw <- sumZ
+
+    m <- mean(c(sum(xRaw), sum(yRaw), sum(zRaw)))
+
+    x <- x / sum(x) * m
+    y <- y / sum(y) * m
+    z <- z / sum(z) * m
+    a <- mask
+
+    er <- c()
+
+    for (i in 1:numIter) {
+        xa <- a %>% apply(1, sum)
+        a <- a * RepMat(x / xa, c(1, dim(mask)[2], dim(mask)[3]))
+        a[is.nan(a)] <- 0
+        ya <- a %>% apply(2, sum)
+        a <- a * aperm(
+            RepMat(y / ya, c(1, dim(mask)[1], dim(mask)[3])),
+            perm = c(2, 1, 3)
+        )
+        a[is.nan(a)] <- 0
+        za <- a %>% apply(3, sum)
+        a <- a * aperm(
+            RepMat(z / za, c(1, dim(mask)[1], dim(mask)[2])),
+            perm = c(2, 3, 1)
+        )
+        a[is.nan(a)] <- 0
+        er <- append(er, sum((xa - x)^2) + sum((ya - y)^2) + sum((za - z)^2))
+    }
+
+    retList <- list(a, er, list(x[1, ], y[1, ], z[1, ]))
+    names(retList) <- c("reconst", "errFunc", "marginalDist")
+    return(retList)
+}
 
 ColFunc <- function (n) {
     return(c("#000000", hcl.colors(n - 1, "Blues", rev = TRUE)))
