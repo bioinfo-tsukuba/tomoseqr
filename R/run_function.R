@@ -1,4 +1,29 @@
-#' Make set of tomoseq objects
+#' Extract geneIDs to which hoge can be applied.
+#' @param x A data.frame object containing a simulated Tomo-seq data
+#' for x-axis sections. The rows represent genes. The first column
+#' contains gene IDs and the second and subsequent columns contain
+#' gene expression levels in sections.
+#' @param y A data.frame object containing a simulated Tomo-seq data for y-axis
+#' sections. The rows represent genes. The first column contains gene IDs and
+#' the second and subsequent columns contain gene expression levels in sections.
+#' @param z A data.frame object containing a simulated Tomo-seq data for
+#' z-axis sections. The rows represent genes. The first column
+#' contains gene IDs and the second and subsequent columns contain
+#' gene expression levels in sections.
+#' @export
+ExtractGeneList <- function (x, y, z) {
+    xGene <- x[, 1] %>% t()
+    yGene <- y[, 1] %>% t()
+    zGene <- z[, 1] %>% t()
+    xAndy <- intersect(xGene, yGene)
+    return(intersect(xAndy, zGene))
+}
+
+#' Estimate 3d expressions
+#' @param tomoObj tomoSeq object
+#' @param query Vector of gene IDs
+#' @param normCount Specifies the method to normalize
+#' the expression amount data.
 #' @param x A data.frame object containing a simulated Tomo-seq data
 #' for x-axis sections. The rows represent genes. The first column
 #' contains gene IDs and the second and subsequent columns contain
@@ -12,51 +37,39 @@
 #' gene expression levels in sections.
 #' @param mask A 3D array that represents if each boxel is included to sample.
 #' You can make a mask using `masker`.
-#' @export
-MakeTomoObjSet <- function (x, y, z, mask) {
-    return(tomoSeq$new(x=x, y=y,z=z, mask=mask))
-}
-
-#' @importFrom methods is
-CheckParameters <- function(tomoObj, query) {
-    if (is(tomoObj, "tomoSeq") == FALSE) {
-        stop(
-            paste(
-                "invalid class:",
-                class(tomoObj),
-                "\nFirst argument must be tomoSeq class object."
-            )
-        )
-    }
-    if (is.element(query, tomoObj$geneList) %>% min() == 0) {
-        queryNotIn <- query[is.element(query, tomoObj$geneList) == FALSE]
-        queryNotInStr <- paste(queryNotIn, collapse=", ")
-        stop(paste(queryNotInStr, ' is not in data.', sep=''))
-    }
-}
-#' Estimate 3d expressions
-#' @param tomoObj tomoSeq object
-#' @param query Vector of gene IDs
-#' @param normCount Specifies the method to normalize
-#' the expression amount data.
 #' @param normMask Whether to normalize by mask or not
 #' @return tomoSeq object
 #' @export
-#' @note  You can do the same things with
-#' `tomoObj$Estimate3dExpressions(query)`.
 Estimate3dExpressions <- function (
-    tomoObj,
+    x,
+    y,
+    z,
+    mask,
     query,
+    numIter = 100,
     normCount="countSum",
     normMask=TRUE
 ) {
-    CheckParameters(tomoObj, query)
-    tomoObj$Estimate3dExpressions(
-        queries=query,
-        normCount=normCount,
-        normMask=normMask
+    recList <- list_along(query)
+    names(recList) <- query
+    for (geneID in query) {
+        recList[[geneID]] <- SingleEstimate(
+            x,
+            y,
+            z,
+            mask=mask,
+            geneID=geneID,
+            normCount=normCount,
+            normMask=normMask,
+            numIter=numIter
+        )
+    }
+    retList <- list(
+        "mask" = mask,
+        "results" = recList
     )
-    return(invisible(tomoObj))
+    class(retList) <- "tomoSeq"
+    return(retList)
 }
 
 
@@ -67,9 +80,14 @@ Estimate3dExpressions <- function (
 #' @note  You can do the same things with
 #' `tomoObj$PlotLossFunction(geneID)`.
 PlotLossFunction <- function (tomoObj, geneID) {
-    CheckParameters(tomoObj, geneID)
-    tomoObj$PlotLossFunction(geneID=geneID)
-    return(invisible(tomoObj))
+    # CheckParameters(tomoObj, geneID)
+    tomoObj[["results"]][[geneID]][["errFunc"]] %>%
+        plot(
+            type = "l",
+            main = geneID,
+            xlab = "Iteration number",
+            ylab = "Loss"
+        )
 }
 
 #' Animate 2D expressions along one axis and generate GIF file.
@@ -100,55 +118,68 @@ Animate2d <- function (
     main=geneID,
     xlab=xaxis,
     ylab=yaxis,
-    file=paste(
-        geneID,
-        "_",
-        target,
-        "_",
-        xaxis,
-        "_",
-        yaxis,
-        ".gif",
-        sep=""
-    ),
+    file=str_c(geneID, "_", target, "_", xaxis, "_", yaxis, ".gif"),
     zlim=NA,
     interval=0.1,
     aspectRatio=c()
 ) {
-    CheckParameters(tomoObj, geneID)
+    # CheckParameters(tomoObj, geneID)
     if (length(aspectRatio) != 0 & length(aspectRatio) != 2) {
         stop("`aspectRatio` should be a 2D vector.")
     }
     if (target == "mask" & is.na(zlim[1]) == FALSE) {
         warning('If target = "mask", parameter "zlim" is ignored.')
     }
-    tomoObj$Animate2d(
-        geneID=geneID,
-        target=target,
-        xaxis=xaxis,
-        yaxis=yaxis,
-        main=main,
-        xlab=xlab,
-        ylab=ylab,
-        file=file,
-        zlim=zlim,
+
+    reconstArray <- tomoObj[["results"]][[geneID]][["reconst"]] %>%
+        aperm(perm=c(xaxis, yaxis, 6 - (xaxis + yaxis)))
+    maskArray <- tomoObj[["mask"]] %>%
+        aperm(perm=c(xaxis, yaxis, 6 - (xaxis + yaxis)))
+
+    saveGIF(
+        AnimateForGIF(
+            reconstArray = reconstArray,
+            maskArray = maskArray,
+            main = main,
+            xlab = xlab,
+            ylab = ylab,
+            zlim = zlim,
+            aspectRatio = aspectRatio,
+            type = target
+        ),
+        movie.name=file,
         interval=interval,
-        aspectRatio=aspectRatio
+        autobrowse=FALSE
     )
-    return(invisible(tomoObj))
 }
 
 #' Plot expression of single gene along an axis
 #' @param tomoObj tomoSeq object
 #' @param geneID single gene ID (string)
-#' @param axes axis (1, 2 or 3)
+#' @param axes axis ("x", "y" or "z")
 #' @export
 #' @note  You can do the same thing with
 #' `tomoObj$Plot1dExpression(geneID, axes)`.
 Plot1dExpression <- function (tomoObj, geneID, axes) {
-    CheckParameters(tomoObj, geneID)
-    tomoObj$Plot1dExpression(geneID, axes)
-    return(invisible(tomoObj))
+    # CheckParameters(tomoObj, geneID)
+    convertList <- list("x" = 1, "y" = 2, "z" = 3)
+    oldpar <- par(no.readonly=T)
+    on.exit(par(oldpar))
+    marginal <- tomoObj[["results"]][[geneID]][[axes]]
+    plot(marginal, type="l", lty=3, axes=F, ann=F)
+    par(new=T)
+    plot(
+        apply(
+            tomoObj[["results"]][[geneID]][["reconst"]],
+            convertList[[axes]],
+            sum
+        ),
+        type="l",
+        lty=2,
+        ylim=range(marginal), col="red",
+        xlab = "Section",
+        ylab = "Expression level"
+    )
 }
 
 #' Plot expressions of all genes along an axis
@@ -156,9 +187,8 @@ Plot1dExpression <- function (tomoObj, geneID, axes) {
 #' @param axes axis (1, 2 or 3)
 #' @export
 #' @note  You can do the same thing with
-Plot1dAllExpression <- function (tomoObj, axes) {
-    tomoObj$Plot1dAllExpression(axes)
-    return(invisible(tomoObj))
+Plot1dAllExpression <- function (tomoSeqData, ...) {
+    tomoSeqData[, -1] %>% colSums() %>% plot(type="l", ...)
 }
 
 #' Convert reconstructed matrix to data.frame.
@@ -168,8 +198,10 @@ Plot1dAllExpression <- function (tomoObj, axes) {
 #' @note  You can do the same thing with
 #' `tomoObj$ToDataFrame(geneID)`.
 ToDataFrame <- function (tomoObj, geneID) {
-    CheckParameters(tomoObj, geneID)
-    tomoObj$ToDataFrame(geneID)
+    # CheckParameters(tomoObj, geneID)
+    tomoObj[["results"]][[geneID]][["reconst"]] %>%
+        MatrixToDataFrame() %>%
+        return()
 }
 
 #' Get reconstructed matrix
@@ -179,6 +211,6 @@ ToDataFrame <- function (tomoObj, geneID) {
 #' @note  You can do the same thing with
 #' `tomoObj$GetReconstructedResult(geneID)`.
 GetReconstructedResult <- function (tomoObj, geneID) {
-    CheckParameters(tomoObj, geneID)
-    tomoObj$GetReconstructedResult(geneID)
+    # CheckParameters(tomoObj, geneID)
+    return(tomoObj[["results"]][[geneID]][["reconst"]])
 }

@@ -4,7 +4,7 @@
 \alias{Plot1dAllExpression}
 \title{Plot expressions of all genes along an axis}
 \usage{
-Plot1dAllExpression(tomoObj, axes)
+Plot1dAllExpression(tomoSeqData, ...)
 }
 \arguments{
 \item{tomoObj}{tomoSeq object}

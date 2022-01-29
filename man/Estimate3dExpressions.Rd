@@ -4,10 +4,34 @@
 \alias{Estimate3dExpressions}
 \title{Estimate 3d expressions}
 \usage{
-Estimate3dExpressions(tomoObj, query, normCount = "countSum", normMask = TRUE)
+Estimate3dExpressions(
+  x,
+  y,
+  z,
+  mask,
+  query,
+  numIter = 100,
+  normCount = "countSum",
+  normMask = TRUE
+)
 }
 \arguments{
-\item{tomoObj}{tomoSeq object}
+\item{x}{A data.frame object containing a simulated Tomo-seq data
+for x-axis sections. The rows represent genes. The first column
+contains gene IDs and the second and subsequent columns contain
+gene expression levels in sections.}
+
+\item{y}{A data.frame object containing a simulated Tomo-seq data for y-axis
+sections. The rows represent genes. The first column contains gene IDs and
+the second and subsequent columns contain gene expression levels in sections.}
+
+\item{z}{A data.frame object containing a simulated Tomo-seq data for
+z-axis sections. The rows represent genes. The first column
+contains gene IDs and the second and subsequent columns contain
+gene expression levels in sections.}
+
+\item{mask}{A 3D array that represents if each boxel is included to sample.
+You can make a mask using \code{masker}.}
 
 \item{query}{Vector of gene IDs}
 
@@ -15,14 +39,12 @@ Estimate3dExpressions(tomoObj, query, normCount = "countSum", normMask = TRUE)
 the expression amount data.}
 
 \item{normMask}{Whether to normalize by mask or not}
+
+\item{tomoObj}{tomoSeq object}
 }
 \value{
 tomoSeq object
 }
 \description{
 Estimate 3d expressions
-}
-\note{
-You can do the same things with
-\code{tomoObj$Estimate3dExpressions(query)}.
 }

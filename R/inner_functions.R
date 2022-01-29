@@ -1,3 +1,20 @@
+#' @importFrom methods is
+CheckParameters <- function(tomoObj, query) {
+    if (is(tomoObj, "tomoSeq") == FALSE) {
+        stop(
+            paste(
+                "invalid class:",
+                class(tomoObj),
+                "\nFirst argument must be tomoSeq class object."
+            )
+        )
+    }
+    if (is.element(query, tomoObj$geneList) %>% min() == 0) {
+        queryNotIn <- query[is.element(query, tomoObj$geneList) == FALSE]
+        queryNotInStr <- paste(queryNotIn, collapse=", ")
+        stop(paste(queryNotInStr, ' is not in data.', sep=''))
+    }
+}
 
 ## This function is used in Estimate3dExpression().
 GetGeneExpression <- function (tomoSeqData, geneID) {
@@ -18,7 +35,7 @@ RepMat <- function (targetVector, nTimesRepeat) {
     return(rep3d)
 }
 
-Estimate3dExpression <- function (
+SingleEstimate <- function (
     X,
     Y,
     Z,
@@ -106,8 +123,14 @@ Estimate3dExpression <- function (
         er <- append(er, sum((xa - x)^2) + sum((ya - y)^2) + sum((za - z)^2))
     }
 
-    retList <- list(a, er, list(x[1, ], y[1, ], z[1, ]))
-    names(retList) <- c("reconst", "errFunc", "marginalDist")
+    retList <- list(
+        "geneID" = geneID,
+        "reconst" = a,
+        "errFunc" = er,
+        "x" = x[1, ],
+        "y" = y[1, ],
+        "z" = z[1, ]
+    )
     return(retList)
 }
 
@@ -233,4 +256,28 @@ PlotForImageViewer <- function (
         ylab,
         asp
     )
+}
+
+#' @export
+print.tomoSeq <- function (tomoObj) {
+    cat("Gene list:\n")
+    cat(names(tomoObj[["results"]]))
+}
+
+
+MatrixToDataFrame <- function (reconst) {
+    vecReconst <- as.vector(reconst)
+    dim <- dim(reconst)
+    xlen <- dim[1]
+    ylen <- dim[2]
+    zlen <- dim[3]
+    xIndex <- rep(1:xlen, ylen * zlen)
+    yIndex <- 1:ylen %>%
+        sapply(function (p) {rep(p, xlen)}) %>%
+        rep(zlen)
+    zIndex <- 1:zlen %>%
+        sapply(function (p) {rep(p, xlen * ylen)}) %>%
+        as.vector()
+    data.frame(x=xIndex, y=yIndex, z=zIndex, value=vecReconst) %>%
+        return()
 }

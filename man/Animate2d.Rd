@@ -13,7 +13,7 @@ Animate2d(
   main = geneID,
   xlab = xaxis,
   ylab = yaxis,
-  file = paste(geneID, "_", target, "_", xaxis, "_", yaxis, ".gif", sep = ""),
+  file = str_c(geneID, "_", target, "_", xaxis, "_", yaxis, ".gif"),
   zlim = NA,
   interval = 0.1,
   aspectRatio = c()

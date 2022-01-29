@@ -14,7 +14,7 @@
 #' @importFrom shiny h3
 #' @export
 ImageViewer <- function (tomoObj, geneID) {
-    recResult <- tomoObj$GetReconstructedResult(geneID)
+    recResult <- tomoObj[["results"]][[geneID]][["reconst"]]
     recAlongX <- aperm(recResult, perm = c(2, 3, 1))
     recAlongY <- aperm(recResult, perm = c(1, 3, 2))
     recAlongZ <- aperm(recResult, perm = c(1, 2, 3))

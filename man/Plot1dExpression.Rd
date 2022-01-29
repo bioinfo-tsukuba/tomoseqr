@@ -11,7 +11,7 @@ Plot1dExpression(tomoObj, geneID, axes)
 
 \item{geneID}{single gene ID (string)}
 
-\item{axes}{axis (1, 2 or 3)}
+\item{axes}{axis ("x", "y" or "z")}
 }
 \description{
 Plot expression of single gene along an axis
