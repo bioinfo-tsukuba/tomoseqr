@@ -16,7 +16,3 @@ Plot1dExpression(tomoObj, geneID, axes)
 \description{
 Plot expression of single gene along an axis
 }
-\note{
-You can do the same thing with
-\code{tomoObj$Plot1dExpression(geneID, axes)}.
-}

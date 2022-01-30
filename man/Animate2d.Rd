@@ -51,6 +51,3 @@ along each axis.}
 \description{
 Animate 2D expressions along one axis and generate GIF file.
 }
-\note{
-You can do the same thing with \code{tomoObj$Animate2d(geneID, ...)}.
-}

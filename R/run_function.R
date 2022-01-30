@@ -1,15 +1,16 @@
 #' Extract geneIDs to which hoge can be applied.
-#' @param x A data.frame object containing a simulated Tomo-seq data
+#' @param x A data.frame object containing a Tomo-seq data
 #' for x-axis sections. The rows represent genes. The first column
 #' contains gene IDs and the second and subsequent columns contain
 #' gene expression levels in sections.
-#' @param y A data.frame object containing a simulated Tomo-seq data for y-axis
+#' @param y A data.frame object containing a Tomo-seq data for y-axis
 #' sections. The rows represent genes. The first column contains gene IDs and
 #' the second and subsequent columns contain gene expression levels in sections.
-#' @param z A data.frame object containing a simulated Tomo-seq data for
+#' @param z A data.frame object containing a Tomo-seq data for
 #' z-axis sections. The rows represent genes. The first column
 #' contains gene IDs and the second and subsequent columns contain
 #' gene expression levels in sections.
+#' @importFrom dplyr %>%
 #' @export
 ExtractGeneList <- function (x, y, z) {
     xGene <- x[, 1] %>% t()
@@ -20,10 +21,6 @@ ExtractGeneList <- function (x, y, z) {
 }
 
 #' Estimate 3d expressions
-#' @param tomoObj tomoSeq object
-#' @param query Vector of gene IDs
-#' @param normCount Specifies the method to normalize
-#' the expression amount data.
 #' @param x A data.frame object containing a simulated Tomo-seq data
 #' for x-axis sections. The rows represent genes. The first column
 #' contains gene IDs and the second and subsequent columns contain
@@ -37,8 +34,13 @@ ExtractGeneList <- function (x, y, z) {
 #' gene expression levels in sections.
 #' @param mask A 3D array that represents if each boxel is included to sample.
 #' You can make a mask using `masker`.
+#' @param query Vector of gene IDs
+#' @param numIter How many times iterate
+#' @param normCount Specifies the method to normalize
+#' the expression amount data.
 #' @param normMask Whether to normalize by mask or not
 #' @return tomoSeq object
+#' @importFrom purrr list_along
 #' @export
 Estimate3dExpressions <- function (
     x,
@@ -76,11 +78,10 @@ Estimate3dExpressions <- function (
 #' Plot the trend of the value of the loss function.
 #' @param tomoObj tomoSeq object
 #' @param geneID single gene ID (string)
+#' @importFrom dplyr %>%
 #' @export
-#' @note  You can do the same things with
-#' `tomoObj$PlotLossFunction(geneID)`.
 PlotLossFunction <- function (tomoObj, geneID) {
-    # CheckParameters(tomoObj, geneID)
+    CheckParameters(tomoObj, geneID)
     tomoObj[["results"]][[geneID]][["errFunc"]] %>%
         plot(
             type = "l",
@@ -107,8 +108,10 @@ PlotLossFunction <- function (tomoObj, geneID) {
 #' specify the ratio as `c(width, height)`. If you don't specify the value of
 #' this parameter, the ratio is calculated based on the number of sections
 #' along each axis.
+#' @importFrom stringr str_c
+#' @importFrom dplyr %>%
+#' @importFrom animation saveGIF
 #' @export
-#' @note  You can do the same thing with `tomoObj$Animate2d(geneID, ...)`.
 Animate2d <- function (
     tomoObj,
     geneID,
@@ -123,7 +126,7 @@ Animate2d <- function (
     interval=0.1,
     aspectRatio=c()
 ) {
-    # CheckParameters(tomoObj, geneID)
+    CheckParameters(tomoObj, geneID)
     if (length(aspectRatio) != 0 & length(aspectRatio) != 2) {
         stop("`aspectRatio` should be a 2D vector.")
     }
@@ -157,11 +160,10 @@ Animate2d <- function (
 #' @param tomoObj tomoSeq object
 #' @param geneID single gene ID (string)
 #' @param axes axis ("x", "y" or "z")
+#' @importFrom graphics par
 #' @export
-#' @note  You can do the same thing with
-#' `tomoObj$Plot1dExpression(geneID, axes)`.
 Plot1dExpression <- function (tomoObj, geneID, axes) {
-    # CheckParameters(tomoObj, geneID)
+    CheckParameters(tomoObj, geneID)
     convertList <- list("x" = 1, "y" = 2, "z" = 3)
     oldpar <- par(no.readonly=T)
     on.exit(par(oldpar))
@@ -176,17 +178,22 @@ Plot1dExpression <- function (tomoObj, geneID, axes) {
         ),
         type="l",
         lty=2,
-        ylim=range(marginal), col="red",
+        ylim=range(marginal),
+        col="red",
         xlab = "Section",
         ylab = "Expression level"
     )
 }
 
 #' Plot expressions of all genes along an axis
-#' @param tomoObj tomoSeq object
-#' @param axes axis (1, 2 or 3)
+#' @param tomoSeqData A data.frame object containing a Tomo-seq data
+#' for any sections. The rows represent genes. The first column
+#' contains gene IDs and the second and subsequent columns contain
+#' gene expression levels in sections.
+#' @param ... Arguments which are related to plot parameters.
+#' Prease refer to \code{\link[graphics]{plot}}.
+#' @importFrom dplyr %>%
 #' @export
-#' @note  You can do the same thing with
 Plot1dAllExpression <- function (tomoSeqData, ...) {
     tomoSeqData[, -1] %>% colSums() %>% plot(type="l", ...)
 }
@@ -194,11 +201,10 @@ Plot1dAllExpression <- function (tomoSeqData, ...) {
 #' Convert reconstructed matrix to data.frame.
 #' @param tomoObj tomoSeq object
 #' @param geneID single gene ID
+#' @importFrom dplyr %>%
 #' @export
-#' @note  You can do the same thing with
-#' `tomoObj$ToDataFrame(geneID)`.
 ToDataFrame <- function (tomoObj, geneID) {
-    # CheckParameters(tomoObj, geneID)
+    CheckParameters(tomoObj, geneID)
     tomoObj[["results"]][[geneID]][["reconst"]] %>%
         MatrixToDataFrame() %>%
         return()
@@ -208,9 +214,7 @@ ToDataFrame <- function (tomoObj, geneID) {
 #' @param tomoObj tomoSeq object
 #' @param geneID single gene ID
 #' @export
-#' @note  You can do the same thing with
-#' `tomoObj$GetReconstructedResult(geneID)`.
 GetReconstructedResult <- function (tomoObj, geneID) {
-    # CheckParameters(tomoObj, geneID)
+    CheckParameters(tomoObj, geneID)
     return(tomoObj[["results"]][[geneID]][["reconst"]])
 }

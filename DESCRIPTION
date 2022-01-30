@@ -19,7 +19,7 @@ Imports:
     animation,
     dplyr,
     stringr,
-    R6,
+    purrr,
     methods,
     shiny,
     jsonlite

@@ -14,7 +14,3 @@ GetReconstructedResult(tomoObj, geneID)
 \description{
 Get reconstructed matrix
 }
-\note{
-You can do the same thing with
-\code{tomoObj$GetReconstructedResult(geneID)}.
-}

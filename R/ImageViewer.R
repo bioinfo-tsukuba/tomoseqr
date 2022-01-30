@@ -12,8 +12,11 @@
 #' @importFrom shiny textInput
 #' @importFrom shiny hr
 #' @importFrom shiny h3
+#' @importFrom grDevices png
+#' @importFrom grDevices dev.off
 #' @export
 ImageViewer <- function (tomoObj, geneID) {
+    CheckParameters(tomoObj, geneID)
     recResult <- tomoObj[["results"]][[geneID]][["reconst"]]
     recAlongX <- aperm(recResult, perm = c(2, 3, 1))
     recAlongY <- aperm(recResult, perm = c(1, 3, 2))

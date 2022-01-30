@@ -7,13 +7,14 @@
 Plot1dAllExpression(tomoSeqData, ...)
 }
 \arguments{
-\item{tomoObj}{tomoSeq object}
+\item{tomoSeqData}{A data.frame object containing a Tomo-seq data
+for any sections. The rows represent genes. The first column
+contains gene IDs and the second and subsequent columns contain
+gene expression levels in sections.}
 
-\item{axes}{axis (1, 2 or 3)}
+\item{...}{Arguments which are related to plot parameters.
+Prease refer to \code{\link[graphics]{plot}}.}
 }
 \description{
 Plot expressions of all genes along an axis
-}
-\note{
-You can do the same thing with
 }

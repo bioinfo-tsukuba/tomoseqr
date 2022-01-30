@@ -35,12 +35,12 @@ You can make a mask using \code{masker}.}
 
 \item{query}{Vector of gene IDs}
 
+\item{numIter}{How many times iterate}
+
 \item{normCount}{Specifies the method to normalize
 the expression amount data.}
 
 \item{normMask}{Whether to normalize by mask or not}
-
-\item{tomoObj}{tomoSeq object}
 }
 \value{
 tomoSeq object

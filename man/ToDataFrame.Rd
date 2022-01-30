@@ -14,7 +14,3 @@ ToDataFrame(tomoObj, geneID)
 \description{
 Convert reconstructed matrix to data.frame.
 }
-\note{
-You can do the same thing with
-\code{tomoObj$ToDataFrame(geneID)}.
-}

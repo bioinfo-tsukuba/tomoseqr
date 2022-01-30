@@ -1,4 +1,6 @@
 #' @importFrom methods is
+#' @importFrom dplyr %>%
+#' @importFrom stringr str_c
 CheckParameters <- function(tomoObj, query) {
     if (is(tomoObj, "tomoSeq") == FALSE) {
         stop(
@@ -9,14 +11,15 @@ CheckParameters <- function(tomoObj, query) {
             )
         )
     }
-    if (is.element(query, tomoObj$geneList) %>% min() == 0) {
-        queryNotIn <- query[is.element(query, tomoObj$geneList) == FALSE]
-        queryNotInStr <- paste(queryNotIn, collapse=", ")
+    if (is.element(query, names(tomoObj[["results"]])) %>% min() == 0) {
+        queryNotIn <- query[is.element(query, tomoObj[["results"]]) == FALSE]
+        queryNotInStr <- str_c(queryNotIn, sep=", ")
         stop(paste(queryNotInStr, ' is not in data.', sep=''))
     }
 }
 
 ## This function is used in Estimate3dExpression().
+#' @importFrom dplyr %>%
 GetGeneExpression <- function (tomoSeqData, geneID) {
     retvalMatrix <- tomoSeqData[tomoSeqData[, 1] == geneID, ]
     retvalMatrix <- retvalMatrix[, -1] %>% as.matrix()
@@ -35,6 +38,7 @@ RepMat <- function (targetVector, nTimesRepeat) {
     return(rep3d)
 }
 
+#' @importFrom dplyr %>%
 SingleEstimate <- function (
     X,
     Y,
@@ -134,10 +138,13 @@ SingleEstimate <- function (
     return(retList)
 }
 
+#' @importFrom grDevices hcl.colors
 ColFunc <- function (n) {
     return(c("#000000", hcl.colors(n - 1, "Blues", rev = TRUE)))
 }
 
+#' @importFrom graphics filled.contour
+#' @importFrom stringr str_c
 BasePlot <- function (
     sourceArray,
     sectionNumber,
@@ -148,13 +155,13 @@ BasePlot <- function (
 ) {
     filled.contour(
         sourceArray[, , sectionNumber],
-        main=paste(main, "_", sectionNumber, sep=""),
+        main=str_c(main, "_", sectionNumber),
         xlab=xlab,
         ylab=ylab,
         asp=aspectRatio,
         frame.plot=F,
         zlim = c(-1, max(sourceArray)),
-        nlevel = 50,
+        nlevels = 50,
         color.palette = ColFunc
     )
 }
@@ -182,6 +189,7 @@ MakePlotArray <- function (
 
     return(plotArray)
 }
+
 AnimateForGIF <- function (
     reconstArray,
     maskArray,
@@ -259,12 +267,12 @@ PlotForImageViewer <- function (
 }
 
 #' @export
-print.tomoSeq <- function (tomoObj) {
+print.tomoSeq <- function (x, ...) {
     cat("Gene list:\n")
-    cat(names(tomoObj[["results"]]))
+    cat(names(x[["results"]]))
 }
 
-
+#' @importFrom dplyr %>%
 MatrixToDataFrame <- function (reconst) {
     vecReconst <- as.vector(reconst)
     dim <- dim(reconst)

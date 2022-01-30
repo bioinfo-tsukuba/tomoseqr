@@ -7,16 +7,16 @@
 ExtractGeneList(x, y, z)
 }
 \arguments{
-\item{x}{A data.frame object containing a simulated Tomo-seq data
+\item{x}{A data.frame object containing a Tomo-seq data
 for x-axis sections. The rows represent genes. The first column
 contains gene IDs and the second and subsequent columns contain
 gene expression levels in sections.}
 
-\item{y}{A data.frame object containing a simulated Tomo-seq data for y-axis
+\item{y}{A data.frame object containing a Tomo-seq data for y-axis
 sections. The rows represent genes. The first column contains gene IDs and
 the second and subsequent columns contain gene expression levels in sections.}
 
-\item{z}{A data.frame object containing a simulated Tomo-seq data for
+\item{z}{A data.frame object containing a Tomo-seq data for
 z-axis sections. The rows represent genes. The first column
 contains gene IDs and the second and subsequent columns contain
 gene expression levels in sections.}

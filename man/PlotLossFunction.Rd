@@ -14,7 +14,3 @@ PlotLossFunction(tomoObj, geneID)
 \description{
 Plot the trend of the value of the loss function.
 }
-\note{
-You can do the same things with
-\code{tomoObj$PlotLossFunction(geneID)}.
-}
