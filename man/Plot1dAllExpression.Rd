@@ -15,6 +15,9 @@ gene expression levels in sections.}
 \item{...}{Arguments which are related to plot parameters.
 Prease refer to \code{\link[graphics]{plot}}.}
 }
+\value{
+NA
+}
 \description{
 Plot expressions of all genes along an axis
 }

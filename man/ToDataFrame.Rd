@@ -11,6 +11,9 @@ ToDataFrame(tomoObj, geneID)
 
 \item{geneID}{single gene ID}
 }
+\value{
+Reconstruction result converted to dataframe.
+}
 \description{
 Convert reconstructed matrix to data.frame.
 }

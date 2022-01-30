@@ -21,6 +21,10 @@ z-axis sections. The rows represent genes. The first column
 contains gene IDs and the second and subsequent columns contain
 gene expression levels in sections.}
 }
+\value{
+A vector that contains genes which can be used for
+\code{Estimate3dExpressions}.
+}
 \description{
 Extract geneIDs to which hoge can be applied.
 }

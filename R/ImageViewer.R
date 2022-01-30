@@ -14,6 +14,7 @@
 #' @importFrom shiny h3
 #' @importFrom grDevices png
 #' @importFrom grDevices dev.off
+#' @return NA
 #' @export
 ImageViewer <- function (tomoObj, geneID) {
     CheckParameters(tomoObj, geneID)

@@ -48,6 +48,9 @@ specify the ratio as \code{c(width, height)}. If you don't specify the value of
 this parameter, the ratio is calculated based on the number of sections
 along each axis.}
 }
+\value{
+It generate GIF file.
+}
 \description{
 Animate 2D expressions along one axis and generate GIF file.
 }

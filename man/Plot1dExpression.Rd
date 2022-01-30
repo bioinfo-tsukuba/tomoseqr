@@ -13,6 +13,9 @@ Plot1dExpression(tomoObj, geneID, axes)
 
 \item{axes}{axis ("x", "y" or "z")}
 }
+\value{
+NA
+}
 \description{
 Plot expression of single gene along an axis
 }

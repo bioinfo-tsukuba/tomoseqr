@@ -16,6 +16,8 @@ RoxygenNote: 7.1.2
 Depends: 
     R (>= 4.0)
 Imports: 
+    grDevices,
+    graphics,
     animation,
     dplyr,
     stringr,

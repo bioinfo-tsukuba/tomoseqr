@@ -11,6 +11,9 @@ PlotLossFunction(tomoObj, geneID)
 
 \item{geneID}{single gene ID (string)}
 }
+\value{
+NA
+}
 \description{
 Plot the trend of the value of the loss function.
 }

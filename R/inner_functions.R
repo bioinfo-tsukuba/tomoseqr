@@ -4,8 +4,8 @@
 CheckParameters <- function(tomoObj, query) {
     if (is(tomoObj, "tomoSeq") == FALSE) {
         stop(
-            paste(
-                "invalid class:",
+            str_c(
+                "invalid class: ",
                 class(tomoObj),
                 "\nFirst argument must be tomoSeq class object."
             )
@@ -14,7 +14,7 @@ CheckParameters <- function(tomoObj, query) {
     if (is.element(query, names(tomoObj[["results"]])) %>% min() == 0) {
         queryNotIn <- query[is.element(query, tomoObj[["results"]]) == FALSE]
         queryNotInStr <- str_c(queryNotIn, sep=", ")
-        stop(paste(queryNotInStr, ' is not in data.', sep=''))
+        stop(str_c(queryNotInStr, ' is not in data.'))
     }
 }
 
@@ -30,9 +30,9 @@ RepMat <- function (targetVector, nTimesRepeat) {
     lenX <- length(targetVector) * nTimesRepeat[1]
     lenY <- nTimesRepeat[2]
     lenZ <- nTimesRepeat[3]
-    rep2d <- matrix(targetVector, nrow=lenX, ncol=lenY, byrow = F)
+    rep2d <- matrix(targetVector, nrow=lenX, ncol=lenY, byrow = FALSE)
     rep3d <- array(NA, dim=c(lenX, lenY, lenZ))
-    for (i in 1:lenZ) {
+    for (i in seq_len(lenZ)) {
         rep3d[, , i] <- rep2d
     }
     return(rep3d)
@@ -108,7 +108,7 @@ SingleEstimate <- function (
 
     er <- c()
 
-    for (i in 1:numIter) {
+    for (i in seq_len(numIter)) {
         xa <- a %>% apply(1, sum)
         a <- a * RepMat(x / xa, c(1, dim(mask)[2], dim(mask)[3]))
         a[is.nan(a)] <- 0
@@ -159,7 +159,7 @@ BasePlot <- function (
         xlab=xlab,
         ylab=ylab,
         asp=aspectRatio,
-        frame.plot=F,
+        frame.plot=FALSE,
         zlim = c(-1, max(sourceArray)),
         nlevels = 50,
         color.palette = ColFunc
@@ -279,12 +279,15 @@ MatrixToDataFrame <- function (reconst) {
     xlen <- dim[1]
     ylen <- dim[2]
     zlen <- dim[3]
-    xIndex <- rep(1:xlen, ylen * zlen)
-    yIndex <- 1:ylen %>%
-        sapply(function (p) {rep(p, xlen)}) %>%
+    xIndex <- rep(seq_len(xlen), ylen * zlen)
+    yIndex <- seq_len(ylen) %>%
+        vapply(function (p) {rep(p, xlen)}, FUN.VALUE = seq_len(xlen)) %>%
         rep(zlen)
-    zIndex <- 1:zlen %>%
-        sapply(function (p) {rep(p, xlen * ylen)}) %>%
+    zIndex <- seq_len(zlen) %>%
+        vapply(
+            function (p) {rep(p, xlen * ylen)},
+            FUN.VALUE = seq_len(xlen * ylen)
+        ) %>%
         as.vector()
     data.frame(x=xIndex, y=yIndex, z=zIndex, value=vecReconst) %>%
         return()

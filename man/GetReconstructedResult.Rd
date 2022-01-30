@@ -11,6 +11,9 @@ GetReconstructedResult(tomoObj, geneID)
 
 \item{geneID}{single gene ID}
 }
+\value{
+Reconstruction result as matrix
+}
 \description{
 Get reconstructed matrix
 }

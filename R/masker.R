@@ -20,6 +20,7 @@
 #' @importFrom shiny addResourcePath
 #' @importFrom shiny removeResourcePath
 #' @import jsonlite
+#' @return NA
 #' @export
 Masker <- function () {
     ui <- function () {

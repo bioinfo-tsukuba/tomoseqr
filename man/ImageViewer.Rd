@@ -11,6 +11,9 @@ ImageViewer(tomoObj, geneID)
 
 \item{geneID}{geneID as string}
 }
+\value{
+NA
+}
 \description{
 Output the reconstructed expression pattern as an image.
 }

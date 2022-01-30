@@ -10,6 +10,8 @@
 #' z-axis sections. The rows represent genes. The first column
 #' contains gene IDs and the second and subsequent columns contain
 #' gene expression levels in sections.
+#' @return A vector that contains genes which can be used for
+#' `Estimate3dExpressions`.
 #' @importFrom dplyr %>%
 #' @export
 ExtractGeneList <- function (x, y, z) {
@@ -79,6 +81,7 @@ Estimate3dExpressions <- function (
 #' @param tomoObj tomoSeq object
 #' @param geneID single gene ID (string)
 #' @importFrom dplyr %>%
+#' @return NA
 #' @export
 PlotLossFunction <- function (tomoObj, geneID) {
     CheckParameters(tomoObj, geneID)
@@ -111,6 +114,7 @@ PlotLossFunction <- function (tomoObj, geneID) {
 #' @importFrom stringr str_c
 #' @importFrom dplyr %>%
 #' @importFrom animation saveGIF
+#' @return It generate GIF file.
 #' @export
 Animate2d <- function (
     tomoObj,
@@ -161,15 +165,16 @@ Animate2d <- function (
 #' @param geneID single gene ID (string)
 #' @param axes axis ("x", "y" or "z")
 #' @importFrom graphics par
+#' @return NA
 #' @export
 Plot1dExpression <- function (tomoObj, geneID, axes) {
     CheckParameters(tomoObj, geneID)
     convertList <- list("x" = 1, "y" = 2, "z" = 3)
-    oldpar <- par(no.readonly=T)
+    oldpar <- par(no.readonly=TRUE)
     on.exit(par(oldpar))
     marginal <- tomoObj[["results"]][[geneID]][[axes]]
-    plot(marginal, type="l", lty=3, axes=F, ann=F)
-    par(new=T)
+    plot(marginal, type="l", lty=3, axes=FALSE, ann=FALSE)
+    par(new=TRUE)
     plot(
         apply(
             tomoObj[["results"]][[geneID]][["reconst"]],
@@ -193,6 +198,7 @@ Plot1dExpression <- function (tomoObj, geneID, axes) {
 #' @param ... Arguments which are related to plot parameters.
 #' Prease refer to \code{\link[graphics]{plot}}.
 #' @importFrom dplyr %>%
+#' @return NA
 #' @export
 Plot1dAllExpression <- function (tomoSeqData, ...) {
     tomoSeqData[, -1] %>% colSums() %>% plot(type="l", ...)
@@ -202,6 +208,7 @@ Plot1dAllExpression <- function (tomoSeqData, ...) {
 #' @param tomoObj tomoSeq object
 #' @param geneID single gene ID
 #' @importFrom dplyr %>%
+#' @return Reconstruction result converted to dataframe.
 #' @export
 ToDataFrame <- function (tomoObj, geneID) {
     CheckParameters(tomoObj, geneID)
@@ -213,6 +220,7 @@ ToDataFrame <- function (tomoObj, geneID) {
 #' Get reconstructed matrix
 #' @param tomoObj tomoSeq object
 #' @param geneID single gene ID
+#' @return Reconstruction result as matrix
 #' @export
 GetReconstructedResult <- function (tomoObj, geneID) {
     CheckParameters(tomoObj, geneID)

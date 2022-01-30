@@ -6,6 +6,9 @@
 \usage{
 Masker()
 }
+\value{
+NA
+}
 \description{
 Make mask
 }
