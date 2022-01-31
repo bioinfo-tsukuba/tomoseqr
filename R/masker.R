@@ -149,8 +149,8 @@ Masker <- function () {
                 if (input$axis == 1) {
                     data_matrix <- aperm(data_matrix, perm=c(2, 3, 1))
                     mask_dim <- dim(data_matrix)
-                    output$h_axis = renderText("Horizontal axis: y")
-                    output$v_axis = renderText("Vertical axis: z")
+                    output$h_axis <- renderText("Horizontal axis: y")
+                    output$v_axis <- renderText("Vertical axis: z")
                     session$sendCustomMessage(
                         "initData",
                         message = list(
@@ -163,8 +163,8 @@ Masker <- function () {
                 } else if (input$axis == 2) {
                     data_matrix <- aperm(data_matrix, perm=c(1, 3, 2))
                     mask_dim <- dim(data_matrix)
-                    output$h_axis = renderText("Horizontal axis: x")
-                    output$v_axis = renderText("Vertical axis: z")
+                    output$h_axis <- renderText("Horizontal axis: x")
+                    output$v_axis <- renderText("Vertical axis: z")
                     session$sendCustomMessage(
                         "initData",
                         message = list(
@@ -176,8 +176,8 @@ Masker <- function () {
                     )
                 } else {
                     mask_dim <- dim(data_matrix)
-                    output$h_axis = renderText("Horizontal axis: z")
-                    output$v_axis = renderText("Vertical axis: y")
+                    output$h_axis <- renderText("Horizontal axis: z")
+                    output$v_axis <- renderText("Vertical axis: y")
                     session$sendCustomMessage(
                         "initData",
                         message = list(
@@ -203,8 +203,8 @@ Masker <- function () {
                 if (input$axis == 1) {
                     data_matrix <- aperm(data_matrix, perm = c(2, 3, 1))
                     mask_dim <- dim(data_matrix)
-                    output$h_axis = renderText("Horizontal axis: y")
-                    output$v_axis = renderText("Vertical axis: z")
+                    output$h_axis <- renderText("Horizontal axis: y")
+                    output$v_axis <- renderText("Vertical axis: z")
                     session$sendCustomMessage(
                         "existingData",
                         message = list(
@@ -216,8 +216,8 @@ Masker <- function () {
                 } else if (input$axis == 2) {
                     data_matrix <- aperm(data_matrix, perm = c(1, 3, 2))
                     mask_dim <- dim(data_matrix)
-                    output$h_axis = renderText("Horizontal axis: x")
-                    output$v_axis = renderText("Vertical axis: z")
+                    output$h_axis <- renderText("Horizontal axis: x")
+                    output$v_axis <- renderText("Vertical axis: z")
                     session$sendCustomMessage(
                         "existingData",
                         message = list(
@@ -228,8 +228,8 @@ Masker <- function () {
                     )
                 } else {
                     mask_dim <- dim(data_matrix)
-                    output$h_axis = renderText("Horizontal axis: x")
-                    output$v_axis = renderText("Vertical axis: y")
+                    output$h_axis <- renderText("Horizontal axis: x")
+                    output$v_axis <- renderText("Vertical axis: y")
                     session$sendCustomMessage(
                         "existingData",
                         message = list(
@@ -242,7 +242,7 @@ Masker <- function () {
             }
         })
 
-        output$downloadData = downloadHandler(
+        output$downloadData <- downloadHandler(
             filename = "mask.rda",
             content = function(file) {
                 mask_matrix <- input$mask_matrix %>%
