@@ -1,24 +1,25 @@
 #' Make mask
-#' @importFrom shiny fluidPage
-#' @importFrom shiny tags
-#' @importFrom shiny titlePanel
-#' @importFrom shiny sidebarPanel
-#' @importFrom shiny h4
-#' @importFrom shiny inputPanel
-#' @importFrom shiny radioButtons
-#' @importFrom shiny fileInput
-#' @importFrom shiny conditionalPanel
-#' @importFrom shiny numericInput
-#' @importFrom shiny actionButton
-#' @importFrom shiny downloadButton
-#' @importFrom shiny mainPanel
-#' @importFrom shiny textOutput
-#' @importFrom shiny observeEvent
-#' @importFrom shiny renderText
-#' @importFrom shiny downloadHandler
-#' @importFrom shiny shinyApp
-#' @importFrom shiny addResourcePath
-#' @importFrom shiny removeResourcePath
+#' @importFrom shiny
+#'    fluidPage
+#'    tags
+#'    titlePanel
+#'    sidebarPanel
+#'    h4
+#'    inputPanel
+#'    radioButtons
+#'    fileInput
+#'    conditionalPanel
+#'    numericInput
+#'    actionButton
+#'    downloadButton
+#'    mainPanel
+#'    textOutput
+#'    observeEvent
+#'    renderText
+#'    downloadHandler
+#'    shinyApp
+#'    addResourcePath
+#'    removeResourcePath
 #' @import jsonlite
 #' @return NA
 #' @export
