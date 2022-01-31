@@ -21,7 +21,7 @@ CheckParameters <- function(tomoObj, query) {
 ## This function is used in Estimate3dExpression().
 #' @importFrom dplyr %>%
 GetGeneExpression <- function (tomoSeqData, geneID) {
-    retvalMatrix <- tomoSeqData[tomoSeqData[, 1] == geneID, ]
+    retvalMatrix <- tomoSeqData[as.vector(tomoSeqData[, 1] == geneID), ]
     retvalMatrix <- retvalMatrix[, -1] %>% as.matrix()
     return(retvalMatrix)
 }
