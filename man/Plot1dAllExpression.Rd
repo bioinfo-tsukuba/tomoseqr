@@ -21,3 +21,7 @@ NA
 \description{
 Plot expressions of all genes along an axis
 }
+\examples{
+data("testx")
+Plot1dAllExpression(testx)
+}

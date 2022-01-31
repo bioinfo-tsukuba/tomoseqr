@@ -1,5 +1,6 @@
 test_that("Reconstruction of 3D expression pattern", {
     load("trueResults.rda")
+    data("testx", "testy", "testz", "mask")
     tomoSeqObject <- Estimate3dExpressions(
         testx,
         testy,

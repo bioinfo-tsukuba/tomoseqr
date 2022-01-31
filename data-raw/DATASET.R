@@ -68,4 +68,13 @@ testx <- testx %>% as_tibble(rownames = "geneID")
 testy <- testy %>% as_tibble(rownames = "geneID")
 testz <- testz %>% as_tibble(rownames = "geneID")
 
-usethis::use_data(testx, testy, testz, mask, overwrite = TRUE)
+tomoObj <- Estimate3dExpressions(
+    testx,
+    testy,
+    testz,
+    mask = mask,
+    query = c("gene1", "gene2", "gene3", "gene4"),
+    normCount = "countSum",
+    normMask = TRUE
+)
+usethis::use_data(testx, testy, testz, mask, tomoObj, overwrite = TRUE)

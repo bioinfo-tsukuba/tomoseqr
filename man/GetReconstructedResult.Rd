@@ -17,3 +17,7 @@ Reconstruction result as matrix
 \description{
 Get reconstructed matrix
 }
+\examples{
+data(tomoObj)
+GetReconstructedResult(tomoObj, "gene2")
+}

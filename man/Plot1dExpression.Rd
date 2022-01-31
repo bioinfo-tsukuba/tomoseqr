@@ -19,3 +19,7 @@ NA
 \description{
 Plot expression of single gene along an axis
 }
+\examples{
+data(tomoObj)
+Plot1dExpression(tomoObj, "gene2", "x")
+}

@@ -17,3 +17,7 @@ Reconstruction result converted to dataframe.
 \description{
 Convert reconstructed matrix to data.frame.
 }
+\examples{
+data(tomoObj)
+ToDataFrame(tomoObj, "gene2")
+}

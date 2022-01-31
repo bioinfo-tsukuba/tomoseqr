@@ -17,3 +17,9 @@ NA
 \description{
 Output the reconstructed expression pattern as an image.
 }
+\examples{
+if (interactive()) {
+    data(tomoObj)
+    ImageViewer(tomoObj, "gene2")
+}
+}

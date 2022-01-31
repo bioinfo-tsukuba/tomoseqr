@@ -17,3 +17,7 @@ NA
 \description{
 Plot the trend of the value of the loss function.
 }
+\examples{
+data(tomoObj)
+PlotLossFunction(tomoObj, "gene2")
+}

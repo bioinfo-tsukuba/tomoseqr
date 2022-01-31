@@ -12,3 +12,8 @@ NA
 \description{
 Make mask
 }
+\examples{
+if (interactive()) {
+    Masker()
+}
+}

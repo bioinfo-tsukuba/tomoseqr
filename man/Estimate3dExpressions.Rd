@@ -48,3 +48,15 @@ tomoSeq object
 \description{
 Estimate 3d expressions
 }
+\examples{
+data("testx", "testy", "testz", "mask")
+Estimate3dExpressions(
+    testx,
+    testy,
+    testz,
+    mask = mask,
+    query = c("gene1"), 
+    normCount = "countSum",
+    normMask = TRUE
+)
+}

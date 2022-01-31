@@ -54,3 +54,9 @@ It generate GIF file.
 \description{
 Animate 2D expressions along one axis and generate GIF file.
 }
+\examples{
+if(interactive()) {
+    data(tomoObj)
+    Animate2d(tomoObj, "gene2", target = "expression", file = "example.gif")
+}
+}

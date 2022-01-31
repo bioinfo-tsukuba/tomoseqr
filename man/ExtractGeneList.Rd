@@ -28,3 +28,7 @@ A vector that contains genes which can be used for
 \description{
 Extract geneIDs to which hoge can be applied.
 }
+\examples{
+data("testx", "testy", "testz")
+ExtractGeneList(testx, testy, testz)
+}

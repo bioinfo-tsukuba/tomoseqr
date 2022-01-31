@@ -22,6 +22,10 @@
 #'    removeResourcePath
 #' @import jsonlite
 #' @return NA
+#' @examples
+#' if (interactive()) {
+#'     Masker()
+#' }
 #' @export
 Masker <- function () {
     ui <- function () {

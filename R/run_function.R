@@ -12,6 +12,9 @@
 #' gene expression levels in sections.
 #' @return A vector that contains genes which can be used for
 #' `Estimate3dExpressions`.
+#' @examples
+#' data("testx", "testy", "testz")
+#' ExtractGeneList(testx, testy, testz)
 #' @importFrom dplyr %>%
 #' @export
 ExtractGeneList <- function (x, y, z) {
@@ -43,6 +46,17 @@ ExtractGeneList <- function (x, y, z) {
 #' @param normMask Whether to normalize by mask or not
 #' @return tomoSeq object
 #' @importFrom purrr list_along
+#' @examples
+#' data("testx", "testy", "testz", "mask")
+#' Estimate3dExpressions(
+#'     testx,
+#'     testy,
+#'     testz,
+#'     mask = mask,
+#'     query = c("gene1"), 
+#'     normCount = "countSum",
+#'     normMask = TRUE
+#' )
 #' @export
 Estimate3dExpressions <- function (
     x,
@@ -82,6 +96,9 @@ Estimate3dExpressions <- function (
 #' @param geneID single gene ID (string)
 #' @importFrom dplyr %>%
 #' @return NA
+#' @examples
+#' data(tomoObj)
+#' PlotLossFunction(tomoObj, "gene2")
 #' @export
 PlotLossFunction <- function (tomoObj, geneID) {
     CheckParameters(tomoObj, geneID)
@@ -115,6 +132,11 @@ PlotLossFunction <- function (tomoObj, geneID) {
 #' @importFrom dplyr %>%
 #' @importFrom animation saveGIF
 #' @return It generate GIF file.
+#' @examples
+#' if(interactive()) {
+#'     data(tomoObj)
+#'     Animate2d(tomoObj, "gene2", target = "expression", file = "example.gif")
+#' }
 #' @export
 Animate2d <- function (
     tomoObj,
@@ -166,6 +188,9 @@ Animate2d <- function (
 #' @param axes axis ("x", "y" or "z")
 #' @importFrom graphics par
 #' @return NA
+#' @examples
+#' data(tomoObj)
+#' Plot1dExpression(tomoObj, "gene2", "x")
 #' @export
 Plot1dExpression <- function (tomoObj, geneID, axes) {
     CheckParameters(tomoObj, geneID)
@@ -199,6 +224,9 @@ Plot1dExpression <- function (tomoObj, geneID, axes) {
 #' Prease refer to \code{\link[graphics]{plot}}.
 #' @importFrom dplyr %>%
 #' @return NA
+#' @examples
+#' data("testx")
+#' Plot1dAllExpression(testx)
 #' @export
 Plot1dAllExpression <- function (tomoSeqData, ...) {
     tomoSeqData[, -1] %>% colSums() %>% plot(type="l", ...)
@@ -209,6 +237,9 @@ Plot1dAllExpression <- function (tomoSeqData, ...) {
 #' @param geneID single gene ID
 #' @importFrom dplyr %>%
 #' @return Reconstruction result converted to dataframe.
+#' @examples
+#' data(tomoObj)
+#' ToDataFrame(tomoObj, "gene2")
 #' @export
 ToDataFrame <- function (tomoObj, geneID) {
     CheckParameters(tomoObj, geneID)
@@ -221,6 +252,9 @@ ToDataFrame <- function (tomoObj, geneID) {
 #' @param tomoObj tomoSeq object
 #' @param geneID single gene ID
 #' @return Reconstruction result as matrix
+#' @examples
+#' data(tomoObj)
+#' GetReconstructedResult(tomoObj, "gene2")
 #' @export
 GetReconstructedResult <- function (tomoObj, geneID) {
     CheckParameters(tomoObj, geneID)

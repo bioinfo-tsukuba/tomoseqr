@@ -17,6 +17,11 @@
 #'    png
 #'    dev.off
 #' @return NA
+#' @examples
+#' if (interactive()) {
+#'     data(tomoObj)
+#'     ImageViewer(tomoObj, "gene2")
+#' }
 #' @export
 ImageViewer <- function (tomoObj, geneID) {
     CheckParameters(tomoObj, geneID)
