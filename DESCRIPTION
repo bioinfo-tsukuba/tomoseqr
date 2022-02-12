@@ -1,7 +1,7 @@
 Package: tomoseqr
 Title: R Package for Analyzing Tomo-seq Data
 Version: 0.3.0
-Authors@R: 
+Authors@R:
     person(
         given = "Ryosuke",
         family = "Matsuzawa",
@@ -16,18 +16,19 @@ Encoding: UTF-8
 LazyData: false
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
-Depends: 
+Depends:
     R (>= 4.0)
-Imports: 
+Imports:
     grDevices,
     graphics,
     animation,
+    tibble,
     dplyr,
     stringr,
     purrr,
     methods,
     shiny,
     jsonlite
-Suggests: 
+Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

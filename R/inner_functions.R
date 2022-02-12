@@ -292,3 +292,29 @@ MatrixToDataFrame <- function (reconst) {
     data.frame(x=xIndex, y=yIndex, z=zIndex, value=vecReconst) %>%
         return()
 }
+
+IsPeakGene <- function (v, threshold = 10) {
+    maxV <- max(v)
+    indexOfMaxV <- which.max(v)
+    meanExeptMaxV <- mean(v[-1 * indexOfMaxV])
+    if((maxV > threshold) && (maxV > 10 * meanExeptMaxV)) {
+        return(c(maxV, meanExeptMaxV, indexOfMaxV))
+    } else {
+        return(c(maxV, meanExeptMaxV, 0))
+    }
+}
+
+#' @importFrom tibble tibble
+FindAxialGenesInner <- function (targetData) {
+    retMat <- targetData %>%
+        select(-1) %>%
+        apply(MARGIN = 1, FUN = IsPeakGene) %>%
+        t()
+    tibble(
+        geneID = targetData[, 1],
+        max = retMat[, 1],
+        meanExeptMax = retMat[, 2],
+        index = retMat[, 3]
+    ) %>%
+        return()
+}

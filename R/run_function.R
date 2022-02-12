@@ -260,3 +260,20 @@ GetReconstructedResult <- function (tomoObj, geneID) {
     CheckParameters(tomoObj, geneID)
     return(tomoObj[["results"]][[geneID]][["reconst"]])
 }
+
+#' Find peak genes on axial
+#' @param tomoSeqData tomo-seq data of any axis
+#' @param genes If run for all genes
+#' @importFrom dplyr select
+#' @export
+FindAxialGenes <- function (tomoSeqData, genes = "all") {
+    if (length(genes) == 1 && genes == "all") {
+        tomoSeqData %>%
+            FindAxialGenesInner() %>%
+            return()
+    } else {
+        tomoSeqData[as.vector(t(tomoSeqData[, 1]) %in% genes), ] %>%
+            FindAxialGenesInner() %>%
+            return()
+    }
+}
