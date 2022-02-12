@@ -190,6 +190,9 @@ MakePlotArray <- function (
     return(plotArray)
 }
 
+#' @importFrom shiny
+#' withProgress
+#' incProgress
 AnimateForGIF <- function (
     reconstArray,
     maskArray,
@@ -215,7 +218,8 @@ AnimateForGIF <- function (
         zlim=zlim,
         type=type
     )
-    message("generating", appendLF=FALSE)
+    message("Plotting", appendLF=FALSE)
+    nTimesRepeat <- length(plotArray[1, 1, ])
     for (i in seq_along(plotArray[1, 1, ])) {
         message(".", appendLF=FALSE)
         BasePlot(
@@ -228,6 +232,7 @@ AnimateForGIF <- function (
         )
     }
     message("")
+    message("Converting to GIF...")
 }
 
 PlotForImageViewer <- function (

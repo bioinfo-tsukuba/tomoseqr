@@ -121,6 +121,10 @@ ImageViewer <- function (tomoObj, geneID) {
                             downloadButton(
                                 "XdownloadFig",
                                 label = "Download figure"
+                            ),
+                            downloadButton(
+                                "XgenerateGIF",
+                                label = "Download GIF"
                             )
                         ),
                         mainPanel(
@@ -208,6 +212,10 @@ ImageViewer <- function (tomoObj, geneID) {
                             downloadButton(
                                 "YdownloadFig",
                                 label = "Download figure"
+                            ),
+                            downloadButton(
+                                "YgenerateGIF",
+                                label = "Download GIF"
                             )
                         ),
                         mainPanel(
@@ -295,6 +303,10 @@ ImageViewer <- function (tomoObj, geneID) {
                             downloadButton(
                                 "ZdownloadFig",
                                 label = "Download figure"
+                            ),
+                            downloadButton(
+                                "ZgenerateGIF",
+                                label = "Download GIF"
                             )
                         ),
                         mainPanel(
@@ -341,6 +353,25 @@ ImageViewer <- function (tomoObj, geneID) {
                 dev.off()
             }
         )
+        output$XgenerateGIF <- downloadHandler(
+            filename = "xPlot.gif",
+            content = function (file) {
+                ShinyAnimate2d(
+                    tomoObj,
+                    geneID,
+                    target=input$x_type,
+                    xaxis=2,
+                    yaxis=3,
+                    main=input$x_main,
+                    xlab=input$x_xlab,
+                    ylab=input$x_ylab,
+                    file=file,
+                    zlim=input$x_zlim,
+                    interval=0.1,
+                    aspectRatio=c(input$x_asp_x, input$x_asp_y)
+                )
+            }
+        )
 
         ## Along y
         yPlotArray <- reactive({
@@ -377,6 +408,26 @@ ImageViewer <- function (tomoObj, geneID) {
             }
         )
 
+        output$YgenerateGIF <- downloadHandler(
+            filename = "yPlot.gif",
+            content = function (file) {
+                ShinyAnimate2d(
+                    tomoObj,
+                    geneID,
+                    target=input$y_type,
+                    xaxis=1,
+                    yaxis=3,
+                    main=input$y_main,
+                    xlab=input$y_xlab,
+                    ylab=input$y_ylab,
+                    file=file,
+                    zlim=input$y_zlim,
+                    interval=0.1,
+                    aspectRatio=c(input$y_asp_x, input$y_asp_y)
+                )
+            }
+        )
+
         ## Along z
         zPlotArray <- reactive({
             MakePlotArray(
@@ -409,6 +460,26 @@ ImageViewer <- function (tomoObj, geneID) {
                     aspectRatio=(input$z_asp_y / input$z_asp_x)
                 )
                 dev.off()
+            }
+        )
+
+        output$ZgenerateGIF <- downloadHandler(
+            filename = "zPlot.gif",
+            content = function (file) {
+                ShinyAnimate2d(
+                    tomoObj,
+                    geneID,
+                    target=input$z_type,
+                    xaxis=1,
+                    yaxis=2,
+                    main=input$z_main,
+                    xlab=input$z_xlab,
+                    ylab=input$z_ylab,
+                    file=file,
+                    zlim=input$z_zlim,
+                    interval=0.1,
+                    aspectRatio=c(input$z_asp_x, input$z_asp_y)
+                )
             }
         )
     }
