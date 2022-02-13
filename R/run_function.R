@@ -277,15 +277,3 @@ FindAxialGenes <- function (tomoSeqData, genes = "all") {
             return()
     }
 }
-
-#' Find peak genes on result of reconstruction
-#' @param reconstructedResult Result of `Estimate3dExpressions()`
-#' @importFrom tibble tibble
-#' @export
-FindSpatialGenes <- function (reconstructedResult) {
-    tibble(
-       geneID = "",
-       pValue = "",
-       fdr = ""
-    )
-}
