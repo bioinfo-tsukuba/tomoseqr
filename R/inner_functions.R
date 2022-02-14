@@ -319,7 +319,7 @@ FindAxialGenesInner <- function (targetData) {
         geneID = targetData[, 1],
         max = retMat[, 1],
         meanExeptMax = retMat[, 2],
-        index = retMat[, 3]
+        isPeakGene = retMat[, 3]
     ) %>%
         return()
 }
