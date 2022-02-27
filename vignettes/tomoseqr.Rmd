@@ -1,0 +1,15 @@
+---
+Title: "R Package for Analyzing Tomo-seq Data"
+Author: "Ryosuke Matsuzawa"
+Output: BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{tomoseqr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# SessionInfo
+
+```{r}
+sessionInfo()
+```
