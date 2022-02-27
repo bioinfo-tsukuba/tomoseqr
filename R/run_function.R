@@ -265,6 +265,9 @@ GetReconstructedResult <- function (tomoObj, geneID) {
 #' @param tomoSeqData tomo-seq data of any axis
 #' @param genes If run for all genes
 #' @importFrom dplyr select
+#' @examples
+#' data(testx)
+#' FindAxialGenes(testx)
 #' @export
 FindAxialGenes <- function (tomoSeqData, genes = "all") {
     if (length(genes) == 1 && genes == "all") {

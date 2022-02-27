@@ -14,3 +14,7 @@ FindAxialGenes(tomoSeqData, genes = "all")
 \description{
 Find peak genes on axial
 }
+\examples{
+data(testx)
+FindAxialGenes(testx)
+}
