@@ -11,6 +11,12 @@ FindAxialGenes(tomoSeqData, genes = "all")
 
 \item{genes}{If run for all genes}
 }
+\value{
+A data frame consisting of gene ID, max of expression levels of the
+gene, mean of expression levels calculated by excluding the maximum value and
+section number showing the maximum expression level (0 means that there is
+no such section).
+}
 \description{
 Find peak genes on axial
 }

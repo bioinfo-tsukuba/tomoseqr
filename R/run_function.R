@@ -264,6 +264,10 @@ GetReconstructedResult <- function (tomoObj, geneID) {
 #' Find peak genes on axial
 #' @param tomoSeqData tomo-seq data of any axis
 #' @param genes If run for all genes
+#' @return A data frame consisting of gene ID, max of expression levels of the
+#' gene, mean of expression levels calculated by excluding the maximum value and
+#' section number showing the maximum expression level (0 means that there is
+#' no such section).
 #' @importFrom dplyr select
 #' @examples
 #' data(testx)
