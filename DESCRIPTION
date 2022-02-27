@@ -13,7 +13,7 @@ Description: `tomoseqr` is an R package for analyzing Tomo-seq
     (a method to obtain genome-wide expression data with spatial resolution)
     data. `tomoseqr` provides these functions: 1) reconstruction of 3D
     expression patterns from tomo-seq data 2) visualization of reconstructed 3D
-    expression patterns 3) convertion of reconstructed 3D expression patterns
+    expression patterns.
     to PNG or GIF file.
 License: MIT + file LICENSE
 Encoding: UTF-8
