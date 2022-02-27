@@ -18,6 +18,8 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Depends:
     R (>= 4.0)
+biocViews: GeneExpression, Sequencing, RNASeq, Transcriptomics,
+        Spatial, Visualization
 Imports:
     grDevices,
     graphics,
