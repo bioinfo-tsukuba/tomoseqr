@@ -9,22 +9,21 @@ Authors@R:
         email = "kinakomochi.work@gmail.com",
         comment = c(ORCID = "0000-0003-2999-4734")
     )
-Description: `tomoseqr` is an R package for analyzing Tomo-seq
-    (a method to obtain genome-wide expression data with spatial resolution)
-    data. `tomoseqr` provides these functions: 1) reconstruction of 3D
-    expression patterns from tomo-seq data 2) visualization of reconstructed 3D
-    expression patterns.
-    to PNG or GIF file.
+Description: `tomoseqr` is an R package for analyzing Tomo-seq data.
+    Tomo-seq is a genome-wide RNA tomography method that combines combining
+    high-throughput RNA sequencing with cryosectioning for spatially resolved transcriptomics.
+    `tomoseqr` reconstructs 3D expression patterns from tomo-seq data
+    and visualizes the reconstructed 3D expression patterns.
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: false
+LazyData: FALSE
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 VignetteBuilder: knitr
 Depends:
     R (>= 4.0)
 biocViews: GeneExpression, Sequencing, RNASeq, Transcriptomics,
-        Spatial, Visualization
+        Spatial, Visualization, Software
 Imports:
     grDevices,
     graphics,
