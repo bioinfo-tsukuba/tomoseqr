@@ -316,7 +316,7 @@ FindAxialGenesInner <- function (targetData) {
         apply(MARGIN = 1, FUN = IsPeakGene) %>%
         t()
     tibble(
-        geneID = targetData[, 1],
+        geneID = as.vector(t(targetData[, 1])),
         max = retMat[, 1],
         meanExeptMax = retMat[, 2],
         isPeakGene = retMat[, 3]
