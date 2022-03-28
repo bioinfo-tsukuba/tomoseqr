@@ -19,7 +19,7 @@ if (!require("BiocManager"))
 BiocManager::install("tomoseqr")
 ```
 
-Load the `tomoseqr` package with the following command
+Load the `tomoseqr` package with the following command.
 
 ```{r setup, message = FALSE}
 library(tomoseqr)
@@ -27,28 +27,44 @@ library(tomoseqr)
 
 # Data preparation
 
-`tomoseqr` requires Tomo-seq data in three directions and a mask.
+`tomoseqr` requires Tomo-seq data in three directions (x, y, and z-axes) and a mask.
 
 ## Tomo-seq data preparation
 
 Tomo-seq data must meet the following conditions.
 
 
-1. It is a data frame.
+1. It is a data frame with a header.
 1. The first column is the gene ID (string), and the second and subsequent
-columns are the expression levels (numeric) at each intercept.
+columns are the expression levels (numeric) at each sections.
 1. The order of the second and subsequent rows is the same as the order of
-the intercepts.
+the sections.
 1. The second and subsequent rows are ordered from left to right
 (not right to left) of the intercept for each axis.
 1. One row corresponds to one gene.
-1. It has a header.
 
 The `tomoseqr` package provides artificial tomoseq data as an example.
 
 ```{r}
 data(testx, testy, testz)
 head(testx)
+```
+
+## Tomo-seq data from Junker 2014
+
+You can download part of the Tomo-seq data published by [Junker et al.](https://www.sciencedirect.com/science/article/pii/S0092867414012264#mmc3) with following commands. 
+
+```{r, eval = FALSE}
+download.file("https://figshare.com/ndownloader/files/34384922", destfile = "sheld_AV.tsv")
+download.file("https://figshare.com/ndownloader/files/34384925", destfile = "sheld_LR.tsv")
+download.file("https://figshare.com/ndownloader/files/34384928", destfile = "sheld_VD.tsv")
+download.file("https://figshare.com/ndownloader/files/34523069", destfile = "mask_97x97x97.rda")
+library(readr)
+
+sheld_AV <- read_tsv("sheld_AV.tsv")
+sheld_LR <- read_tsv("sheld_LR.tsv")
+sheld_VD <- read_tsv("sheld_VD.tsv")
+load("mask_97x97x97.rda") # It is loaded with the name `sampleMask`.
 ```
 
 ## Mask data preparation
@@ -82,7 +98,7 @@ You can create mask data using masker by create cross sections along
 certain axes.
 
 1. To create a new mask, select `new mask` under `How input`.
-1. Set the number of intercepts for each axis in the
+1. Set the number of sections for each axis in the
 `Number of intercept` field.
 1. In `width of cells`, set the thickness of the intercept for each axis
 as a relative value.
@@ -118,6 +134,8 @@ Visualize the reconstruction results using `ImageViewer`.
 ImageViewer(tomoObj, geneID = "gene3")
 ```
 
+This command starts a shiny app `ImageViewer`.
+
 ![Interface of ImageViewer](imageviewer_image.png)
 
 1. Select which axis to look at the cross section perpendicular to.
@@ -127,7 +145,7 @@ mask: silhouette of the mask, Unite: superimposition of the two).
 1. Press the Auto Play button to view each section of the image
 frame by frame.
 1. Set the aspect ratio of the figure (default is the ratio of the
-number of intercepts).
+number of sections).
 1. Edit figure titles and labels.
 1. Specify the range of expression levels to be displayed (default is
 the full range).
@@ -138,22 +156,24 @@ of each fragment being displayed.
 # Find axial peak gene
 
 Detect genes with significant differences in expression levels between
-intercepts from Tomo-seq data.
+sections from Tomo-seq data.
 
 ```{r}
-FindAxialGenes(testx)
+axialGeneTable <- FindAxialGenes(testx)
+print(axialGeneTable)
 ```
-The results include these columns.
+The results include these columns:
 
-GeneID: Gene ID.  
-max: The maximum expression level of the gene.  
-meanExeptMax: Average of expression levels excluding the maximum.  
-index: Number of the section containing the maximum expression level.
+- GeneID: Gene ID.  
+- max: The maximum expression level of the gene.  
+- meanExeptMax: Average of expression levels excluding the maximum.  
+- index: Number of the section containing the maximum expression level.
 
 You can also specify a vector of candidate gene IDs.
 
 ```{r}
-FindAxialGenes(testx, genes = c("gene1", "gene3"))
+axialGeneTable <- FindAxialGenes(testx, genes = c("gene1", "gene3"))
+print(axialGeneTable)
 ```
 
 # SessionInfo
