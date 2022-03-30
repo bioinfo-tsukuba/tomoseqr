@@ -55,16 +55,13 @@ head(testx)
 You can download part of the Tomo-seq data published by [Junker et al.](https://www.sciencedirect.com/science/article/pii/S0092867414012264#mmc3) with following commands. 
 
 ```{r, eval = FALSE}
-download.file("https://figshare.com/ndownloader/files/34384922", destfile = "sheld_AV.tsv")
-download.file("https://figshare.com/ndownloader/files/34384925", destfile = "sheld_LR.tsv")
-download.file("https://figshare.com/ndownloader/files/34384928", destfile = "sheld_VD.tsv")
-download.file("https://figshare.com/ndownloader/files/34523069", destfile = "mask_97x97x97.rda")
-library(readr)
+tomoCache <- DownloadJunker2014()
+junker2014 <- LoadJunker2014(tomoCache)
 
-sheld_AV <- read_tsv("sheld_AV.tsv")
-sheld_LR <- read_tsv("sheld_LR.tsv")
-sheld_VD <- read_tsv("sheld_VD.tsv")
-load("mask_97x97x97.rda") # It is loaded with the name `sampleMask`.
+sheldAV <- junker2014[["sheldAV"]]
+sheldVD <- junker2014[["sheldVD"]]
+sheldLR <- junker2014[["sheldLR"]]
+mask <- junker2014[["mask"]]
 ```
 
 ## Mask data preparation

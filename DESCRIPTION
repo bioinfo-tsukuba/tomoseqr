@@ -35,6 +35,9 @@ Imports:
     methods,
     shiny,
     jsonlite,
+    BiocFileCache,
+    readr,
+    tools
 Suggests:
     rmarkdown,
     knitr,

@@ -284,3 +284,52 @@ FindAxialGenes <- function (tomoSeqData, genes = "all") {
             return()
     }
 }
+
+#' Download  part of the Tomo-seq data published by Junker et al.
+#' @param verbose If you want to force downloads with or without cache,
+#' set this to TRUE.
+#' @return BiocFileCache object.
+#' @export 
+DownloadJunker2014 <- function ( verbose = FALSE ) {
+    sheldAVURL <- "https://figshare.com/ndownloader/files/34384922"
+    sheldVDURL <- "https://figshare.com/ndownloader/files/34384928"
+    sheldLRURL <- "https://figshare.com/ndownloader/files/34384925"
+    maskURL <- "https://figshare.com/ndownloader/files/34523069"
+
+    bfc <- GetTomoseqrCache()
+    message("Downloading sheld_AV......")
+    DownloadData(bfc=bfc, rname="sheld_AV", URL=sheldAVURL)
+    message("Downloading sheld_VD......")
+    DownloadData(bfc=bfc, rname="sheld_VD", URL=sheldVDURL)
+    message("Downloading sheld_LR......")
+    DownloadData(bfc=bfc, rname="sheld_LR", URL=sheldLRURL)
+    message("Downloading mask97x97x97......")
+    DownloadData(bfc=bfc, rname="mask97x97x97", URL=maskURL)
+    return(bfc)
+}
+
+#' Load data of Junker2014 from cache.
+#' @param tomoseqrCache Cache of tomoseqr. You can get it using
+#' `DownloadJunker2014`.
+#' @return List of tomo-seq data in cache.
+#' @importFrom BiocFileCache bfcquery
+#' @importFrom readr read_tsv
+#' @export
+LoadJunker2014 <- function (tomoseqrCache) {
+    ridAV <- bfcquery(tomoseqrCache, "sheld_AV", "rname")$rid
+    ridVD <- bfcquery(tomoseqrCache, "sheld_VD", "rname")$rid
+    ridLR <- bfcquery(tomoseqrCache, "sheld_LR", "rname")$rid
+    ridMask <- bfcquery(tomoseqrCache, "mask97x97x97", "rname")$rid
+    sheldAV <- read_tsv(tomoseqrCache[[ridAV]])
+    sheldVD <- read_tsv(tomoseqrCache[[ridVD]])
+    sheldLR <- read_tsv(tomoseqrCache[[ridLR]])
+    mask <- get(load(tomoseqrCache[[ridMask]]))
+    return(
+        list(
+            sheldAV=sheldAV,
+            sheldVD=sheldVD,
+            sheldLR=sheldLR,
+            mask=mask
+        )
+    )
+}

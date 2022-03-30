@@ -323,3 +323,29 @@ FindAxialGenesInner <- function (targetData) {
     ) %>%
         return()
 }
+
+#' @importFrom tools R_user_dir
+#' @importFrom BiocFileCache BiocFileCache
+GetTomoseqrCache <-
+    function()
+{
+    cache <- R_user_dir("tomoseqrCache", which="cache")
+    BiocFileCache(cache)
+}
+
+#' @importFrom BiocFileCache bfcquery
+#' @importFrom BiocFileCache bfcadd
+#' @importFrom BiocFileCache bfcneedsupdate
+#' @importFrom BiocFileCache bfcdownload
+DownloadData <- function (bfc, rname, URL, verbose=FALSE) {
+    rid <- bfcquery(bfc, rname, "rname")$rid
+    if (!length(rid)) {
+        if (verbose) {
+            message("Downloading file")
+            rid <- names(bfcadd(bfc, rname, URL))
+        }
+    }
+    if (isTRUE(bfcneedsupdate(bfc, rid))) {
+        bfcdownload(bfc, rid)
+    }
+}
