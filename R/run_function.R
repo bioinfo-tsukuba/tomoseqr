@@ -333,3 +333,8 @@ LoadJunker2014 <- function (tomoseqrCache) {
         )
     )
 }
+
+FindCorrelatedGenes <- function(tomoObj) {
+    argOfCor <- combn(names(tomoObj[["results"]]), m=2)
+    CorTibble <- tibble(geneID1=argOfCor[1, ], geneID2=argOfCor[2, ])
+}

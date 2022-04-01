@@ -349,3 +349,13 @@ DownloadData <- function (bfc, rname, URL, verbose=FALSE) {
         bfcdownload(bfc, rid)
     }
 }
+
+CorOfReconst <- function (reconst1, reconst2) {
+    corTestResult <- cor.test(reconst1, reconst2)
+    return(
+        list(
+            cor=corTestResult[["estimate"]],
+            pValue=corTestResult[["p.value"]]
+        )
+    )
+}
