@@ -37,7 +37,9 @@ Imports:
     jsonlite,
     BiocFileCache,
     readr,
-    tools
+    tools,
+    tidyr,
+    stats
 Suggests:
     rmarkdown,
     knitr,

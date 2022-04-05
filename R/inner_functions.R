@@ -350,8 +350,10 @@ DownloadData <- function (bfc, rname, URL, verbose=FALSE) {
     }
 }
 
-CorOfReconst <- function (reconst1, reconst2) {
-    corTestResult <- cor.test(reconst1, reconst2)
+CorOfReconst <- function (tomoObj, geneID1, geneID2) {
+    recResult1 <- ToDataFrame(tomoObj, geneID1)[, 4]
+    recResult2 <- ToDataFrame(tomoObj, geneID2)[, 4]
+    corTestResult <- cor.test(recResult1, recResult2)
     return(
         list(
             cor=corTestResult[["estimate"]],
@@ -359,3 +361,8 @@ CorOfReconst <- function (reconst1, reconst2) {
         )
     )
 }
+
+VectorizedCorOfReconst <- Vectorize(
+    CorOfReconst,
+    vectorize.args = c("geneID1", "geneID2")
+)

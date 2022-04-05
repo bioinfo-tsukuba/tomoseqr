@@ -334,7 +334,22 @@ LoadJunker2014 <- function (tomoseqrCache) {
     )
 }
 
-FindCorrelatedGenes <- function(tomoObj) {
+#' Find gorrelated genes
+#' @param tomoObj tomoseq object
+#' @importFrom tidyr unnest
+#' @importFrom stats p.adjust
+#' @export
+FindCorrelatedGenes <- function (tomoObj) {
     argOfCor <- combn(names(tomoObj[["results"]]), m=2)
-    CorTibble <- tibble(geneID1=argOfCor[1, ], geneID2=argOfCor[2, ])
+    corResult <- VectorizedCorOfReconst(tomoObj, argOfCor[1, ], argOfCor[2, ])
+    pValueAdjusted <- p.adjust(corResult["pValue", ], method="BH")
+    corTibble <- tibble(
+        geneID1=argOfCor[1, ],
+        geneID2=argOfCor[2, ],
+        cor=corResult["cor", ],
+        pValue=corResult["pValue", ],
+        pValueAdjusted=pValueAdjusted
+    ) %>%
+        unnest(col=c("cor", "pValue"))
+    return(corTibble)
 }
