@@ -297,13 +297,9 @@ DownloadJunker2014 <- function ( verbose = FALSE ) {
     maskURL <- "https://figshare.com/ndownloader/files/34523069"
 
     bfc <- GetTomoseqrCache()
-    message("Downloading sheld_AV......")
     DownloadData(bfc=bfc, rname="sheld_AV", URL=sheldAVURL)
-    message("Downloading sheld_VD......")
     DownloadData(bfc=bfc, rname="sheld_VD", URL=sheldVDURL)
-    message("Downloading sheld_LR......")
     DownloadData(bfc=bfc, rname="sheld_LR", URL=sheldLRURL)
-    message("Downloading mask97x97x97......")
     DownloadData(bfc=bfc, rname="mask97x97x97", URL=maskURL)
     return(bfc)
 }

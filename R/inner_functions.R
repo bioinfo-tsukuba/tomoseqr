@@ -342,8 +342,8 @@ DownloadData <- function (bfc, rname, URL, verbose=FALSE) {
     if (!length(rid)) {
         if (verbose) {
             message("Downloading file")
-            rid <- names(bfcadd(bfc, rname, URL))
         }
+        rid <- names(bfcadd(bfc, rname, URL))
     }
     if (isTRUE(bfcneedsupdate(bfc, rid))) {
         bfcdownload(bfc, rid)
