@@ -48,7 +48,6 @@ ImageViewer <- function (tomoObj, geneID) {
                     hr(),
                     sidebarLayout(
                         sidebarPanel(
-                            # style = "overflow-y: scroll",
                             radioButtons(
                                 "x_type",
                                 label = h3("Type"),
@@ -66,7 +65,6 @@ ImageViewer <- function (tomoObj, geneID) {
                                 max=dim(recResult)[3],
                                 step=1,
                                 value=1,
-                                # animate=TRUE,
                                 animate = animationOptions(
                                     interval=100,
                                     loop=TRUE
@@ -139,7 +137,6 @@ ImageViewer <- function (tomoObj, geneID) {
                     hr(),
                     sidebarLayout(
                         sidebarPanel(
-                            # style = "overflow-y: scroll",
                             radioButtons(
                                 "y_type",
                                 label = h3("Type"),
@@ -157,7 +154,6 @@ ImageViewer <- function (tomoObj, geneID) {
                                 max=dim(recResult)[3],
                                 step=1,
                                 value=1,
-                                # animate=TRUE,
                                 animate = animationOptions(
                                     interval=100,
                                     loop=TRUE
@@ -230,7 +226,6 @@ ImageViewer <- function (tomoObj, geneID) {
                     hr(),
                     sidebarLayout(
                         sidebarPanel(
-                            # style = "overflow-y: scroll",
                             radioButtons(
                                 "z_type",
                                 label = h3("Type"),
@@ -248,7 +243,6 @@ ImageViewer <- function (tomoObj, geneID) {
                                 max=dim(recResult)[3],
                                 step=1,
                                 value=1,
-                                # animate=TRUE,
                                 animate = animationOptions(
                                     interval=100,
                                     loop=TRUE
