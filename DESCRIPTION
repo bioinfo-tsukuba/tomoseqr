@@ -34,7 +34,6 @@ Imports:
     purrr,
     methods,
     shiny,
-    jsonlite,
     BiocFileCache,
     readr,
     tools
