@@ -350,10 +350,14 @@ DownloadData <- function (bfc, rname, URL, verbose=FALSE) {
     }
 }
 
-CorOfReconst <- function (tomoObj, geneID1, geneID2) {
-    recResult1 <- ToDataFrame(tomoObj, geneID1)[, 4]
-    recResult2 <- ToDataFrame(tomoObj, geneID2)[, 4]
-    corTestResult <- cor.test(recResult1, recResult2)
+#' @importFrom tibble as_tibble
+#' @importFrom dplyr %>%
+#' @importFrom stats cor.test
+CorOfReconst <- function (tomoObj, geneID1, geneID2, method) {
+    vecMask <- MatrixToDataFrame(tomoObj[["mask"]])[, 4]
+    recResult1 <- ToDataFrame(tomoObj, geneID1)[(vecMask != 0), 4]
+    recResult2 <- ToDataFrame(tomoObj, geneID2)[(vecMask != 0), 4]
+    corTestResult <- cor.test(recResult1, recResult2, method = method)
     return(
         list(
             cor=corTestResult[["estimate"]],
