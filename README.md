@@ -50,13 +50,13 @@ tomo_obj <- Estimate3dExpressions(
 ImageViewer(tomo_obj, "gene1")
 ```
 
-![example](./inst/imageviewer_example.png)
+![example](./inst/images/imageviewer_example.png)
 
 ```{r}
 Animate2d(tomo_obj, "gene1", target="unite")
 ```
 
-![example](./inst/gene1_unite_1_2.gif)
+![example](./inst/images/gene1_unite_1_2.gif)
 
 ## Reference
 
