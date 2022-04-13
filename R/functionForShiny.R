@@ -2,7 +2,7 @@
 #' @importFrom dplyr %>%
 #' @importFrom animation saveGIF
 #' @importFrom shiny withProgress
-ShinyAnimate2d <- function (
+shinyAnimate2d <- function (
     tomoObj,
     geneID,
     target,
@@ -23,7 +23,7 @@ ShinyAnimate2d <- function (
 
     withProgress(message='generating GIF', value=0, {
         saveGIF(
-            ShinyAnimateForGIF(
+            shinyAnimateForGIF(
                 reconstArray = reconstArray,
                 maskArray = maskArray,
                 main = main,
@@ -42,7 +42,7 @@ ShinyAnimate2d <- function (
 
 #' @importFrom shiny
 #' incProgress
-ShinyAnimateForGIF <- function (
+shinyAnimateForGIF <- function (
     reconstArray,
     maskArray,
     main,
@@ -53,7 +53,7 @@ ShinyAnimateForGIF <- function (
     type
 ) {
     asp <- aspectRatio[2] / aspectRatio[1]
-    plotArray <- MakePlotArray(
+    plotArray <- makePlotArray(
         reconstArray=reconstArray,
         maskArray=maskArray,
         zlim=zlim,
@@ -61,7 +61,7 @@ ShinyAnimateForGIF <- function (
     )
     nTimesRepeat <- length(plotArray[1, 1, ])
     for (i in seq_along(plotArray[1, 1, ])) {
-        BasePlot(
+        basePlot(
             plotArray,
             sectionNumber=i,
             main,

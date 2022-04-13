@@ -23,10 +23,10 @@
 #' @return NA
 #' @examples
 #' if (interactive()) {
-#'     Masker()
+#'     masker()
 #' }
 #' @export
-Masker <- function () {
+masker <- function () {
     ui <- function () {
         addResourcePath(
             'www',

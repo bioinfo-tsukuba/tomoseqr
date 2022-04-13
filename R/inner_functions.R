@@ -1,7 +1,7 @@
 #' @importFrom methods is
 #' @importFrom dplyr %>%
 #' @importFrom stringr str_c
-CheckParameters <- function(tomoObj, query) {
+checkParameters <- function(tomoObj, query) {
     if (is(tomoObj, "tomoSeq") == FALSE) {
         stop(
             str_c(
@@ -18,15 +18,15 @@ CheckParameters <- function(tomoObj, query) {
     }
 }
 
-## This function is used in Estimate3dExpression().
+## This function is used in estimate3dExpression().
 #' @importFrom dplyr %>%
-GetGeneExpression <- function (tomoSeqData, geneID) {
+getGeneExpression <- function (tomoSeqData, geneID) {
     retvalMatrix <- tomoSeqData[as.vector(tomoSeqData[, 1] == geneID), ]
     retvalMatrix <- retvalMatrix[, -1] %>% as.matrix()
     return(retvalMatrix)
 }
 
-RepMat <- function (targetVector, nTimesRepeat) {
+repMat <- function (targetVector, nTimesRepeat) {
     lenX <- length(targetVector) * nTimesRepeat[1]
     lenY <- nTimesRepeat[2]
     lenZ <- nTimesRepeat[3]
@@ -39,7 +39,7 @@ RepMat <- function (targetVector, nTimesRepeat) {
 }
 
 #' @importFrom dplyr %>%
-SingleEstimate <- function (
+singleEstimate <- function (
     X,
     Y,
     Z,
@@ -53,9 +53,9 @@ SingleEstimate <- function (
     sumY <- Y[, -1] %>% colSums()
     sumZ <- Z[, -1] %>% colSums()
 
-    x0 <- X %>% GetGeneExpression(geneID)
-    y0 <- Y %>% GetGeneExpression(geneID)
-    z0 <- Z %>% GetGeneExpression(geneID)
+    x0 <- X %>% getGeneExpression(geneID)
+    y0 <- Y %>% getGeneExpression(geneID)
+    z0 <- Z %>% getGeneExpression(geneID)
     xLen <- length(x0)
     yLen <- length(y0)
     zLen <- length(z0)
@@ -110,17 +110,17 @@ SingleEstimate <- function (
 
     for (i in seq_len(numIter)) {
         xa <- a %>% apply(1, sum)
-        a <- a * RepMat(x / xa, c(1, dim(mask)[2], dim(mask)[3]))
+        a <- a * repMat(x / xa, c(1, dim(mask)[2], dim(mask)[3]))
         a[is.nan(a)] <- 0
         ya <- a %>% apply(2, sum)
         a <- a * aperm(
-            RepMat(y / ya, c(1, dim(mask)[1], dim(mask)[3])),
+            repMat(y / ya, c(1, dim(mask)[1], dim(mask)[3])),
             perm = c(2, 1, 3)
         )
         a[is.nan(a)] <- 0
         za <- a %>% apply(3, sum)
         a <- a * aperm(
-            RepMat(z / za, c(1, dim(mask)[1], dim(mask)[2])),
+            repMat(z / za, c(1, dim(mask)[1], dim(mask)[2])),
             perm = c(2, 3, 1)
         )
         a[is.nan(a)] <- 0
@@ -139,13 +139,13 @@ SingleEstimate <- function (
 }
 
 #' @importFrom grDevices hcl.colors
-ColFunc <- function (n) {
+colFunc <- function (n) {
     return(c("#000000", hcl.colors(n - 1, "Blues", rev = TRUE)))
 }
 
 #' @importFrom graphics filled.contour
 #' @importFrom stringr str_c
-BasePlot <- function (
+basePlot <- function (
     sourceArray,
     sectionNumber,
     main,
@@ -162,11 +162,11 @@ BasePlot <- function (
         frame.plot=FALSE,
         zlim = c(-1, max(sourceArray)),
         nlevels = 50,
-        color.palette = ColFunc
+        color.palette = colFunc
     )
 }
 
-MakePlotArray <- function (
+makePlotArray <- function (
     reconstArray,
     maskArray,
     zlim,
@@ -193,7 +193,7 @@ MakePlotArray <- function (
 #' @importFrom shiny
 #' withProgress
 #' incProgress
-AnimateForGIF <- function (
+animateForGIF <- function (
     reconstArray,
     maskArray,
     main,
@@ -212,7 +212,7 @@ AnimateForGIF <- function (
         asp <- aspectRatio[2] / aspectRatio[1]
     }
 
-    plotArray <- MakePlotArray(
+    plotArray <- makePlotArray(
         reconstArray=reconstArray,
         maskArray=maskArray,
         zlim=zlim,
@@ -222,7 +222,7 @@ AnimateForGIF <- function (
     nTimesRepeat <- length(plotArray[1, 1, ])
     for (i in seq_along(plotArray[1, 1, ])) {
         message(".", appendLF=FALSE)
-        BasePlot(
+        basePlot(
             plotArray,
             sectionNumber=i,
             main,
@@ -235,7 +235,7 @@ AnimateForGIF <- function (
     message("Converting to GIF...")
 }
 
-PlotForImageViewer <- function (
+plotForImageViewer <- function (
     reconstArray,
     maskArray,
     main,
@@ -255,13 +255,13 @@ PlotForImageViewer <- function (
         asp <- aspectRatio[2] / aspectRatio[1]
     }
 
-    plotArray <- MakePlotArray(
+    plotArray <- makePlotArray(
         reconstArray=reconstArray,
         maskArray=maskArray,
         zlim=zlim,
         type=type
     )
-    BasePlot(
+    basePlot(
         plotArray,
         sectionNumber=sectionNumber,
         main,
@@ -278,7 +278,7 @@ print.tomoSeq <- function (x, ...) {
 }
 
 #' @importFrom dplyr %>%
-MatrixToDataFrame <- function (reconst) {
+matrixToDataFrame <- function (reconst) {
     vecReconst <- as.vector(reconst)
     dim <- dim(reconst)
     xlen <- dim[1]
@@ -298,7 +298,7 @@ MatrixToDataFrame <- function (reconst) {
         return()
 }
 
-IsPeakGene <- function (v, threshold = 10) {
+isPeakGene <- function (v, threshold = 10) {
     maxV <- max(v)
     indexOfMaxV <- which.max(v)
     meanExeptMaxV <- mean(v[-1 * indexOfMaxV])
@@ -310,10 +310,10 @@ IsPeakGene <- function (v, threshold = 10) {
 }
 
 #' @importFrom tibble tibble
-FindAxialGenesInner <- function (targetData) {
+findAxialGenesInner <- function (targetData) {
     retMat <- targetData %>%
         select(-1) %>%
-        apply(MARGIN = 1, FUN = IsPeakGene) %>%
+        apply(MARGIN = 1, FUN = isPeakGene) %>%
         t()
     tibble(
         geneID = as.vector(t(targetData[, 1])),
@@ -326,9 +326,7 @@ FindAxialGenesInner <- function (targetData) {
 
 #' @importFrom tools R_user_dir
 #' @importFrom BiocFileCache BiocFileCache
-GetTomoseqrCache <-
-    function()
-{
+getTomoseqrCache <- function() {
     cache <- R_user_dir("tomoseqrCache", which="cache")
     BiocFileCache(cache)
 }
@@ -337,7 +335,7 @@ GetTomoseqrCache <-
 #' @importFrom BiocFileCache bfcadd
 #' @importFrom BiocFileCache bfcneedsupdate
 #' @importFrom BiocFileCache bfcdownload
-DownloadData <- function (bfc, rname, URL, verbose=FALSE) {
+downloadData <- function (bfc, rname, URL, verbose=FALSE) {
     rid <- bfcquery(bfc, rname, "rname")$rid
     if (!length(rid)) {
         if (verbose) {

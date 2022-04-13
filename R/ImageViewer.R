@@ -20,11 +20,11 @@
 #' @examples
 #' if (interactive()) {
 #'     data(tomoObj)
-#'     ImageViewer(tomoObj, "gene2")
+#'     imageViewer(tomoObj, "gene2")
 #' }
 #' @export
-ImageViewer <- function (tomoObj, geneID) {
-    CheckParameters(tomoObj, geneID)
+imageViewer <- function (tomoObj, geneID) {
+    checkParameters(tomoObj, geneID)
     recResult <- tomoObj[["results"]][[geneID]][["reconst"]]
     recAlongX <- aperm(recResult, perm = c(2, 3, 1))
     recAlongY <- aperm(recResult, perm = c(1, 3, 2))
@@ -315,7 +315,7 @@ ImageViewer <- function (tomoObj, geneID) {
 
         ## Along x
         xPlotArray <- reactive({
-            MakePlotArray(
+            makePlotArray(
                 reconstArray=recAlongX,
                 maskArray=maskAlongX,
                 zlim=input$x_zlim,
@@ -323,7 +323,7 @@ ImageViewer <- function (tomoObj, geneID) {
             )
         })
         output$xplot <- renderPlot({
-            BasePlot(
+            basePlot(
                 sourceArray=xPlotArray(),
                 sectionNumber=input$xSec,
                 main=input$x_main,
@@ -336,7 +336,7 @@ ImageViewer <- function (tomoObj, geneID) {
             filename = "xPlot.png",
             content = function (file) {
                 png(file, height=1000, width=1000, res=144)
-                BasePlot(
+                basePlot(
                     sourceArray=xPlotArray(),
                     sectionNumber=input$xSec,
                     main=input$x_main,
@@ -350,7 +350,7 @@ ImageViewer <- function (tomoObj, geneID) {
         output$XgenerateGIF <- downloadHandler(
             filename = "xPlot.gif",
             content = function (file) {
-                ShinyAnimate2d(
+                shinyAnimate2d(
                     tomoObj,
                     geneID,
                     target=input$x_type,
@@ -369,7 +369,7 @@ ImageViewer <- function (tomoObj, geneID) {
 
         ## Along y
         yPlotArray <- reactive({
-            MakePlotArray(
+            makePlotArray(
                 reconstArray=recAlongY,
                 maskArray=maskAlongY,
                 zlim=input$y_zlim,
@@ -377,7 +377,7 @@ ImageViewer <- function (tomoObj, geneID) {
             )
         })
         output$yplot <- renderPlot({
-            BasePlot(
+            basePlot(
                 sourceArray=yPlotArray(),
                 sectionNumber=input$ySec,
                 main=input$y_main,
@@ -390,7 +390,7 @@ ImageViewer <- function (tomoObj, geneID) {
             filename = "yPlot.png",
             content = function (file) {
                 png(file, height=1000, width=1000, res=144)
-                BasePlot(
+                basePlot(
                     sourceArray=yPlotArray(),
                     sectionNumber=input$ySec,
                     main=input$y_main,
@@ -405,7 +405,7 @@ ImageViewer <- function (tomoObj, geneID) {
         output$YgenerateGIF <- downloadHandler(
             filename = "yPlot.gif",
             content = function (file) {
-                ShinyAnimate2d(
+                shinyAnimate2d(
                     tomoObj,
                     geneID,
                     target=input$y_type,
@@ -424,7 +424,7 @@ ImageViewer <- function (tomoObj, geneID) {
 
         ## Along z
         zPlotArray <- reactive({
-            MakePlotArray(
+            makePlotArray(
                 reconstArray=recAlongZ,
                 maskArray=maskAlongZ,
                 zlim=input$z_zlim,
@@ -432,7 +432,7 @@ ImageViewer <- function (tomoObj, geneID) {
             )
         })
         output$zplot <- renderPlot({
-            BasePlot(
+            basePlot(
                 sourceArray=zPlotArray(),
                 sectionNumber=input$zSec,
                 main=input$z_main,
@@ -445,7 +445,7 @@ ImageViewer <- function (tomoObj, geneID) {
             filename = "zPlot.png",
             content = function (file) {
                 png(file, height=1000, width=1000, res=144)
-                BasePlot(
+                basePlot(
                     sourceArray=zPlotArray(),
                     sectionNumber=input$zSec,
                     main=input$z_main,
@@ -460,7 +460,7 @@ ImageViewer <- function (tomoObj, geneID) {
         output$ZgenerateGIF <- downloadHandler(
             filename = "zPlot.gif",
             content = function (file) {
-                ShinyAnimate2d(
+                shinyAnimate2d(
                     tomoObj,
                     geneID,
                     target=input$z_type,

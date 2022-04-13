@@ -55,8 +55,8 @@ head(testx)
 You can download part of the Tomo-seq data published by [Junker et al.](https://www.sciencedirect.com/science/article/pii/S0092867414012264#mmc3) with following commands. 
 
 ```{r, eval = FALSE}
-tomoCache <- DownloadJunker2014()
-junker2014 <- LoadJunker2014(tomoCache)
+tomoCache <- downloadJunker2014()
+junker2014 <- doadJunker2014(tomoCache)
 
 sheldAV <- junker2014[["sheldAV"]]
 sheldVD <- junker2014[["sheldVD"]]
@@ -86,7 +86,7 @@ The `tomoseqr` package provides a tool to create mask data,
 which can be run with the following command.
 
 ```{r eval = FALSE}
-Masker()
+masker()
 ```
 
 ![Interface of masker](masker_image.png)
@@ -110,11 +110,11 @@ as if you were creating pixel art.
 
 # Reconstruction of 3D expression patterns
 
-Use the `Estimate3dExpressions` function to reconstruct the 3D expression
+Use the `estimate3dExpressions` function to reconstruct the 3D expression
 pattern of the gene specified by `query` from Tomo-seq data.
 
 ```{r}
-tomoObj <- Estimate3dExpressions(
+tomoObj <- estimate3dExpressions(
     testx,
     testy,
     testz,
@@ -125,13 +125,13 @@ tomoObj <- Estimate3dExpressions(
 
 # Visualize result of reconstruction
 
-Visualize the reconstruction results using `ImageViewer`.
+Visualize the reconstruction results using `imageViewer`.
 
 ```{r eval = FALSE}
-ImageViewer(tomoObj, geneID = "gene3")
+imageViewer(tomoObj, geneID = "gene3")
 ```
 
-This command starts a shiny app `ImageViewer`.
+This command starts a shiny app `imageViewer`.
 
 ![Interface of ImageViewer](imageviewer_image.png)
 
@@ -156,7 +156,7 @@ Detect genes with significant differences in expression levels between
 sections from Tomo-seq data.
 
 ```{r}
-axialGeneTable <- FindAxialGenes(testx)
+axialGeneTable <- findAxialGenes(testx)
 print(axialGeneTable)
 ```
 The results include these columns:
@@ -169,7 +169,7 @@ The results include these columns:
 You can also specify a vector of candidate gene IDs.
 
 ```{r}
-axialGeneTable <- FindAxialGenes(testx, genes = c("gene1", "gene3"))
+axialGeneTable <- findAxialGenes(testx, genes = c("gene1", "gene3"))
 print(axialGeneTable)
 ```
 

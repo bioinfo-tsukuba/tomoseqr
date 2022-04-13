@@ -11,13 +11,13 @@
 #' contains gene IDs and the second and subsequent columns contain
 #' gene expression levels in sections.
 #' @return A vector that contains genes which can be used for
-#' `Estimate3dExpressions`.
+#' `estimate3dExpressions`.
 #' @examples
 #' data("testx", "testy", "testz")
-#' ExtractGeneList(testx, testy, testz)
+#' extractGeneList(testx, testy, testz)
 #' @importFrom dplyr %>%
 #' @export
-ExtractGeneList <- function (x, y, z) {
+extractGeneList <- function (x, y, z) {
     xGene <- x[, 1] %>% t()
     yGene <- y[, 1] %>% t()
     zGene <- z[, 1] %>% t()
@@ -48,7 +48,7 @@ ExtractGeneList <- function (x, y, z) {
 #' @importFrom purrr list_along
 #' @examples
 #' data("testx", "testy", "testz", "mask")
-#' Estimate3dExpressions(
+#' estimate3dExpressions(
 #'     testx,
 #'     testy,
 #'     testz,
@@ -58,7 +58,7 @@ ExtractGeneList <- function (x, y, z) {
 #'     normMask = TRUE
 #' )
 #' @export
-Estimate3dExpressions <- function (
+estimate3dExpressions <- function (
     x,
     y,
     z,
@@ -71,7 +71,7 @@ Estimate3dExpressions <- function (
     recList <- list_along(query)
     names(recList) <- query
     for (geneID in query) {
-        recList[[geneID]] <- SingleEstimate(
+        recList[[geneID]] <- singleEstimate(
             x,
             y,
             z,
@@ -98,10 +98,10 @@ Estimate3dExpressions <- function (
 #' @return NA
 #' @examples
 #' data(tomoObj)
-#' PlotLossFunction(tomoObj, "gene2")
+#' plotLossFunction(tomoObj, "gene2")
 #' @export
-PlotLossFunction <- function (tomoObj, geneID) {
-    CheckParameters(tomoObj, geneID)
+plotLossFunction <- function (tomoObj, geneID) {
+    checkParameters(tomoObj, geneID)
     tomoObj[["results"]][[geneID]][["errFunc"]] %>%
         plot(
             type = "l",
@@ -135,10 +135,10 @@ PlotLossFunction <- function (tomoObj, geneID) {
 #' @examples
 #' if(interactive()) {
 #'     data(tomoObj)
-#'     Animate2d(tomoObj, "gene2", target = "expression", file = "example.gif")
+#'     animate2d(tomoObj, "gene2", target = "expression", file = "example.gif")
 #' }
 #' @export
-Animate2d <- function (
+animate2d <- function (
     tomoObj,
     geneID,
     target="expression",
@@ -152,7 +152,7 @@ Animate2d <- function (
     interval=0.1,
     aspectRatio=c()
 ) {
-    CheckParameters(tomoObj, geneID)
+    checkParameters(tomoObj, geneID)
     if (length(aspectRatio) != 0 & length(aspectRatio) != 2) {
         stop("`aspectRatio` should be a 2D vector.")
     }
@@ -166,7 +166,7 @@ Animate2d <- function (
         aperm(perm=c(xaxis, yaxis, 6 - (xaxis + yaxis)))
 
     saveGIF(
-        AnimateForGIF(
+        animateForGIF(
             reconstArray = reconstArray,
             maskArray = maskArray,
             main = main,
@@ -190,10 +190,10 @@ Animate2d <- function (
 #' @return NA
 #' @examples
 #' data(tomoObj)
-#' Plot1dExpression(tomoObj, "gene2", "x")
+#' plot1dExpression(tomoObj, "gene2", "x")
 #' @export
-Plot1dExpression <- function (tomoObj, geneID, axes) {
-    CheckParameters(tomoObj, geneID)
+plot1dExpression <- function (tomoObj, geneID, axes) {
+    checkParameters(tomoObj, geneID)
     convertList <- list("x" = 1, "y" = 2, "z" = 3)
     oldpar <- par(no.readonly=TRUE)
     on.exit(par(oldpar))
@@ -226,9 +226,9 @@ Plot1dExpression <- function (tomoObj, geneID, axes) {
 #' @return NA
 #' @examples
 #' data("testx")
-#' Plot1dAllExpression(testx)
+#' plot1dAllExpression(testx)
 #' @export
-Plot1dAllExpression <- function (tomoSeqData, ...) {
+plot1dAllExpression <- function (tomoSeqData, ...) {
     tomoSeqData[, -1] %>% colSums() %>% plot(type="l", ...)
 }
 
@@ -239,12 +239,12 @@ Plot1dAllExpression <- function (tomoSeqData, ...) {
 #' @return Reconstruction result converted to dataframe.
 #' @examples
 #' data(tomoObj)
-#' ToDataFrame(tomoObj, "gene2")
+#' toDataFrame(tomoObj, "gene2")
 #' @export
-ToDataFrame <- function (tomoObj, geneID) {
-    CheckParameters(tomoObj, geneID)
+toDataFrame <- function (tomoObj, geneID) {
+    checkParameters(tomoObj, geneID)
     tomoObj[["results"]][[geneID]][["reconst"]] %>%
-        MatrixToDataFrame() %>%
+        matrixToDataFrame() %>%
         return()
 }
 
@@ -254,10 +254,10 @@ ToDataFrame <- function (tomoObj, geneID) {
 #' @return Reconstruction result as matrix
 #' @examples
 #' data(tomoObj)
-#' GetReconstructedResult(tomoObj, "gene2")
+#' getReconstructedResult(tomoObj, "gene2")
 #' @export
-GetReconstructedResult <- function (tomoObj, geneID) {
-    CheckParameters(tomoObj, geneID)
+getReconstructedResult <- function (tomoObj, geneID) {
+    checkParameters(tomoObj, geneID)
     return(tomoObj[["results"]][[geneID]][["reconst"]])
 }
 
@@ -271,16 +271,16 @@ GetReconstructedResult <- function (tomoObj, geneID) {
 #' @importFrom dplyr select
 #' @examples
 #' data(testx)
-#' FindAxialGenes(testx)
+#' findAxialGenes(testx)
 #' @export
-FindAxialGenes <- function (tomoSeqData, genes = "all") {
+findAxialGenes <- function (tomoSeqData, genes = "all") {
     if (length(genes) == 1 && genes == "all") {
         tomoSeqData %>%
-            FindAxialGenesInner() %>%
+            findAxialGenesInner() %>%
             return()
     } else {
         tomoSeqData[as.vector(t(tomoSeqData[, 1]) %in% genes), ] %>%
-            FindAxialGenesInner() %>%
+            findAxialGenesInner() %>%
             return()
     }
 }
@@ -290,28 +290,28 @@ FindAxialGenes <- function (tomoSeqData, genes = "all") {
 #' set this to TRUE.
 #' @return BiocFileCache object.
 #' @export 
-DownloadJunker2014 <- function ( verbose = FALSE ) {
+downloadJunker2014 <- function ( verbose = FALSE ) {
     sheldAVURL <- "https://figshare.com/ndownloader/files/34384922"
     sheldVDURL <- "https://figshare.com/ndownloader/files/34384928"
     sheldLRURL <- "https://figshare.com/ndownloader/files/34384925"
     maskURL <- "https://figshare.com/ndownloader/files/34523069"
 
-    bfc <- GetTomoseqrCache()
-    DownloadData(bfc=bfc, rname="sheld_AV", URL=sheldAVURL)
-    DownloadData(bfc=bfc, rname="sheld_VD", URL=sheldVDURL)
-    DownloadData(bfc=bfc, rname="sheld_LR", URL=sheldLRURL)
-    DownloadData(bfc=bfc, rname="mask97x97x97", URL=maskURL)
+    bfc <- getTomoseqrCache()
+    downloadData(bfc=bfc, rname="sheld_AV", URL=sheldAVURL)
+    downloadData(bfc=bfc, rname="sheld_VD", URL=sheldVDURL)
+    downloadData(bfc=bfc, rname="sheld_LR", URL=sheldLRURL)
+    downloadData(bfc=bfc, rname="mask97x97x97", URL=maskURL)
     return(bfc)
 }
 
 #' Load data of Junker2014 from cache.
 #' @param tomoseqrCache Cache of tomoseqr. You can get it using
-#' `DownloadJunker2014`.
+#' `downloadJunker2014`.
 #' @return List of tomo-seq data in cache.
 #' @importFrom BiocFileCache bfcquery
 #' @importFrom readr read_tsv
 #' @export
-LoadJunker2014 <- function (tomoseqrCache) {
+doadJunker2014 <- function (tomoseqrCache) {
     ridAV <- bfcquery(tomoseqrCache, "sheld_AV", "rname")$rid
     ridVD <- bfcquery(tomoseqrCache, "sheld_VD", "rname")$rid
     ridLR <- bfcquery(tomoseqrCache, "sheld_LR", "rname")$rid
