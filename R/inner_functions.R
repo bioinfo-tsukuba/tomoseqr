@@ -3,18 +3,18 @@
 #' @importFrom stringr str_c
 checkParameters <- function(tomoObj, query) {
     if (is(tomoObj, "tomoSeq") == FALSE) {
-        stop(
-            str_c(
-                "invalid class: ",
-                class(tomoObj),
-                "\nFirst argument must be tomoSeq class object."
-            )
+        stopMessage <- str_c(
+            "invalid class: ",
+            class(tomoObj),
+            "\nFirst argument must be tomoSeq class object."
         )
+        stop(stopMessage)
     }
     if (is.element(query, names(tomoObj[["results"]])) %>% min() == 0) {
         queryNotIn <- query[is.element(query, tomoObj[["results"]]) == FALSE]
         queryNotInStr <- str_c(queryNotIn, sep=", ")
-        stop(str_c(queryNotInStr, ' is not in data.'))
+        stopMessage <- str_c(queryNotInStr, ' is not in data.')
+        stop(stopMessage)
     }
 }
 
