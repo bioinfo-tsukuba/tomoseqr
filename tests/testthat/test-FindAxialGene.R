@@ -3,7 +3,7 @@ test_that("Extract peak genes at axial", {
     data("testx")
     testAll <- findAxialGenes(testx)
     testPartial <- findAxialGenes(testx, genes = c("gene1", "gene3"))
-    expect_identical(testAll, resultAll)
-    expect_identical(testPartial, resultPartial)
+    expect_equal(testAll, resultAll, tolerance=1e-6)
+    expect_equal(testPartial, resultPartial, tolerance=1e-6)
 })
 
