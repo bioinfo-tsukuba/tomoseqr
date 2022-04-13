@@ -20,7 +20,6 @@
 #'    shinyApp
 #'    addResourcePath
 #'    removeResourcePath
-#' @import jsonlite
 #' @return NA
 #' @examples
 #' if (interactive()) {
