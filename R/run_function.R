@@ -68,20 +68,18 @@ estimate3dExpressions <- function (
     normCount="countSum",
     normMask=TRUE
 ) {
-    recList <- list_along(query)
+    recList <- lapply(
+        X=query,
+        FUN=singleEstimate,
+        dataX=x,
+        dataY=y,
+        dataZ=z,
+        mask=mask,
+        normCount=normCount,
+        normMask=normMask,
+        numIter=numIter
+    )
     names(recList) <- query
-    for (geneID in query) {
-        recList[[geneID]] <- singleEstimate(
-            x,
-            y,
-            z,
-            mask=mask,
-            geneID=geneID,
-            normCount=normCount,
-            normMask=normMask,
-            numIter=numIter
-        )
-    }
     retList <- list(
         "mask" = mask,
         "results" = recList

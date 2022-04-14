@@ -21,7 +21,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 VignetteBuilder: knitr
 Depends:
-    R (>= 4.2)
+    R (>= 4.1)
 biocViews: GeneExpression, Sequencing, RNASeq, Transcriptomics,
         Spatial, Visualization, Software
 Imports:

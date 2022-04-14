@@ -59,20 +59,15 @@ shinyAnimateForGIF <- function (
         zlim=zlim,
         type=type
     )
-    nTimesRepeat <- length(plotArray[1, 1, ])
-    for (i in seq_along(plotArray[1, 1, ])) {
-        basePlot(
-            plotArray,
-            sectionNumber=i,
-            main,
-            xlab,
-            ylab,
-            asp
-        )
-        incProgress(
-            1 / nTimesRepeat,
-            detail = str_c("Plot:", i, " / ", nTimesRepeat)
-        )
-    }
+    ind <- seq_along(plotArray[1, 1, ])
+    lapply(
+        ind,
+        basePlot,
+        sourceArray=plotArray,
+        main=main,
+        xlab=xlab,
+        ylab=ylab,
+        aspectRatio=asp
+    )
     incProgress(1, detail = "Converting to GIF...")
 }

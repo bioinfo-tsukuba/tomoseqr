@@ -31,31 +31,28 @@ repMat <- function (targetVector, nTimesRepeat) {
     lenY <- nTimesRepeat[2]
     lenZ <- nTimesRepeat[3]
     rep2d <- matrix(targetVector, nrow=lenX, ncol=lenY, byrow = FALSE)
-    rep3d <- array(NA, dim=c(lenX, lenY, lenZ))
-    for (i in seq_len(lenZ)) {
-        rep3d[, , i] <- rep2d
-    }
+    rep3d <- array(rep2d, dim=c(lenX, lenY, lenZ))
     return(rep3d)
 }
 
 #' @importFrom dplyr %>%
 singleEstimate <- function (
-    X,
-    Y,
-    Z,
     geneID,
+    dataX,
+    dataY,
+    dataZ,
     mask,
     normCount,
     normMask,
     numIter
 ) {
-    sumX <- X[, -1] %>% colSums()
-    sumY <- Y[, -1] %>% colSums()
-    sumZ <- Z[, -1] %>% colSums()
+    sumX <- dataX[, -1] %>% colSums()
+    sumY <- dataY[, -1] %>% colSums()
+    sumZ <- dataZ[, -1] %>% colSums()
 
-    x0 <- X %>% getGeneExpression(geneID)
-    y0 <- Y %>% getGeneExpression(geneID)
-    z0 <- Z %>% getGeneExpression(geneID)
+    x0 <- dataX %>% getGeneExpression(geneID)
+    y0 <- dataY %>% getGeneExpression(geneID)
+    z0 <- dataZ %>% getGeneExpression(geneID)
     xLen <- length(x0)
     yLen <- length(y0)
     zLen <- length(z0)
@@ -146,8 +143,8 @@ colFunc <- function (n) {
 #' @importFrom graphics filled.contour
 #' @importFrom stringr str_c
 basePlot <- function (
-    sourceArray,
     sectionNumber,
+    sourceArray,
     main,
     xlab,
     ylab,
@@ -219,18 +216,16 @@ animateForGIF <- function (
         type=type
     )
     message("Plotting", appendLF=FALSE)
-    nTimesRepeat <- length(plotArray[1, 1, ])
-    for (i in seq_along(plotArray[1, 1, ])) {
-        message(".", appendLF=FALSE)
-        basePlot(
-            plotArray,
-            sectionNumber=i,
-            main,
-            xlab,
-            ylab,
-            asp
-        )
-    }
+    ind <- seq_along(plotArray[1, 1, ])
+    lapply(
+        ind,
+        basePlot,
+        sourceArray=plotArray,
+        main=main,
+        xlab=xlab,
+        ylab=ylab,
+        aspectRatio=asp
+    )
     message("")
     message("Converting to GIF...")
 }
