@@ -350,7 +350,7 @@ imageViewer <- function (tomoObj, geneID) {
         output$XgenerateGIF <- downloadHandler(
             filename = "xPlot.gif",
             content = function (file) {
-                shinyAnimate2d(
+                animate2d(
                     tomoObj,
                     geneID,
                     target=input$x_type,
@@ -405,7 +405,7 @@ imageViewer <- function (tomoObj, geneID) {
         output$YgenerateGIF <- downloadHandler(
             filename = "yPlot.gif",
             content = function (file) {
-                shinyAnimate2d(
+                animate2d(
                     tomoObj,
                     geneID,
                     target=input$y_type,
@@ -460,7 +460,7 @@ imageViewer <- function (tomoObj, geneID) {
         output$ZgenerateGIF <- downloadHandler(
             filename = "zPlot.gif",
             content = function (file) {
-                shinyAnimate2d(
+                animate2d(
                     tomoObj,
                     geneID,
                     target=input$z_type,

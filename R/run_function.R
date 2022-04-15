@@ -129,6 +129,9 @@ plotLossFunction <- function (tomoObj, geneID) {
 #' @importFrom stringr str_c
 #' @importFrom dplyr %>%
 #' @importFrom animation saveGIF
+#' @importFrom shiny
+#' getDefaultReactiveDomain
+#' withProgress
 #' @return It generate GIF file.
 #' @examples
 #' if(interactive()) {
@@ -163,21 +166,31 @@ animate2d <- function (
     maskArray <- tomoObj[["mask"]] %>%
         aperm(perm=c(xaxis, yaxis, 6 - (xaxis + yaxis)))
 
-    saveGIF(
-        animateForGIF(
-            reconstArray = reconstArray,
-            maskArray = maskArray,
-            main = main,
-            xlab = xlab,
-            ylab = ylab,
-            zlim = zlim,
-            aspectRatio = aspectRatio,
-            type = target
-        ),
-        movie.name=file,
-        interval=interval,
-        autobrowse=FALSE
-    )
+    generateGIF <- function (forShiny) {
+        saveGIF(
+            animateForGIF(
+                reconstArray = reconstArray,
+                maskArray = maskArray,
+                main = main,
+                xlab = xlab,
+                ylab = ylab,
+                zlim = zlim,
+                aspectRatio = aspectRatio,
+                type = target,
+                forShiny = forShiny
+            ),
+            movie.name=file,
+            interval=interval,
+            autobrowse=FALSE
+        )
+    }
+    if (is.null(getDefaultReactiveDomain())) {
+        generateGIF(forShiny = FALSE)
+    } else {
+        withProgress(message='generating GIF', value=0, {
+            generateGIF(forShiny = TRUE)
+        })
+    }
 }
 
 #' Plot expression of single gene along an axis

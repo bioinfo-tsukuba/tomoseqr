@@ -188,7 +188,6 @@ makePlotArray <- function (
 }
 
 #' @importFrom shiny
-#' withProgress
 #' incProgress
 animateForGIF <- function (
     reconstArray,
@@ -198,7 +197,8 @@ animateForGIF <- function (
     ylab,
     zlim,
     aspectRatio,
-    type
+    type,
+    forShiny
 ) {
     if (length(aspectRatio) < 2) {
         ## Dim of reconstructed matrix should be equal to
@@ -215,7 +215,9 @@ animateForGIF <- function (
         zlim=zlim,
         type=type
     )
-    message("Plotting", appendLF=FALSE)
+    if (forShiny == FALSE) {
+        message("Plotting", appendLF=FALSE)
+    }
     ind <- seq_along(plotArray[1, 1, ])
     lapply(
         ind,
@@ -226,44 +228,12 @@ animateForGIF <- function (
         ylab=ylab,
         aspectRatio=asp
     )
-    message("")
-    message("Converting to GIF...")
-}
-
-plotForImageViewer <- function (
-    reconstArray,
-    maskArray,
-    main,
-    xlab,
-    ylab,
-    zlim,
-    aspectRatio,
-    type,
-    sectionNumber
-) {
-    if (length(aspectRatio) < 2) {
-        ## Dim of reconstructed matrix should be equal to
-        ## that of mask.
-        plotDim <- dim(reconstArray)
-        asp <- plotDim[2] / plotDim[1]
+    if (forShiny == TRUE) {
+        incProgress(1, detail = "Converting to GIF...")
     } else {
-        asp <- aspectRatio[2] / aspectRatio[1]
+        message("")
+        message("Converting to GIF...")
     }
-
-    plotArray <- makePlotArray(
-        reconstArray=reconstArray,
-        maskArray=maskArray,
-        zlim=zlim,
-        type=type
-    )
-    basePlot(
-        plotArray,
-        sectionNumber=sectionNumber,
-        main,
-        xlab,
-        ylab,
-        asp
-    )
 }
 
 #' @export
