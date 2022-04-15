@@ -1,12 +1,22 @@
 ---
-Title: "R Package for Analyzing Tomo-seq Data"
-Author: "Ryosuke Matsuzawa"
-Output: BiocStyle::html_document
+title: "R Package for Analyzing Tomo-seq Data"
+author: "Ryosuke Matsuzawa"
+output: BiocStyle::html_document
 vignette: >
     %\VignetteIndexEntry{tomoseqr}
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
 ---
+
+# Introduction
+
+Tomo-seq is a genome-wide RNA tomography method that combines combining
+high-throughput RNA sequencing with cryosectioning for spatially resolved
+transcriptomics.
+In 2014, [Junker et al.](https://doi.org/10.1016/j.cell.2014.09.038) published a method for reconstructing 3D gene
+expression patterns from tomoseq data. tomoseqr is a package to run
+this method in R. tomoseqr also includes a 3D silhouette maker
+for samples and tools to visualize the reconstruction results.
 
 # Installation and loading
 
