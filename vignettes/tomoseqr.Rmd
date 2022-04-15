@@ -14,7 +14,7 @@ Tomo-seq is a genome-wide RNA tomography method that combines combining
 high-throughput RNA sequencing with cryosectioning for spatially resolved
 transcriptomics.
 In 2014, [Junker et al.](https://doi.org/10.1016/j.cell.2014.09.038) published a method for reconstructing 3D gene
-expression patterns from tomoseq data. tomoseqr is a package to run
+expression patterns from tomoseq data (iterative proportional fitting ([Fienberg, 1970](https://doi.org/10.1214/aoms/1177696968))). tomoseqr is a package to run
 this method in R. tomoseqr also includes a 3D silhouette maker
 for samples and tools to visualize the reconstruction results.
 
