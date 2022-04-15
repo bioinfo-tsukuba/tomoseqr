@@ -1,6 +1,6 @@
 Package: tomoseqr
 Title: R Package for Analyzing Tomo-seq Data
-Version: 0.99.4
+Version: 0.99.5
 Authors@R:
     person(
         given = "Ryosuke",
@@ -21,7 +21,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 VignetteBuilder: knitr
 Depends:
-    R (>= 4.1)
+    R (>= 4.2)
 biocViews: GeneExpression, Sequencing, RNASeq, Transcriptomics,
         Spatial, Visualization, Software
 Imports:
