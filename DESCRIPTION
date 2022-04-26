@@ -1,6 +1,6 @@
 Package: tomoseqr
 Title: R Package for Analyzing Tomo-seq Data
-Version: 0.99.5
+Version: 1.0.0
 Authors@R:
     person(
         given = "Ryosuke",
