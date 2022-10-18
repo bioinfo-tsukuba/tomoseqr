@@ -137,7 +137,7 @@ singleEstimate <- function (
 
 #' @importFrom grDevices hcl.colors
 colFunc <- function (n) {
-    return(c("#000000", hcl.colors(n - 1, "Blues", rev = TRUE)))
+    return(c("#000000", "#FFFFFF", hcl.colors(n - 2, "Blues", rev = TRUE)))
 }
 
 #' @importFrom graphics filled.contour
@@ -311,4 +311,201 @@ downloadData <- function (bfc, rname, URL, verbose=FALSE) {
     if (isTRUE(bfcneedsupdate(bfc, rid))) {
         bfcdownload(bfc, rid)
     }
+}
+
+
+show3d <- function(
+    df,
+    mask,
+    threshold,
+    clim,
+    xlab,
+    ylab,
+    zlab,
+    addMask,
+    exp_size,
+    exp_opacity,
+    mask_size,
+    mask_opacity,
+    mask_color,
+    aspX,
+    aspY,
+    aspZ
+) {
+    # hoge <- viridis::plasma(100, alpha = 0.3)
+    # maskWithoutExp <- mask[(mask$value == 1 & df$value <= threshold),]
+    xlim <- max(df$x)
+    ylim <- max(df$y)
+    zlim <- max(df$z)
+    maxLen <- max(xlim, ylim, zlim)
+    plotResult <- plot_ly(
+        df[df$value > threshold, ],
+        x=~x,
+        y=~y,
+        z=~z,
+        #color = ~value,
+        #colors = viridis::plasma(1000000, alpha = 0.3),
+        # alpha = exp_opacity * 0.01,
+        alpha_stroke = 0,
+        size = I(exp_size),
+        marker = list(
+        #color = rgb(0.267, 0.071, 0.341, 0.3),
+        color =~value,
+        # autocolorscale = FALSE,
+        # cmin = clim[1],
+        cmin = min(df$value),
+        cmax = clim[2],
+        # showscale = FALSE,
+        showscale = TRUE,
+        # opacity = exp_opacity * 0.01,
+        opacity = exp_opacity * 0.01,
+        colorscale = "Viridis"
+        # colorscale = list(list(0, "#F4FAFE"), list(0.5, "#7FABD3"), list(1, "#273871"))
+        # colorscale = list(list(0, "#4B005580"), list(0.5, "#009B0580"), list(1, "#FDE33380"))
+        #colorscale = list(list(0, "#4401544D"), list(0.5, "#21908C4D"), list(1, "#FDE7254D"))
+        # colorscale = list(list(0, "#44015466"), list(0.5, "#21908C66"), list(1, "#FDE72566"))
+        )
+        #colorscale  = c(rgb(0.267, 0.071, 0.341), rgb(0.984,0.894,0.161)))
+
+    ) %>%
+        add_markers()%>%
+        # add_markers(
+        #     data = maskWithoutExp,
+        #     x = ~x,
+        #     y=~y,
+        #     z=~z,
+        #     inherit = F,
+        #     alpha = 0.2,
+        #     alpha_stroke = 0,
+        #     size = I(20),
+        #     color = I("#12121233")
+        # ) %>%
+        layout(
+            autosize = TRUE,
+            showlegend = FALSE,
+            scene = list(
+            xaxis=list(
+                title = xlab,
+                range = c(0, xlim),
+                gridcolor="#ffffff",
+                zerolinecolor ="#ffffff"
+            ),
+            yaxis = list(
+                title = ylab,
+                range=c(0,ylim),
+                gridcolor="#ffffff",
+                zerolinecolor ="#ffffff"
+            ),
+            zaxis = list(
+                title = zlab,
+                range=c(0,zlim),
+                gridcolor="#ffffff",
+                zerolinecolor ="#ffffff"
+            ),
+            aspectratio = list(x=xlim / maxLen * aspX, y=ylim/maxLen * aspY, z=zlim/maxLen * aspZ)
+            ),
+            paper_bgcolor = "#000000",
+            font = list(color="#ffffff")
+        ) %>%
+        config(
+            toImageButtonOptions = list(
+            format = "svg",
+            filename = "myplot",
+            width = 1000,
+            height = 1000,
+            scale = 3
+            )
+        )
+    if (addMask == TRUE) {
+        maskWithoutExp <- mask[(mask$value == 1 & df$value <= threshold),]
+        plotResult %>%
+            add_markers(
+                data = maskWithoutExp,
+                x = ~x,
+                y=~y,
+                z=~z,
+                inherit = F,
+                alpha = mask_opacity * 0.01,
+                # alpha = 0.2,
+                alpha_stroke = 0,
+                size = I(mask_size),
+                color = I(mask_color)
+            ) %>%
+            return()
+    } else {
+        return(plotResult)
+    }
+}
+
+showExp <- function(
+    tomoObj,
+    geneID,
+    threshold,
+    xlab,
+    ylab,
+    zlab,
+    addMask,
+    exp_size,
+    exp_opacity,
+    mask_size,
+    mask_opacity,
+    mask_color,
+    aspX,
+    aspY,
+    aspZ
+    ) {
+    df <- toDataFrame(tomoObj, geneID)
+    mask <- tomoseqr:::matrixToDataFrame(tomoObj$mask)
+    show3d(
+        df,
+        mask,
+        threshold,
+        c(threshold, max(df$value)),
+        xlab = xlab,
+        ylab = ylab,
+        zlab = zlab,
+        addMask = addMask,
+        exp_size = exp_size,
+        exp_opacity = exp_opacity,
+        mask_size = mask_size,
+        mask_opacity = mask_opacity,
+        mask_color = mask_color,
+        aspX,
+        aspY,
+        aspZ
+    )
+}
+plotsurface <- function(arr) {
+    dimarr <- dim(arr)
+    arrSurZero <- array(
+        0,
+        dim = c(
+            dimarr[1] + 2,
+            dimarr[2] + 2,
+            dimarr[3] + 2
+        )
+    )
+    dimArrS <- dim(arrSurZero)
+    xCenter <- 2:(dimArrS[1] - 1)
+    xLeftShift <- 1:(dimArrS[1] - 2)
+    xRightShift <- 3:dimArrS[1]
+    yCenter <- 2:(dimArrS[2] - 1)
+    yLeftShift <- 1:(dimArrS[2] - 2)
+    yRightShift <- 3:dimArrS[2]
+    zCenter <- 2:(dimArrS[3] - 1)
+    zLeftShift <- 1:(dimArrS[3] - 2)
+    zRightShift <- 3:dimArrS[3]
+
+    arrSurZero[xCenter, yCenter, zCenter] <- arr
+    return(
+        arr * (
+            arrSurZero[xLeftShift, yCenter, zCenter] *
+            arrSurZero[xRightShift, yCenter, zCenter] *
+            arrSurZero[xCenter, yLeftShift, zCenter] *
+            arrSurZero[xCenter, yRightShift, zCenter] *
+            arrSurZero[xCenter, yCenter, zLeftShift] *
+            arrSurZero[xCenter, yCenter, zRightShift]
+            == 0
+        )
+    )
 }
