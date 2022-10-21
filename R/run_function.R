@@ -142,52 +142,92 @@ plotLossFunction <- function (tomoObj, geneID) {
 animate2d <- function (
     tomoObj,
     geneID,
-    target="expression",
-    xaxis=1,
-    yaxis=2,
+    along = "x",
     main=geneID,
-    xlab=xaxis,
-    ylab=yaxis,
-    file=str_c(geneID, "_", target, "_", xaxis, "_", yaxis, ".gif"),
+    xlab=NA,
+    ylab=NA,
+    file=str_c(geneID, "_", along, ".gif"),
     zlim=NA,
     interval=0.1,
-    aspectRatio=c()
+    aspectX = 1,
+    aspectY = 1
 ) {
     checkParameters(tomoObj, geneID)
-    if (length(aspectRatio) != 0 & length(aspectRatio) != 2) {
-        stop("`aspectRatio` should be a 2D vector.")
+    if (!(along %in% c("x", "y", "z"))) {
+        stop("`along` should be 'x', 'y' or 'z'.")
     }
-    if (target == "mask" & is.na(zlim[1]) == FALSE) {
-        warning('If target = "mask", parameter "zlim" is ignored.')
+    print("hoge")
+    # if (length(aspectRatio) != 0 & length(aspectRatio) != 2) {
+    #     stop("`aspectRatio` should be a 2D vector.")
+    # }
+
+    maskDf <- matrixToDataFrame(tomoObj[["mask"]])
+    expDf <- toDataFrame(tomoObj, geneID)
+    expDf <- expDf[maskDf[, 4] == 1,]
+    maskDim <- dim(tomoObj[["mask"]])
+    dimOrder <- list(
+        "x" = c(maskDim[2], maskDim[3], maskDim[1]),
+        "y" = c(maskDim[1], maskDim[3], maskDim[2]),
+        "z" = maskDim
+    )
+    axesOrder <- list(
+        "x" = c("y", "z", "x"),
+        "y" = c("x", "z", "y"),
+        "z" = c("x", "y", "z")
+    )
+
+    if (is.na(zlim[1])) {
+        zlimParameter <- c(0, max(expDf[,4]))
+    } else {
+        zlimParameter <- zlim
     }
 
-    reconstArray <- tomoObj[["results"]][[geneID]][["reconst"]] %>%
-        aperm(perm=c(xaxis, yaxis, 6 - (xaxis + yaxis)))
-    maskArray <- tomoObj[["mask"]] %>%
-        aperm(perm=c(xaxis, yaxis, 6 - (xaxis + yaxis)))
+    basePlot <- makeBasePlot(
+        expDf = expDf,
+        xAxis = axesOrder[[along]][1], 
+        yAxis = axesOrder[[along]][2],
+        xMax = dimOrder[[along]][1],
+        yMax = dimOrder[[along]][2],
+        xAsp = dimOrder[[along]][1] * aspectX,
+        yAsp = dimOrder[[along]][2] * aspectY,
+        xlab = xlab,
+        ylab = ylab,
+        zlim = zlimParameter
+    )
 
     generateGIF <- function (forShiny) {
         saveGIF(
             animateForGIF(
-                reconstArray = reconstArray,
-                maskArray = maskArray,
+                basePlot = basePlot,
+                expDf = expDf,
+                dimOrder = dimOrder,
+                along = along,
+                xAxis = axesOrder[[along]][1],
+                yAxis = axesOrder[[along]][2],
                 main = main,
-                xlab = xlab,
-                ylab = ylab,
-                zlim = zlim,
-                aspectRatio = aspectRatio,
-                type = target,
                 forShiny = forShiny
             ),
             movie.name=file,
             interval=interval,
+            ani.width=800,
+            ani.height=800,
             autobrowse=FALSE
         )
+        # make2DPlot(
+        #     sectionNumber = 23,
+        #     basePlot = basePlot,
+        #     expDf = expDf,
+        #     along = along,
+        #     xAxis = axesOrder[[along]][1], 
+        #     yAxis = axesOrder[[along]][2],
+        #     main = main
+        # ) #+
+            # transition_states(x)
     }
     if (is.null(getDefaultReactiveDomain())) {
         generateGIF(forShiny = FALSE)
     } else {
-        withProgress(message='generating GIF', value=0, {
+        withProgress(message='generating GIF. It takes long time...', value=0, {
             generateGIF(forShiny = TRUE)
         })
     }

@@ -140,26 +140,27 @@ colFunc <- function (n) {
     return(c("#000000", "#FFFFFF", hcl.colors(n - 2, "Blues", rev = TRUE)))
 }
 
-#' @importFrom graphics filled.contour
 #' @importFrom stringr str_c
-basePlot <- function (
+make2DPlot <- function (
     sectionNumber,
-    sourceArray,
-    main,
-    xlab,
-    ylab,
-    aspectRatio
+    basePlot,
+    expDf,
+    along,
+    xAxis,
+    yAxis,
+    main
 ) {
-    filled.contour(
-        sourceArray[, , sectionNumber],
-        main=str_c(main, "_", sectionNumber),
-        xlab=xlab,
-        ylab=ylab,
-        asp=aspectRatio,
-        frame.plot=FALSE,
-        zlim = c(-1, max(sourceArray)),
-        nlevels = 50,
-        color.palette = colFunc
+    print(
+        basePlot +
+            geom_tile(
+                data=expDf[expDf[[along]] == sectionNumber,],
+                aes_(
+                    x = as.name(xAxis),
+                    y = as.name(yAxis),
+                    fill=as.name("value")
+                )
+            ) +
+            ggtitle(str_c(main, " : ", sectionNumber))
     )
 }
 
@@ -190,52 +191,83 @@ makePlotArray <- function (
 #' @importFrom shiny
 #' incProgress
 animateForGIF <- function (
-    reconstArray,
-    maskArray,
+    basePlot,
+    expDf,
+    dimOrder,
+    along,
+    xAxis,
+    yAxis,
     main,
-    xlab,
-    ylab,
-    zlim,
-    aspectRatio,
-    type,
     forShiny
 ) {
-    if (length(aspectRatio) < 2) {
-        ## Dim of reconstructed matrix should be equal to
-        ## that of mask.
-        plotDim <- dim(reconstArray)
-        asp <- plotDim[2] / plotDim[1]
-    } else {
-        asp <- aspectRatio[2] / aspectRatio[1]
-    }
-
-    plotArray <- makePlotArray(
-        reconstArray=reconstArray,
-        maskArray=maskArray,
-        zlim=zlim,
-        type=type
-    )
     if (forShiny == FALSE) {
         message("Plotting", appendLF=FALSE)
     }
-    ind <- seq_along(plotArray[1, 1, ])
+    ind <- seq_len(dimOrder[[along]][3])
     lapply(
         ind,
-        basePlot,
-        sourceArray=plotArray,
-        main=main,
-        xlab=xlab,
-        ylab=ylab,
-        aspectRatio=asp
+        make2DPlot,
+        basePlot = basePlot,
+        expDf = expDf,
+        along = along,
+        xAxis = xAxis,
+        yAxis = yAxis,
+        main = main
     )
     if (forShiny == TRUE) {
-        incProgress(1, detail = "Converting to GIF...")
+        incProgress(1, detail = "Converting to GIF. It takes long time...")
     } else {
         message("")
-        message("Converting to GIF...")
+        message("Converting to GIF. It takes long time...")
     }
 }
 
+# animateForGIF <- function (
+#     reconstArray,
+#     maskArray,
+#     main,
+#     xlab,
+#     ylab,
+#     zlim,
+#     aspectRatio,
+#     type,
+#     forShiny
+# ) {
+#     if (length(aspectRatio) < 2) {
+#         ## Dim of reconstructed matrix should be equal to
+#         ## that of mask.
+#         plotDim <- dim(reconstArray)
+#         asp <- plotDim[2] / plotDim[1]
+#     } else {
+#         asp <- aspectRatio[2] / aspectRatio[1]
+#     }
+
+#     plotArray <- makePlotArray(
+#         reconstArray=reconstArray,
+#         maskArray=maskArray,
+#         zlim=zlim,
+#         type=type
+#     )
+#     if (forShiny == FALSE) {
+#         message("Plotting", appendLF=FALSE)
+#     }
+#     ind <- seq_along(plotArray[1, 1, ])
+#     lapply(
+#         ind,
+#         basePlot,
+#         sourceArray=plotArray,
+#         main=main,
+#         xlab=xlab,
+#         ylab=ylab,
+#         aspectRatio=asp
+#     )
+#     if (forShiny == TRUE) {
+#         incProgress(1, detail = "Converting to GIF...")
+#     } else {
+#         message("")
+#         message("Converting to GIF...")
+#     }
+# }
 #' @export
 print.tomoSeq <- function (x, ...) {
     cat("Gene list:\n")
@@ -507,5 +539,49 @@ plotsurface <- function(arr) {
             arrSurZero[xCenter, yCenter, zRightShift]
             == 0
         )
+    )
+}
+
+makeBasePlot <- function(
+    expDf,
+    xAxis,
+    yAxis, 
+    xMax,
+    yMax,
+    xAsp,
+    yAsp,
+    xlab,
+    ylab,
+    zlim
+) {
+    return(
+        ggplot(
+            expDf,
+            aes_(
+                x = as.name(xAxis),
+                y = as.name(yAxis),
+                fill = as.name("value")
+            )
+        ) +
+            scale_fill_gradientn(
+                colors = hcl.colors(50, "Blues", rev = T),
+                limits = zlim
+            ) +
+            xlim(0, xMax) +
+            ylim(0, yMax) +
+            xlab(xlab) +
+            ylab(ylab) +
+            theme_minimal() +
+            theme(
+                plot.background= element_rect(fill="black"),
+                text = element_text(color = "white", size=20),
+                axis.line.x.bottom = element_line(color = "white"),
+                axis.line.y.left = element_line(color = "white"),
+                panel.grid.major = element_blank(),
+                panel.grid.minor = element_blank(),
+                axis.ticks=element_line(colour = "white"),
+                axis.text=element_text(colour = "white", size=20)
+                ) +
+            theme(aspect.ratio = yAsp / xAsp)
     )
 }
