@@ -112,20 +112,20 @@ plotLossFunction <- function (tomoObj, geneID) {
 #' Animate 2D expressions along one axis and generate GIF file.
 #' @param tomoObj tomoSeq object
 #' @param geneID single gene ID (string)
-#' @param target "expression", "mask" or "unite" (combination of expression and
-#' mask). Default is `expression`.
-#' @param xaxis Number to specify as x-axis (1, 2 or 3). Default is `1`.
-#' @param yaxis Number to specify as y-axis (1, 2 or 3). Default is `2`.
+#' @param along Parameter specifying along which axis the cross section should
+#' be plotted.
 #' @param main A string used for the title of the plot. Default is `geneID`.
 #' @param xlab Label of x axis. Default is `xaxis`.
 #' @param ylab Label of y axis. Default is `yaxis`.
 #' @param file Path of GIF file.
 #' @param zlim Limit of value of heatmap. If target="mask", it is ignored.
 #' @param interval interval of GIF animation.
-#' @param aspectRatio A 2D vector that represents the ratio of figure. You can
-#' specify the ratio as `c(width, height)`. If you don't specify the value of
-#' this parameter, the ratio is calculated based on the number of sections
-#' along each axis.
+#' @param aspectX Width of figure. If you don't specify the value of
+#' this parameter, It is calculated based on the number of sections
+#' Corresponding to the horizontal axis
+#' @param aspectY Height of figure. If you don't specify the value of
+#' this parameter, It is calculated based on the number of sections
+#' Corresponding to the vertical axis
 #' @importFrom stringr str_c
 #' @importFrom dplyr %>%
 #' @importFrom animation saveGIF
@@ -144,8 +144,8 @@ animate2d <- function (
     geneID,
     along = "x",
     main=geneID,
-    xlab=NA,
-    ylab=NA,
+    xlab="x",
+    ylab="y",
     file=str_c(geneID, "_", along, ".gif"),
     zlim=NA,
     interval=0.1,
@@ -156,7 +156,6 @@ animate2d <- function (
     if (!(along %in% c("x", "y", "z"))) {
         stop("`along` should be 'x', 'y' or 'z'.")
     }
-    print("hoge")
     # if (length(aspectRatio) != 0 & length(aspectRatio) != 2) {
     #     stop("`aspectRatio` should be a 2D vector.")
     # }
@@ -182,6 +181,7 @@ animate2d <- function (
         zlimParameter <- zlim
     }
 
+        print(dimOrder[[along]][1])
     basePlot <- makeBasePlot(
         expDf = expDf,
         xAxis = axesOrder[[along]][1], 
@@ -190,8 +190,8 @@ animate2d <- function (
         yMax = dimOrder[[along]][2],
         xAsp = dimOrder[[along]][1] * aspectX,
         yAsp = dimOrder[[along]][2] * aspectY,
-        xlab = xlab,
-        ylab = ylab,
+        xlabel = xlab,
+        ylabel = ylab,
         zlim = zlimParameter
     )
 
@@ -213,16 +213,6 @@ animate2d <- function (
             ani.height=800,
             autobrowse=FALSE
         )
-        # make2DPlot(
-        #     sectionNumber = 23,
-        #     basePlot = basePlot,
-        #     expDf = expDf,
-        #     along = along,
-        #     xAxis = axesOrder[[along]][1], 
-        #     yAxis = axesOrder[[along]][2],
-        #     main = main
-        # ) #+
-            # transition_states(x)
     }
     if (is.null(getDefaultReactiveDomain())) {
         generateGIF(forShiny = FALSE)

@@ -150,14 +150,17 @@ make2DPlot <- function (
     yAxis,
     main
 ) {
+    xAxisParameter <- sym(xAxis)
+    yAxisParameter <- sym(yAxis)
+    value <- sym("value")
     print(
         basePlot +
             geom_tile(
                 data=expDf[expDf[[along]] == sectionNumber,],
-                aes_(
-                    x = as.name(xAxis),
-                    y = as.name(yAxis),
-                    fill=as.name("value")
+                aes(
+                    x = !!xAxisParameter,
+                    y = !!yAxisParameter,
+                    fill=!!value
                 )
             ) +
             ggtitle(str_c(main, " : ", sectionNumber))
@@ -222,52 +225,6 @@ animateForGIF <- function (
     }
 }
 
-# animateForGIF <- function (
-#     reconstArray,
-#     maskArray,
-#     main,
-#     xlab,
-#     ylab,
-#     zlim,
-#     aspectRatio,
-#     type,
-#     forShiny
-# ) {
-#     if (length(aspectRatio) < 2) {
-#         ## Dim of reconstructed matrix should be equal to
-#         ## that of mask.
-#         plotDim <- dim(reconstArray)
-#         asp <- plotDim[2] / plotDim[1]
-#     } else {
-#         asp <- aspectRatio[2] / aspectRatio[1]
-#     }
-
-#     plotArray <- makePlotArray(
-#         reconstArray=reconstArray,
-#         maskArray=maskArray,
-#         zlim=zlim,
-#         type=type
-#     )
-#     if (forShiny == FALSE) {
-#         message("Plotting", appendLF=FALSE)
-#     }
-#     ind <- seq_along(plotArray[1, 1, ])
-#     lapply(
-#         ind,
-#         basePlot,
-#         sourceArray=plotArray,
-#         main=main,
-#         xlab=xlab,
-#         ylab=ylab,
-#         aspectRatio=asp
-#     )
-#     if (forShiny == TRUE) {
-#         incProgress(1, detail = "Converting to GIF...")
-#     } else {
-#         message("")
-#         message("Converting to GIF...")
-#     }
-# }
 #' @export
 print.tomoSeq <- function (x, ...) {
     cat("Gene list:\n")
@@ -364,8 +321,6 @@ show3d <- function(
     aspY,
     aspZ
 ) {
-    # hoge <- viridis::plasma(100, alpha = 0.3)
-    # maskWithoutExp <- mask[(mask$value == 1 & df$value <= threshold),]
     xlim <- max(df$x)
     ylim <- max(df$y)
     zlim <- max(df$z)
@@ -375,43 +330,19 @@ show3d <- function(
         x=~x,
         y=~y,
         z=~z,
-        #color = ~value,
-        #colors = viridis::plasma(1000000, alpha = 0.3),
-        # alpha = exp_opacity * 0.01,
         alpha_stroke = 0,
         size = I(exp_size),
         marker = list(
-        #color = rgb(0.267, 0.071, 0.341, 0.3),
         color =~value,
-        # autocolorscale = FALSE,
-        # cmin = clim[1],
         cmin = min(df$value),
         cmax = clim[2],
-        # showscale = FALSE,
         showscale = TRUE,
-        # opacity = exp_opacity * 0.01,
         opacity = exp_opacity * 0.01,
         colorscale = "Viridis"
-        # colorscale = list(list(0, "#F4FAFE"), list(0.5, "#7FABD3"), list(1, "#273871"))
-        # colorscale = list(list(0, "#4B005580"), list(0.5, "#009B0580"), list(1, "#FDE33380"))
-        #colorscale = list(list(0, "#4401544D"), list(0.5, "#21908C4D"), list(1, "#FDE7254D"))
-        # colorscale = list(list(0, "#44015466"), list(0.5, "#21908C66"), list(1, "#FDE72566"))
         )
-        #colorscale  = c(rgb(0.267, 0.071, 0.341), rgb(0.984,0.894,0.161)))
 
     ) %>%
-        add_markers()%>%
-        # add_markers(
-        #     data = maskWithoutExp,
-        #     x = ~x,
-        #     y=~y,
-        #     z=~z,
-        #     inherit = F,
-        #     alpha = 0.2,
-        #     alpha_stroke = 0,
-        #     size = I(20),
-        #     color = I("#12121233")
-        # ) %>%
+        add_markers() %>%
         layout(
             autosize = TRUE,
             showlegend = FALSE,
@@ -434,18 +365,22 @@ show3d <- function(
                 gridcolor="#ffffff",
                 zerolinecolor ="#ffffff"
             ),
-            aspectratio = list(x=xlim / maxLen * aspX, y=ylim/maxLen * aspY, z=zlim/maxLen * aspZ)
+            aspectratio = list(
+                x=xlim / maxLen * aspX,
+                y=ylim/maxLen * aspY,
+                z=zlim/maxLen * aspZ
+                )
             ),
             paper_bgcolor = "#000000",
             font = list(color="#ffffff")
         ) %>%
         config(
             toImageButtonOptions = list(
-            format = "svg",
-            filename = "myplot",
-            width = 1000,
-            height = 1000,
-            scale = 3
+                format = "svg",
+                filename = "myplot",
+                width = 1000,
+                height = 1000,
+                scale = 3
             )
         )
     if (addMask == TRUE) {
@@ -456,7 +391,7 @@ show3d <- function(
                 x = ~x,
                 y=~y,
                 z=~z,
-                inherit = F,
+                inherit = FALSE,
                 alpha = mask_opacity * 0.01,
                 # alpha = 0.2,
                 alpha_stroke = 0,
@@ -487,7 +422,7 @@ showExp <- function(
     aspZ
     ) {
     df <- toDataFrame(tomoObj, geneID)
-    mask <- tomoseqr:::matrixToDataFrame(tomoObj$mask)
+    mask <- matrixToDataFrame(tomoObj[["mask"]])
     show3d(
         df,
         mask,
@@ -519,13 +454,13 @@ plotsurface <- function(arr) {
     )
     dimArrS <- dim(arrSurZero)
     xCenter <- 2:(dimArrS[1] - 1)
-    xLeftShift <- 1:(dimArrS[1] - 2)
+    xLeftShift <- seq_len(dimArrS[1] - 2)
     xRightShift <- 3:dimArrS[1]
     yCenter <- 2:(dimArrS[2] - 1)
-    yLeftShift <- 1:(dimArrS[2] - 2)
+    yLeftShift <- seq_len(dimArrS[2] - 2)
     yRightShift <- 3:dimArrS[2]
     zCenter <- 2:(dimArrS[3] - 1)
-    zLeftShift <- 1:(dimArrS[3] - 2)
+    zLeftShift <- seq_len(dimArrS[3] - 2)
     zRightShift <- 3:dimArrS[3]
 
     arrSurZero[xCenter, yCenter, zCenter] <- arr
@@ -542,6 +477,11 @@ plotsurface <- function(arr) {
     )
 }
 
+#' @importFrom ggplot2
+#'      xlab
+#'      ylab
+#'      xlim
+#'      ylim
 makeBasePlot <- function(
     expDf,
     xAxis,
@@ -550,27 +490,30 @@ makeBasePlot <- function(
     yMax,
     xAsp,
     yAsp,
-    xlab,
-    ylab,
+    xlabel,
+    ylabel,
     zlim
 ) {
+    xAxisParameter <- sym(xAxis)
+    yAxisParameter <- sym(yAxis)
+    value <- sym("value")
     return(
         ggplot(
             expDf,
-            aes_(
-                x = as.name(xAxis),
-                y = as.name(yAxis),
-                fill = as.name("value")
+            aes(
+                x = !!xAxisParameter,
+                y = !!yAxisParameter,
+                fill = !!value
             )
         ) +
             scale_fill_gradientn(
-                colors = hcl.colors(50, "Blues", rev = T),
+                colors = hcl.colors(50, "Blues", rev = TRUE),
                 limits = zlim
             ) +
-            xlim(0, xMax) +
-            ylim(0, yMax) +
-            xlab(xlab) +
-            ylab(ylab) +
+            xlim(0.0, xMax) +
+            ylim(0.0, yMax) +
+            xlab(xlabel) +
+            ylab(ylabel) +
             theme_minimal() +
             theme(
                 plot.background= element_rect(fill="black"),

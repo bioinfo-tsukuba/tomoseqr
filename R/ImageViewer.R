@@ -1,6 +1,5 @@
 #' Output the reconstructed expression pattern as an image.
 #' @param tomoObj tomoSeq object
-#' @param geneID geneID as string
 #' @importFrom shiny
 #'    reactive
 #'    animationOptions
@@ -13,10 +12,39 @@
 #'    textInput
 #'    hr
 #'    h3
+#'    column
+#'    selectInput
+#'    fluidRow
+#'    uiOutput
+#'    checkboxInput
+#'    renderUI
 #' @importFrom grDevices
 #'    png
 #'    dev.off
-#' @importFrom plotly plotlyOutput
+#' @importFrom plotly
+#'    plot_ly
+#'    add_markers
+#'    layout
+#'    config
+#'    plotlyOutput
+#'    renderPlotly
+#' @importFrom dplyr
+#'    sym
+#' @importFrom ggplot2
+#'    geom_tile
+#'    aes
+#'    ggtitle
+#'    ggsave
+#'    ggplot
+#'    scale_fill_gradientn
+#'    ylim
+#'    xlim
+#'    theme_minimal
+#'    theme
+#'    element_rect
+#'    element_text
+#'    element_line
+#'    element_blank
 #' @return NA
 #' @examples
 #' if (interactive()) {
@@ -88,38 +116,14 @@ imageViewer <- function (tomoObj) {
                     # hr(),
                     sidebarLayout(
                         sidebarPanel(
-                            # radioButtons(
-                            #     "x_type",
-                            #     label = h3("Type"),
-                            #     choices = list(
-                            #         "Expression" = "expression",
-                            #         "Mask" = "mask",
-                            #         "Unite" = "unite"
-                            #     ), 
-                            #     selected = "expression"
-                            # ),
                             selectInput(
                                 "angle",
                                 label = h4("Select Angle"),
                                 choices = c("x", "y", "z")
                             ),
                             uiOutput("sectionSlider"),
-
-                            # h4("Aspect ratio"),
-                            # inputPanel(
-                            #     uiOutput("asp_x"),
-                            #     uiOutput("asp_y")
-                            # ),
-                            # h4("Labels"),
-                            # inputPanel(
-                                uiOutput("title"),
-                                # uiOutput("xlab"),
-                                # uiOutput("ylab"),
-                            # ),
-                            # h4("zlim"),
-                            # inputPanel(
-                                uiOutput("zlim_slider"),
-                            # ),
+                            uiOutput("title"),
+                            uiOutput("zlim_slider"),
                             downloadButton(
                                 "XdownloadFig",
                                 label = "Download figure"
@@ -138,22 +142,48 @@ imageViewer <- function (tomoObj) {
                     "3D view",
                     sidebarLayout(
                         sidebarPanel(
-                            numericInput("threshold_3D", label = h4("Threshold"), value = 1),
-                            numericInput("exp_size_3D", label = h4("size of expression dots"), value = 40),
-                            numericInput("exp_opacity_3D", label = h4("Opacity of expression dots"), value = 80),
-                            numericInput("mask_size_3D", label = h4("size of mask dots"), value = 2),
-                            numericInput("mask_opacity_3D", label = h4("Opacity of mask dots"), value = 70),
-                            textInput("mask_color_3D", label = h4("color of mask dots"), value = "#999999"),
-                            # numericInput("aspX_3D", "Width of section: x", value = 1),
-                            # numericInput("aspY_3D", "Width of section: y", value = 1),
-                            # numericInput("aspZ_3D", "Width of section: z", value = 1),
-                            # textInput("xlab_3D", label = "x label", value = "x"),
-                            # textInput("ylab_3D", label = "y label", value = "y"),
-                            # textInput("zlab_3D", label = "z label", value = "z"),
-                            checkboxInput("addMask_3D", label = "Add Mask", value = TRUE)
+                            numericInput(
+                                "threshold_3D",
+                                label = h4("Threshold"),
+                                value = 1
+                            ),
+                            numericInput(
+                                "exp_size_3D",
+                                label = h4("size of expression dots"),
+                                value = 40
+                            ),
+                            numericInput(
+                                "exp_opacity_3D",
+                                label = h4("Opacity of expression dots"),
+                                value = 80
+                            ),
+                            numericInput(
+                                "mask_size_3D",
+                                label = h4("size of mask dots"),
+                                value = 2
+                            ),
+                            numericInput(
+                                "mask_opacity_3D",
+                                label = h4("Opacity of mask dots"),
+                                value = 70
+                            ),
+                            textInput(
+                                "mask_color_3D",
+                                label = h4("color of mask dots"),
+                                value = "#999999"
+                            ),
+                            checkboxInput(
+                                "addMask_3D",
+                                label = "Add Mask",
+                                value = TRUE
+                            )
                         ),
                         mainPanel(
-                            plotlyOutput("choice_3D", height = "800px", width = "800px"),
+                            plotlyOutput(
+                                "choice_3D",
+                                height = "800px",
+                                width = "800px"
+                            )
                         )
                     )
                 )
@@ -188,20 +218,6 @@ imageViewer <- function (tomoObj) {
         recAlong[["z"]] <- aperm(recResult(), perm = c(1, 2, 3))
         return(recAlong)
     })
-    # output$xlab <- renderUI({
-    #     textInput(
-    #         "xlab",
-    #         label="x label",
-    #         value=axesOrder[[input$angle]][1]
-    #     )
-    # })
-    # output$ylab <- renderUI({
-    #     textInput(
-    #         "ylab",
-    #         label="y label",
-    #         value=axesOrder[[input$angle]][2]
-    #     )
-    # })
     
     output$sectionSlider <- renderUI({
         max <- dimOrder[[input$angle]][3]
@@ -225,24 +241,6 @@ imageViewer <- function (tomoObj) {
             value=input$geneID
         )
     })
-    # output$asp_x <- renderUI({
-    #     numericInput(
-    #         "asp_x",
-    #         label = "x",
-    #         value = dimOrder[[input$angle]][1],
-    #         min=1,
-    #         width = 100
-    #     )
-    # })
-    # output$asp_y <- renderUI({
-    #     numericInput(
-    #         "asp_y",
-    #         value = dimOrder[[input$angle]][2],
-    #         label="y",
-    #         min=1,
-    #         width=100
-    #     )
-    # })
 
     output$zlim_slider <- renderUI({
         sliderMax <- ceiling(max(recResult()))
@@ -257,16 +255,10 @@ imageViewer <- function (tomoObj) {
     })
 
         maskDf <- matrixToDataFrame(tomoObj[["mask"]])
-        expDf <- reactive({(toDataFrame(tomoObj, input$geneID))[maskDf[, 4] == 1,]})
+        expDf <- reactive({
+            (toDataFrame(tomoObj, input$geneID))[maskDf[, 4] == 1,]
+        })
 
-        # xPlotArray <- reactive({
-        #     makePlotArray(
-        #         reconstArray=recAlong()[[input$angle]],
-        #         maskArray=maskAlong[[input$angle]],
-        #         zlim=input$x_zlim,
-        #         type=input$x_type
-        #     )
-        # })
         labelOrder <- reactive({
             list(
             "x" = c(input$ylab, input$zlab),
@@ -288,46 +280,15 @@ imageViewer <- function (tomoObj) {
                 yAxis = axesOrder[[input$angle]][2],
                 xMax = dimOrder[[input$angle]][1],
                 yMax = dimOrder[[input$angle]][2],
-                # xAsp = input$asp_x,
-                xAsp = dimOrder[[input$angle]][1] * widthOrder()[[input$angle]][1],
-                # yAsp = input$asp_y,
-                yAsp = dimOrder[[input$angle]][2] * widthOrder()[[input$angle]][2],
-                xlab = labelOrder()[[input$angle]][1],
-                ylab = labelOrder()[[input$angle]][2],
+                xAsp = dimOrder[[input$angle]][1] *
+                    widthOrder()[[input$angle]][1],
+                yAsp = dimOrder[[input$angle]][2] *
+                    widthOrder()[[input$angle]][2],
+                xlabel = labelOrder()[[input$angle]][1],
+                ylabel = labelOrder()[[input$angle]][2],
                 zlim = input$x_zlim
             )
         })
-        # base_plot <- reactive({
-        #     ggplot(
-        #         expDf(),
-        #         aes_(
-        #             x = as.name(axesOrder[[input$angle]][1]),
-        #             y = as.name(axesOrder[[input$angle]][2]),
-        #             fill = as.name("value")
-        #         )
-        #     ) +
-        #         scale_fill_gradientn(
-        #             colors = hcl.colors(50, "Blues", rev = T),
-        #             limits = input$x_zlim
-        #         ) +
-        #         xlim(0, dimOrder[[input$angle]][1]) +
-        #         ylim(0, dimOrder[[input$angle]][2]) +
-        #         xlab(input$xlab) +
-        #         ylab(input$ylab) +
-        #         theme_minimal() +
-        #         theme(
-        #             plot.background= element_rect(fill="black"),
-        #             text = element_text(color = "white"),
-        #             axis.line.x.bottom = element_line(color = "white"),
-        #             axis.line.y.left = element_line(color = "white"),
-        #             panel.grid.major = element_blank(),
-        #             panel.grid.minor = element_blank(),
-        #             axis.ticks=element_line(colour = "white"),
-        #             axis.text=element_text(colour = "white")
-        #             ) +
-        #         theme(aspect.ratio = input$asp_y / input$asp_x)
-        # })
-
         plot2D <- reactive({
             if (is.null(input$xSec)) {
                 message("Please wait...")
@@ -340,8 +301,6 @@ imageViewer <- function (tomoObj) {
                     geom_tile(
                         data=expDf()[expDf()[[input$angle]] == input$xSec,],
                         aes(
-                            # x = as.name(axesOrder[[input$angle]][1]),
-                            # y = as.name(axesOrder[[input$angle]][2]),
                             x = !!xAxis,
                             y = !!yAxis,
                             fill = !!fill
@@ -359,25 +318,21 @@ imageViewer <- function (tomoObj) {
                 print(plot2D())
             }
         })
-        #         basePlot(
-        #             sourceArray=xPlotArray(),
-        #             sectionNumber=input$xSec,
-        #             main=input$x_main,
-        #             xlab=input$x_xlab,
-        #             ylab=input$x_ylab,
-        #             aspectRatio=(input$x_asp_y / input$x_asp_x)
-        #         )
-        #     }
-        # })
+
         output$XdownloadFig <- downloadHandler(
             filename = reactive({str_c(input$geneID, ".png")}),
             content = function (file) {
-                # png(file, height=1000, width=1000, res=144)
-                # print(plot2D())
-                ggsave(file, plot = plot2D(), height=800, width=800, units = "px", scale = 5)
-                # dev.off()
+                ggsave(
+                    file,
+                    plot = plot2D(),
+                    height=800,
+                    width=800,
+                    units = "px",
+                    scale = 5
+                )
             }
         )
+
         output$XgenerateGIF <- downloadHandler(
             filename = "xPlot.gif",
             content = function (file) {
