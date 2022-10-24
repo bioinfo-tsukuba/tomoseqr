@@ -118,11 +118,6 @@ singleEstimate <- function (
     return(retList)
 }
 
-#' @importFrom grDevices hcl.colors
-colFunc <- function (n) {
-    return(c("#000000", "#FFFFFF", hcl.colors(n - 2, "Blues", rev = TRUE)))
-}
-
 #' @importFrom stringr str_c
 make2DPlot <- function (
     sectionNumber,
@@ -150,29 +145,6 @@ make2DPlot <- function (
     )
 }
 
-makePlotArray <- function (
-    reconstArray,
-    maskArray,
-    zlim,
-    type
-) {
-    if (type == "expression") {
-        plotArray <- reconstArray
-        plotArray[plotArray < zlim[1]] <- 0
-        plotArray[zlim[2] < plotArray] <- 0
-    } else if (type == "mask") {
-        plotArray <- maskArray * 2 - 1
-    } else if (type == "unite") {
-        plotArray <- reconstArray
-        plotArray[plotArray < zlim[1]] <- 0
-        plotArray[zlim[2] < plotArray] <- 0
-        plotArray <- plotArray + maskArray - 1
-    } else {
-        stop("'type' must be 'expression', 'mask' or 'unite'.")
-    }
-
-    return(plotArray)
-}
 
 #' @importFrom shiny
 #' incProgress
@@ -460,6 +432,7 @@ plotsurface <- function(arr) {
     )
 }
 
+#' @importFrom grDevices hcl.colors
 #' @importFrom ggplot2
 #'      xlab
 #'      ylab
