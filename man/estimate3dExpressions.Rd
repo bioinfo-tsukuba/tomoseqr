@@ -4,16 +4,7 @@
 \alias{estimate3dExpressions}
 \title{Estimate 3d expressions}
 \usage{
-estimate3dExpressions(
-  x,
-  y,
-  z,
-  mask,
-  query,
-  numIter = 100,
-  normCount = "countSum",
-  normMask = TRUE
-)
+estimate3dExpressions(x, y, z, mask, query, numIter = 100, normalize = FALSE)
 }
 \arguments{
 \item{x}{A data.frame object containing a simulated Tomo-seq data
@@ -37,10 +28,8 @@ You can make a mask using \code{masker}.}
 
 \item{numIter}{How many times iterate}
 
-\item{normCount}{Specifies the method to normalize
-the expression amount data.}
-
-\item{normMask}{Whether to normalize by mask or not}
+\item{normalize}{Whether to normalize so that total expression per sample
+volume is equal between sections.}
 }
 \value{
 tomoSeq object
@@ -56,7 +45,6 @@ estimate3dExpressions(
     testz,
     mask = mask,
     query = c("gene1"), 
-    normCount = "countSum",
-    normMask = TRUE
+    normalize = TRUE
 )
 }

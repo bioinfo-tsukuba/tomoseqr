@@ -41,9 +41,8 @@ extractGeneList <- function (x, y, z) {
 #' You can make a mask using `masker`.
 #' @param query Vector of gene IDs
 #' @param numIter How many times iterate
-#' @param normCount Specifies the method to normalize
-#' the expression amount data.
-#' @param normMask Whether to normalize by mask or not
+#' @param normalize Whether to normalize so that total expression per sample
+#' volume is equal between sections.
 #' @return tomoSeq object
 #' @importFrom purrr list_along
 #' @examples
@@ -54,8 +53,7 @@ extractGeneList <- function (x, y, z) {
 #'     testz,
 #'     mask = mask,
 #'     query = c("gene1"), 
-#'     normCount = "countSum",
-#'     normMask = TRUE
+#'     normalize = TRUE
 #' )
 #' @export
 estimate3dExpressions <- function (
@@ -65,8 +63,7 @@ estimate3dExpressions <- function (
     mask,
     query,
     numIter = 100,
-    normCount="countSum",
-    normMask=TRUE
+    normalize=FALSE
 ) {
     recList <- lapply(
         X=query,
@@ -75,8 +72,7 @@ estimate3dExpressions <- function (
         dataY=y,
         dataZ=z,
         mask=mask,
-        normCount=normCount,
-        normMask=normMask,
+        normalize=normalize,
         numIter=numIter
     )
     names(recList) <- query

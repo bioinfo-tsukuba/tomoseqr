@@ -42,95 +42,78 @@ singleEstimate <- function (
     dataY,
     dataZ,
     mask,
-    normCount,
-    normMask,
+    normalize,
     numIter
 ) {
-    sumX <- dataX[, -1] %>% colSums()
-    sumY <- dataY[, -1] %>% colSums()
-    sumZ <- dataZ[, -1] %>% colSums()
+    sumPerSectionX <- dataX[, -1] %>% colSums()
+    sumPerSectionY <- dataY[, -1] %>% colSums()
+    sumPerSectionZ <- dataZ[, -1] %>% colSums()
 
-    x0 <- dataX %>% getGeneExpression(geneID)
-    y0 <- dataY %>% getGeneExpression(geneID)
-    z0 <- dataZ %>% getGeneExpression(geneID)
-    xLen <- length(x0)
-    yLen <- length(y0)
-    zLen <- length(z0)
+    xk <- dataX %>% getGeneExpression(geneID)
+    yk <- dataY %>% getGeneExpression(geneID)
+    zk <- dataZ %>% getGeneExpression(geneID)
+    xLen <- length(xk)
+    yLen <- length(yk)
+    zLen <- length(zk)
 
-    maskX <- mask %>% apply(1, sum)
-    maskY <- mask %>% apply(2, sum)
-    maskZ <- mask %>% apply(3, sum)
+    maskSumX <- mask %>% apply(1, sum)
+    maskSumY <- mask %>% apply(2, sum)
+    maskSumZ <- mask %>% apply(3, sum)
 
-    if (normCount == "countSum") {
-        x <- x0 / sumX
-        y <- y0 / sumY
-        z <- z0 / sumZ
-    }
-    
-    if (is.list(normCount)) {
-        x <- x0 / normCount[["x"]]
-        y <- y0 / normCount[["y"]]
-        z <- z0 / normCount[["z"]]
+    if (normalize) {
+        xk<- xk / sumPerSectionX * maskSumX
+        yk<- yk / sumPerSectionY * maskSumY
+        zk<- zk / sumPerSectionZ * maskSumZ
     }
 
-    if (normCount == "none") {
-        x <- x0
-        y <- y0
-        z <- z0
-    }
+    xk[1, is.nan(xk)] <- 0
+    yk[1, is.nan(yk)] <- 0
+    zk[1, is.nan(zk)] <- 0
+    xk[is.infinite(xk)] <- max(xk[xk < Inf])
+    yk[is.infinite(yk)] <- max(zk[yk < Inf])
+    zk[is.infinite(zk)] <- max(yk[zk < Inf])
 
-    if (normMask) {
-        x <- x * maskX
-        y <- y * maskY
-        z <- z * maskZ
-    }
+    m <- mean(c(sum(sumPerSectionX), sum(sumPerSectionY), sum(sumPerSectionZ)))
 
-    x[1, is.nan(x)] <- 0
-    y[1, is.nan(y)] <- 0
-    z[1, is.nan(z)] <- 0
-    x[is.infinite(x)] <- max(x[x < Inf])
-    y[is.infinite(y)] <- max(z[y < Inf])
-    z[is.infinite(z)] <- max(y[z < Inf])
+    xk <- xk / sum(xk) * m
+    yk <- yk / sum(yk) * m
+    zk <- zk / sum(zk) * m
+    reconstArray <- mask
 
-    xRaw <- sumX
-    yRaw <- sumY
-    zRaw <- sumZ
-
-    m <- mean(c(sum(xRaw), sum(yRaw), sum(zRaw)))
-
-    x <- x / sum(x) * m
-    y <- y / sum(y) * m
-    z <- z / sum(z) * m
-    a <- mask
-
-    er <- c()
-
+    errFuncVal <- rep_len(0, numIter)
+    dimMask <- dim(mask)
     for (i in seq_len(numIter)) {
-        xa <- a %>% apply(1, sum)
-        a <- a * repMat(x / xa, c(1, dim(mask)[2], dim(mask)[3]))
-        a[is.nan(a)] <- 0
-        ya <- a %>% apply(2, sum)
-        a <- a * aperm(
-            repMat(y / ya, c(1, dim(mask)[1], dim(mask)[3])),
+        recArrX <- reconstArray %>% apply(1, sum)
+        reconstArray <- reconstArray *
+            repMat(xk / recArrX, c(1, dimMask[2], dimMask[3]))
+        reconstArray[is.nan(reconstArray)] <- 0
+
+        recArrY <- reconstArray %>% apply(2, sum)
+        reconstArray <- reconstArray * aperm(
+            repMat(yk / recArrY, c(1, dimMask[1], dimMask[3])),
             perm = c(2, 1, 3)
         )
-        a[is.nan(a)] <- 0
-        za <- a %>% apply(3, sum)
-        a <- a * aperm(
-            repMat(z / za, c(1, dim(mask)[1], dim(mask)[2])),
+        reconstArray[is.nan(reconstArray)] <- 0
+
+        recArrZ <- reconstArray %>% apply(3, sum)
+        reconstArray <- reconstArray * aperm(
+            repMat(zk / recArrZ, c(1, dimMask[1], dimMask[2])),
             perm = c(2, 3, 1)
         )
-        a[is.nan(a)] <- 0
-        er <- append(er, sum((xa - x)^2) + sum((ya - y)^2) + sum((za - z)^2))
+        reconstArray[is.nan(reconstArray)] <- 0
+
+        errFuncVal[i] <- sum((recArrX - xk)^2) +
+            sum((recArrY - yk)^2) +
+            sum((recArrZ - zk)^2)
     }
 
     retList <- list(
         "geneID" = geneID,
-        "reconst" = a,
-        "errFunc" = er,
-        "x" = x[1, ],
-        "y" = y[1, ],
-        "z" = z[1, ]
+        "reconst" = reconstArray,
+        "errFunc" = errFuncVal,
+        "x" = xk[1, ],
+        "y" = yk[1, ],
+        "z" = zk[1, ]
     )
     return(retList)
 }

@@ -6,7 +6,8 @@ test_that("Reconstruction of 3D expression pattern", {
         testy,
         testz,
         mask = mask,
-        query = c("gene1", "gene2", "gene3", "gene4")
+        query = c("gene1", "gene2", "gene3", "gene4"),
+        normalize = TRUE
     )
     result1 <- getReconstructedResult(tomoSeqObject, "gene1")
     result2 <- getReconstructedResult(tomoSeqObject, "gene2")
