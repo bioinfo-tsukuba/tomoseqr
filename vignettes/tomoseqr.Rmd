@@ -32,7 +32,8 @@ BiocManager::install("tomoseqr")
 Load the `tomoseqr` package with the following command.
 
 ```{r setup, message = FALSE}
-library(tomoseqr)
+# library(tomoseqr)
+devtools::load_all(export_all = FALSE)
 ```
 
 # Data preparation
@@ -138,27 +139,32 @@ tomoObj <- estimate3dExpressions(
 Visualize the reconstruction results using `imageViewer`.
 
 ```{r eval = FALSE}
-imageViewer(tomoObj, geneID = "gene3")
+imageViewer(tomoObj)
 ```
 
 This command starts a shiny app `imageViewer`.
 
-![Interface of ImageViewer](imageviewer_image.png)
+![Interface of ImageViewer (2D view)](2Dimage.png)
 
+![Interface of ImageViewer (3D view)](3Dimage.png)
+
+1. Select gene ID.
+1. Edit labels of each axes.
+1. Set the width of sections for each axis. it is used to calculate the
+aspect ratio of figures.
+1. Use this tab to switch between 2D and 3D views.
 1. Select which axis to look at the cross section perpendicular to.
-1. Choose the type of visualization (Expression: expression pattern,
-mask: silhouette of the mask, Unite: superimposition of the two).
-1. Move the slider to select the location you want to see.
-1. Press the Auto Play button to view each section of the image
+1. Move the slider to select the location you want to see. Press the Auto Play button to view each section of the image
 frame by frame.
-1. Set the aspect ratio of the figure (default is the ratio of the
-number of sections).
 1. Edit figure titles and labels.
 1. Specify the range of expression levels to be displayed (default is
 the full range).
 1. Rendering area.
 1. Obtain a cross-sectional view (png) or a frame-by-frame image (gif)
 of each fragment being displayed.
+1. Threshold of expression level. Expression points with levels lower than
+this value are not plotted.
+1. Toggle whether or not to plot points representing the mask.
 
 # Find axial peak gene
 
