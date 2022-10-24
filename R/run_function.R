@@ -63,7 +63,7 @@ estimate3dExpressions <- function (
     mask,
     query,
     numIter = 100,
-    normalize=FALSE
+    normalize=TRUE
 ) {
     recList <- lapply(
         X=query,
