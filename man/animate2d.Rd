@@ -7,16 +7,15 @@
 animate2d(
   tomoObj,
   geneID,
-  target = "expression",
-  xaxis = 1,
-  yaxis = 2,
+  along = "x",
   main = geneID,
-  xlab = xaxis,
-  ylab = yaxis,
-  file = str_c(geneID, "_", target, "_", xaxis, "_", yaxis, ".gif"),
+  xlab = NA,
+  ylab = NA,
+  file = str_c(geneID, "_", along, ".gif"),
   zlim = NA,
   interval = 0.1,
-  aspectRatio = c()
+  aspectX = 1,
+  aspectY = 1
 )
 }
 \arguments{
@@ -24,12 +23,8 @@ animate2d(
 
 \item{geneID}{single gene ID (string)}
 
-\item{target}{"expression", "mask" or "unite" (combination of expression and
-mask). Default is \code{expression}.}
-
-\item{xaxis}{Number to specify as x-axis (1, 2 or 3). Default is \code{1}.}
-
-\item{yaxis}{Number to specify as y-axis (1, 2 or 3). Default is \code{2}.}
+\item{along}{Parameter specifying along which axis the cross section should
+be plotted.}
 
 \item{main}{A string used for the title of the plot. Default is \code{geneID}.}
 
@@ -43,10 +38,13 @@ mask). Default is \code{expression}.}
 
 \item{interval}{interval of GIF animation.}
 
-\item{aspectRatio}{A 2D vector that represents the ratio of figure. You can
-specify the ratio as \code{c(width, height)}. If you don't specify the value of
-this parameter, the ratio is calculated based on the number of sections
-along each axis.}
+\item{aspectX}{Width of figure. If you don't specify the value of
+this parameter, It is calculated based on the number of sections
+Corresponding to the horizontal axis}
+
+\item{aspectY}{Height of figure. If you don't specify the value of
+this parameter, It is calculated based on the number of sections
+Corresponding to the vertical axis}
 }
 \value{
 It generate GIF file.

@@ -1,6 +1,6 @@
 Package: tomoseqr
 Title: R Package for Analyzing Tomo-seq Data
-Version: 1.1.0
+Version: 1.2.0
 Authors@R:
     person(
         given = "Ryosuke",
@@ -36,7 +36,9 @@ Imports:
     shiny,
     BiocFileCache,
     readr,
-    tools
+    tools,
+    plotly,
+    ggplot2
 Suggests:
     rmarkdown,
     knitr,

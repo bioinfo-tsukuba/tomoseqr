@@ -1,6 +1,5 @@
 #' Output the reconstructed expression pattern as an image.
 #' @param tomoObj tomoSeq object
-#' @param geneID geneID as string
 #' @importFrom shiny
 #'    reactive
 #'    animationOptions
@@ -13,9 +12,39 @@
 #'    textInput
 #'    hr
 #'    h3
+#'    column
+#'    selectInput
+#'    fluidRow
+#'    uiOutput
+#'    checkboxInput
+#'    renderUI
 #' @importFrom grDevices
 #'    png
 #'    dev.off
+#' @importFrom plotly
+#'    plot_ly
+#'    add_markers
+#'    layout
+#'    config
+#'    plotlyOutput
+#'    renderPlotly
+#' @importFrom dplyr
+#'    sym
+#' @importFrom ggplot2
+#'    geom_tile
+#'    aes
+#'    ggtitle
+#'    ggsave
+#'    ggplot
+#'    scale_fill_gradientn
+#'    ylim
+#'    xlim
+#'    theme_minimal
+#'    theme
+#'    element_rect
+#'    element_text
+#'    element_line
+#'    element_blank
 #' @return NA
 #' @examples
 #' if (interactive()) {
@@ -23,99 +52,78 @@
 #'     imageViewer(tomoObj, "gene2")
 #' }
 #' @export
-imageViewer <- function (tomoObj, geneID) {
-    checkParameters(tomoObj, geneID)
-    recResult <- tomoObj[["results"]][[geneID]][["reconst"]]
-    recAlongX <- aperm(recResult, perm = c(2, 3, 1))
-    recAlongY <- aperm(recResult, perm = c(1, 3, 2))
-    recAlongZ <- aperm(recResult, perm = c(1, 2, 3))
-
-    maskResult <- tomoObj$mask
-    maskAlongX <- aperm(maskResult, perm = c(2, 3, 1))
-    maskAlongY <- aperm(maskResult, perm = c(1, 3, 2))
-    maskAlongZ <- aperm(maskResult, perm = c(1, 2, 3))
-
-    sliderMax <- ceiling(max(recResult) * 1.1)
+imageViewer <- function (tomoObj) {
     ui <- function () {
         fluidPage(
             titlePanel("Image viewer"),
+            selectInput(
+                "geneID",
+                label = h4("Gene ID"),
+                choices = names(tomoObj[["results"]])
+            ),
+            fluidRow(
+                column(4,
+                    textInput(
+                        "xlab",
+                        label = "x label",
+                        value = "x"
+                    )
+                ),
+                column(4,
+                    textInput(
+                        "ylab",
+                        label = "y label",
+                        value = "y"
+                    )
+                ),
+                column(4,
+                    textInput(
+                        "zlab",
+                        label = "z label",
+                        value = "z"
+                    )
+                )
+            ),
+            h4("Section width (relative value)"),
+            fluidRow(
+                column(4,
+                    numericInput(
+                        "xWidth",
+                        label = "x",
+                        value = 1
+                    )
+                ),
+                column(4,
+                    numericInput(
+                        "yWidth",
+                        label = "y",
+                        value = 1
+                    )
+                ),
+                column(4,
+                    numericInput(
+                        "zWidth",
+                        label = "z",
+                        value = 1
+                    )
+                )
+            ),
             tabsetPanel(
                 type="tabs",
 
-                ## Along x
                 tabPanel(
-                    "Along x",
-                    hr(),
+                    "2D view",
+                    # hr(),
                     sidebarLayout(
                         sidebarPanel(
-                            radioButtons(
-                                "x_type",
-                                label = h3("Type"),
-                                choices = list(
-                                    "Expression" = "expression",
-                                    "Mask" = "mask",
-                                    "Unite" = "unite"
-                                ), 
-                                selected = "expression"
+                            selectInput(
+                                "angle",
+                                label = h4("Select Angle"),
+                                choices = c("x", "y", "z")
                             ),
-                            sliderInput(
-                                "xSec",
-                                "Section",
-                                min=1,
-                                max=dim(recResult)[3],
-                                step=1,
-                                value=1,
-                                animate = animationOptions(
-                                    interval=100,
-                                    loop=TRUE
-                                )
-                            ),
-                            h4("Aspect ratio"),
-                            inputPanel(
-                                numericInput(
-                                    "x_asp_x",
-                                    label = "x",
-                                    value = dim(recAlongX)[1],
-                                    min=1,
-                                    width = 100
-                                ),
-                                numericInput(
-                                    "x_asp_y",
-                                    value = dim(recAlongX)[2],
-                                    label="y",
-                                    min=1,
-                                    width=100
-                                )
-                            ),
-                            h4("Labels"),
-                            inputPanel(
-                                textInput(
-                                    "x_main",
-                                    label="Title",
-                                    value=geneID
-                                ),
-                                textInput(
-                                    "x_xlab",
-                                    label="x label",
-                                    value="y"
-                                ),
-                                textInput(
-                                    "x_ylab",
-                                    label="y label",
-                                    value="z"
-                                ),
-                            ),
-                            h4("zlim"),
-                            inputPanel(
-                                sliderInput(
-                                    "x_zlim",
-                                    "zlim",
-                                    min=0,
-                                    max=sliderMax,
-                                    step=1,
-                                    value=c(1, sliderMax),
-                                )
-                            ),
+                            uiOutput("sectionSlider"),
+                            uiOutput("title"),
+                            uiOutput("zlim_slider"),
                             downloadButton(
                                 "XdownloadFig",
                                 label = "Download figure"
@@ -126,185 +134,56 @@ imageViewer <- function (tomoObj, geneID) {
                             )
                         ),
                         mainPanel(
-                            plotOutput("xplot")
+                            plotOutput("xplot", height = "800px", width="800px")
                         )
                     )
                 ),
-
-                ## Along y
                 tabPanel(
-                    "Along y",
-                    hr(),
+                    "3D view",
                     sidebarLayout(
                         sidebarPanel(
-                            radioButtons(
-                                "y_type",
-                                label = h3("Type"),
-                                choices = list(
-                                    "Expression" = "expression",
-                                    "Mask" = "mask",
-                                    "Unite" = "unite"
-                                ), 
-                                selected = "expression"
+                            numericInput(
+                                "threshold_3D",
+                                label = h4("Threshold"),
+                                value = 1
                             ),
-                            sliderInput(
-                                "ySec",
-                                "Section",
-                                min=1,
-                                max=dim(recResult)[3],
-                                step=1,
-                                value=1,
-                                animate = animationOptions(
-                                    interval=100,
-                                    loop=TRUE
-                                )
+                            numericInput(
+                                "exp_size_3D",
+                                label = h4("size of expression dots"),
+                                value = 40
                             ),
-                            h4("Aspect ratio"),
-                            inputPanel(
-                                numericInput(
-                                    "y_asp_x",
-                                    label = "x",
-                                    value = dim(recAlongY)[1],
-                                    min=1,
-                                    width = 100
-                                ),
-                                numericInput(
-                                    "y_asp_y",
-                                    value = dim(recAlongY)[2],
-                                    label="y",
-                                    min=1,
-                                    width=100
-                                )
+                            numericInput(
+                                "exp_opacity_3D",
+                                label = h4("Opacity of expression dots"),
+                                value = 80
                             ),
-                            h4("Labels"),
-                            inputPanel(
-                                textInput(
-                                    "y_main",
-                                    label="Title",
-                                    value=geneID
-                                ),
-                                textInput(
-                                    "y_xlab",
-                                    label="x label",
-                                    value="x"
-                                ),
-                                textInput(
-                                    "y_ylab",
-                                    label="y label",
-                                    value="z"
-                                ),
+                            numericInput(
+                                "mask_size_3D",
+                                label = h4("size of mask dots"),
+                                value = 2
                             ),
-                            h4("zlim"),
-                            inputPanel(
-                                sliderInput(
-                                    "y_zlim",
-                                    "zlim",
-                                    min=0,
-                                    max=sliderMax,
-                                    step=1,
-                                    value=c(1, sliderMax),
-                                )
+                            numericInput(
+                                "mask_opacity_3D",
+                                label = h4("Opacity of mask dots"),
+                                value = 70
                             ),
-                            downloadButton(
-                                "YdownloadFig",
-                                label = "Download figure"
+                            textInput(
+                                "mask_color_3D",
+                                label = h4("color of mask dots"),
+                                value = "#999999"
                             ),
-                            downloadButton(
-                                "YgenerateGIF",
-                                label = "Download GIF"
+                            checkboxInput(
+                                "addMask_3D",
+                                label = "Add Mask",
+                                value = TRUE
                             )
                         ),
                         mainPanel(
-                            plotOutput("yplot")
-                        )
-                    )
-                ),
-
-                ## Along z
-                tabPanel(
-                    "Along z",
-                    hr(),
-                    sidebarLayout(
-                        sidebarPanel(
-                            radioButtons(
-                                "z_type",
-                                label = h3("Type"),
-                                choices = list(
-                                    "Expression" = "expression",
-                                    "Mask" = "mask",
-                                    "Unite" = "unite"
-                                ), 
-                                selected = "expression"
-                            ),
-                            sliderInput(
-                                "zSec",
-                                "Section",
-                                min=1,
-                                max=dim(recResult)[3],
-                                step=1,
-                                value=1,
-                                animate = animationOptions(
-                                    interval=100,
-                                    loop=TRUE
-                                )
-                            ),
-                            h4("Aspect ratio"),
-                            inputPanel(
-                                numericInput(
-                                    "z_asp_x",
-                                    label = "x",
-                                    value = dim(recAlongZ)[1],
-                                    min=1,
-                                    width = 100
-                                ),
-                                numericInput(
-                                    "z_asp_y",
-                                    value = dim(recAlongY)[2],
-                                    label="y",
-                                    min=1,
-                                    width=100
-                                )
-                            ),
-                            h4("Labels"),
-                            inputPanel(
-                                textInput(
-                                    "z_main",
-                                    label="Title",
-                                    value=geneID
-                                ),
-                                textInput(
-                                    "z_xlab",
-                                    label="x label",
-                                    value="x"
-                                ),
-                                textInput(
-                                    "z_ylab",
-                                    label="y label",
-                                    value="y"
-                                ),
-                            ),
-                            h4("zlim"),
-                            inputPanel(
-                                sliderInput(
-                                    "z_zlim",
-                                    "zlim",
-                                    min=0,
-                                    max=sliderMax,
-                                    step=1,
-                                    value=c(1, sliderMax),
-                                )
-                            ),
-                            downloadButton(
-                                "ZdownloadFig",
-                                label = "Download figure"
-                            ),
-                            downloadButton(
-                                "ZgenerateGIF",
-                                label = "Download GIF"
+                            plotlyOutput(
+                                "choice_3D",
+                                height = "800px",
+                                width = "800px"
                             )
-                        ),
-                        mainPanel(
-                            plotOutput("zplot")
                         )
                     )
                 )
@@ -312,169 +191,187 @@ imageViewer <- function (tomoObj, geneID) {
         )
     }
     server <- function (input, output) {
+    maskResult <- tomoObj$mask
+    axesOrder <- list(
+        "x" = c("y", "z", "x"),
+        "y" = c("x", "z", "y"),
+        "z" = c("x", "y", "z")
+    )
+    maskAlong <- list()
+    maskDim <- dim(maskResult)
+    dimOrder <- list(
+        "x" = c(maskDim[2], maskDim[3], maskDim[1]),
+        "y" = c(maskDim[1], maskDim[3], maskDim[2]),
+        "z" = maskDim
+    )
+    maskAlong[["x"]] <- aperm(maskResult, perm = c(2, 3, 1))
+    maskAlong[["y"]] <- aperm(maskResult, perm = c(1, 3, 2))
+    maskAlong[["z"]] <- aperm(maskResult, perm = c(1, 2, 3))
 
-        ## Along x
-        xPlotArray <- reactive({
-            makePlotArray(
-                reconstArray=recAlongX,
-                maskArray=maskAlongX,
-                zlim=input$x_zlim,
-                type=input$x_type
+    recResult <- reactive({
+        tomoObj[["results"]][[input$geneID]][["reconst"]]
+    })
+    recAlong <- reactive({
+        recAlong <- list()
+        recAlong[["x"]] <- aperm(recResult(), perm = c(2, 3, 1))
+        recAlong[["y"]] <- aperm(recResult(), perm = c(1, 3, 2))
+        recAlong[["z"]] <- aperm(recResult(), perm = c(1, 2, 3))
+        return(recAlong)
+    })
+    
+    output$sectionSlider <- renderUI({
+        max <- dimOrder[[input$angle]][3]
+        sliderInput(
+            "xSec",
+            "Section",
+            min=1,
+            max=max,
+            step=1,
+            value=1,
+            animate = animationOptions(
+                interval=400,
+                loop=TRUE
+            )
+        )
+    })
+    output$title <- renderUI({
+        textInput(
+            "main",
+            label="Title",
+            value=input$geneID
+        )
+    })
+
+    output$zlim_slider <- renderUI({
+        sliderMax <- ceiling(max(recResult()))
+        sliderInput(
+            "x_zlim",
+            "zlim",
+            min=0,
+            max=sliderMax,
+            step=1,
+            value=c(0, sliderMax),
+        )
+    })
+
+        maskDf <- matrixToDataFrame(tomoObj[["mask"]])
+        expDf <- reactive({
+            (toDataFrame(tomoObj, input$geneID))[maskDf[, 4] == 1,]
+        })
+
+        labelOrder <- reactive({
+            list(
+            "x" = c(input$ylab, input$zlab),
+            "y" = c(input$xlab, input$zlab),
+            "z" = c(input$xlab, input$ylab)
             )
         })
-        output$xplot <- renderPlot({
-            basePlot(
-                sourceArray=xPlotArray(),
-                sectionNumber=input$xSec,
-                main=input$x_main,
-                xlab=input$x_xlab,
-                ylab=input$x_ylab,
-                aspectRatio=(input$x_asp_y / input$x_asp_x)
+        widthOrder <- reactive({
+            list(
+            "x" = c(input$yWidth, input$zWidth),
+            "y" = c(input$xWidth, input$zWidth),
+            "z" = c(input$xWidth, input$yWidth)
             )
         })
-        output$XdownloadFig <- downloadHandler(
-            filename = "xPlot.png",
-            content = function (file) {
-                png(file, height=1000, width=1000, res=144)
-                basePlot(
-                    sourceArray=xPlotArray(),
-                    sectionNumber=input$xSec,
-                    main=input$x_main,
-                    xlab=input$x_xlab,
-                    ylab=input$x_ylab,
-                    aspectRatio=(input$x_asp_y / input$x_asp_x)
+        base_plot <- reactive({
+            makeBasePlot(
+                expDf = expDf(),
+                xAxis = axesOrder[[input$angle]][1],
+                yAxis = axesOrder[[input$angle]][2],
+                xMax = dimOrder[[input$angle]][1],
+                yMax = dimOrder[[input$angle]][2],
+                xAsp = dimOrder[[input$angle]][1] *
+                    widthOrder()[[input$angle]][1],
+                yAsp = dimOrder[[input$angle]][2] *
+                    widthOrder()[[input$angle]][2],
+                xlabel = labelOrder()[[input$angle]][1],
+                ylabel = labelOrder()[[input$angle]][2],
+                zlim = input$x_zlim
+            )
+        })
+        plot2D <- reactive({
+            if (is.null(input$xSec)) {
+                message("Please wait...")
+            } else {
+                xAxis <- sym(axesOrder[[input$angle]][1])
+                yAxis <- sym(axesOrder[[input$angle]][2])
+                fill <- sym("value")
+                return(
+                base_plot() +
+                    geom_tile(
+                        data=expDf()[expDf()[[input$angle]] == input$xSec,],
+                        aes(
+                            x = !!xAxis,
+                            y = !!yAxis,
+                            fill = !!fill
+                        )
+                    ) +
+                    ggtitle(str_c(input$main, " : ", input$xSec))
                 )
-                dev.off()
+            }
+        })
+        
+        output$xplot <- renderPlot({
+            if (is.null(input$xSec)) {
+                message("Please wait...")
+            } else {
+                print(plot2D())
+            }
+        })
+
+        output$XdownloadFig <- downloadHandler(
+            filename = reactive({str_c(input$geneID, ".png")}),
+            content = function (file) {
+                ggsave(
+                    file,
+                    plot = plot2D(),
+                    height=800,
+                    width=800,
+                    units = "px",
+                    scale = 5
+                )
             }
         )
+
         output$XgenerateGIF <- downloadHandler(
             filename = "xPlot.gif",
             content = function (file) {
+                tomoObj[["mask"]] <- maskResult
                 animate2d(
                     tomoObj,
-                    geneID,
-                    target=input$x_type,
-                    xaxis=2,
-                    yaxis=3,
-                    main=input$x_main,
-                    xlab=input$x_xlab,
-                    ylab=input$x_ylab,
+                    input$geneID,
+                    along = input$angle,
+                    main=input$main,
+                    xlab=labelOrder()[[input$angle]][1],
+                    ylab=labelOrder()[[input$angle]][2],
                     file=file,
                     zlim=input$x_zlim,
                     interval=0.1,
-                    aspectRatio=c(input$x_asp_x, input$x_asp_y)
+                    aspectX = widthOrder()[[input$angle]][1],
+                    aspectY = widthOrder()[[input$angle]][2]
                 )
             }
         )
 
-        ## Along y
-        yPlotArray <- reactive({
-            makePlotArray(
-                reconstArray=recAlongY,
-                maskArray=maskAlongY,
-                zlim=input$y_zlim,
-                type=input$y_type
+        tomoObj$mask <- plotsurface(tomoObj$mask)
+        output$choice_3D <- renderPlotly(
+            showExp(
+                tomoObj,
+                geneID = input$geneID,
+                threshold = input$threshold_3D,
+                xlab = input$xlab,
+                ylab = input$ylab,
+                zlab = input$zlab,
+                addMask = input$addMask_3D,
+                exp_size = input$exp_size_3D,
+                exp_opacity = input$exp_opacity_3D,
+                mask_size = input$mask_size_3D,
+                mask_opacity = input$mask_opacity_3D,
+                mask_color = input$mask_color_3D,
+                aspX = input$xWidth,
+                aspY = input$yWidth,
+                aspZ = input$zWidth
             )
-        })
-        output$yplot <- renderPlot({
-            basePlot(
-                sourceArray=yPlotArray(),
-                sectionNumber=input$ySec,
-                main=input$y_main,
-                xlab=input$y_xlab,
-                ylab=input$y_ylab,
-                aspectRatio=(input$y_asp_y / input$y_asp_x)
-            )
-        })
-        output$YdownloadFig <- downloadHandler(
-            filename = "yPlot.png",
-            content = function (file) {
-                png(file, height=1000, width=1000, res=144)
-                basePlot(
-                    sourceArray=yPlotArray(),
-                    sectionNumber=input$ySec,
-                    main=input$y_main,
-                    xlab=input$y_xlab,
-                    ylab=input$y_ylab,
-                    aspectRatio=(input$y_asp_y / input$y_asp_x)
-                )
-                dev.off()
-            }
-        )
-
-        output$YgenerateGIF <- downloadHandler(
-            filename = "yPlot.gif",
-            content = function (file) {
-                animate2d(
-                    tomoObj,
-                    geneID,
-                    target=input$y_type,
-                    xaxis=1,
-                    yaxis=3,
-                    main=input$y_main,
-                    xlab=input$y_xlab,
-                    ylab=input$y_ylab,
-                    file=file,
-                    zlim=input$y_zlim,
-                    interval=0.1,
-                    aspectRatio=c(input$y_asp_x, input$y_asp_y)
-                )
-            }
-        )
-
-        ## Along z
-        zPlotArray <- reactive({
-            makePlotArray(
-                reconstArray=recAlongZ,
-                maskArray=maskAlongZ,
-                zlim=input$z_zlim,
-                type=input$z_type
-            )
-        })
-        output$zplot <- renderPlot({
-            basePlot(
-                sourceArray=zPlotArray(),
-                sectionNumber=input$zSec,
-                main=input$z_main,
-                xlab=input$z_xlab,
-                ylab=input$z_ylab,
-                aspectRatio=(input$z_asp_y / input$z_asp_x)
-            )
-        })
-        output$ZdownloadFig <- downloadHandler(
-            filename = "zPlot.png",
-            content = function (file) {
-                png(file, height=1000, width=1000, res=144)
-                basePlot(
-                    sourceArray=zPlotArray(),
-                    sectionNumber=input$zSec,
-                    main=input$z_main,
-                    xlab=input$z_xlab,
-                    ylab=input$z_ylab,
-                    aspectRatio=(input$z_asp_y / input$z_asp_x)
-                )
-                dev.off()
-            }
-        )
-
-        output$ZgenerateGIF <- downloadHandler(
-            filename = "zPlot.gif",
-            content = function (file) {
-                animate2d(
-                    tomoObj,
-                    geneID,
-                    target=input$z_type,
-                    xaxis=1,
-                    yaxis=2,
-                    main=input$z_main,
-                    xlab=input$z_xlab,
-                    ylab=input$z_ylab,
-                    file=file,
-                    zlim=input$z_zlim,
-                    interval=0.1,
-                    aspectRatio=c(input$z_asp_x, input$z_asp_y)
-                )
-            }
         )
     }
     shinyApp(ui, server)

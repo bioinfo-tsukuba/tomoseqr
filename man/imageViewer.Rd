@@ -4,12 +4,10 @@
 \alias{imageViewer}
 \title{Output the reconstructed expression pattern as an image.}
 \usage{
-imageViewer(tomoObj, geneID)
+imageViewer(tomoObj)
 }
 \arguments{
 \item{tomoObj}{tomoSeq object}
-
-\item{geneID}{geneID as string}
 }
 \value{
 NA

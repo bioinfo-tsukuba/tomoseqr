@@ -108,20 +108,20 @@ plotLossFunction <- function (tomoObj, geneID) {
 #' Animate 2D expressions along one axis and generate GIF file.
 #' @param tomoObj tomoSeq object
 #' @param geneID single gene ID (string)
-#' @param target "expression", "mask" or "unite" (combination of expression and
-#' mask). Default is `expression`.
-#' @param xaxis Number to specify as x-axis (1, 2 or 3). Default is `1`.
-#' @param yaxis Number to specify as y-axis (1, 2 or 3). Default is `2`.
+#' @param along Parameter specifying along which axis the cross section should
+#' be plotted.
 #' @param main A string used for the title of the plot. Default is `geneID`.
 #' @param xlab Label of x axis. Default is `xaxis`.
 #' @param ylab Label of y axis. Default is `yaxis`.
 #' @param file Path of GIF file.
 #' @param zlim Limit of value of heatmap. If target="mask", it is ignored.
 #' @param interval interval of GIF animation.
-#' @param aspectRatio A 2D vector that represents the ratio of figure. You can
-#' specify the ratio as `c(width, height)`. If you don't specify the value of
-#' this parameter, the ratio is calculated based on the number of sections
-#' along each axis.
+#' @param aspectX Width of figure. If you don't specify the value of
+#' this parameter, It is calculated based on the number of sections
+#' Corresponding to the horizontal axis
+#' @param aspectY Height of figure. If you don't specify the value of
+#' this parameter, It is calculated based on the number of sections
+#' Corresponding to the vertical axis
 #' @importFrom stringr str_c
 #' @importFrom dplyr %>%
 #' @importFrom animation saveGIF
@@ -138,52 +138,82 @@ plotLossFunction <- function (tomoObj, geneID) {
 animate2d <- function (
     tomoObj,
     geneID,
-    target="expression",
-    xaxis=1,
-    yaxis=2,
+    along = "x",
     main=geneID,
-    xlab=xaxis,
-    ylab=yaxis,
-    file=str_c(geneID, "_", target, "_", xaxis, "_", yaxis, ".gif"),
+    xlab="x",
+    ylab="y",
+    file=str_c(geneID, "_", along, ".gif"),
     zlim=NA,
     interval=0.1,
-    aspectRatio=c()
+    aspectX = 1,
+    aspectY = 1
 ) {
     checkParameters(tomoObj, geneID)
-    if (length(aspectRatio) != 0 & length(aspectRatio) != 2) {
-        stop("`aspectRatio` should be a 2D vector.")
+    if (!(along %in% c("x", "y", "z"))) {
+        stop("`along` should be 'x', 'y' or 'z'.")
     }
-    if (target == "mask" & is.na(zlim[1]) == FALSE) {
-        warning('If target = "mask", parameter "zlim" is ignored.')
+    # if (length(aspectRatio) != 0 & length(aspectRatio) != 2) {
+    #     stop("`aspectRatio` should be a 2D vector.")
+    # }
+
+    maskDf <- matrixToDataFrame(tomoObj[["mask"]])
+    expDf <- toDataFrame(tomoObj, geneID)
+    expDf <- expDf[maskDf[, 4] == 1,]
+    maskDim <- dim(tomoObj[["mask"]])
+    dimOrder <- list(
+        "x" = c(maskDim[2], maskDim[3], maskDim[1]),
+        "y" = c(maskDim[1], maskDim[3], maskDim[2]),
+        "z" = maskDim
+    )
+    axesOrder <- list(
+        "x" = c("y", "z", "x"),
+        "y" = c("x", "z", "y"),
+        "z" = c("x", "y", "z")
+    )
+
+    if (is.na(zlim[1])) {
+        zlimParameter <- c(0, max(expDf[,4]))
+    } else {
+        zlimParameter <- zlim
     }
 
-    reconstArray <- tomoObj[["results"]][[geneID]][["reconst"]] %>%
-        aperm(perm=c(xaxis, yaxis, 6 - (xaxis + yaxis)))
-    maskArray <- tomoObj[["mask"]] %>%
-        aperm(perm=c(xaxis, yaxis, 6 - (xaxis + yaxis)))
+        print(dimOrder[[along]][1])
+    basePlot <- makeBasePlot(
+        expDf = expDf,
+        xAxis = axesOrder[[along]][1], 
+        yAxis = axesOrder[[along]][2],
+        xMax = dimOrder[[along]][1],
+        yMax = dimOrder[[along]][2],
+        xAsp = dimOrder[[along]][1] * aspectX,
+        yAsp = dimOrder[[along]][2] * aspectY,
+        xlabel = xlab,
+        ylabel = ylab,
+        zlim = zlimParameter
+    )
 
     generateGIF <- function (forShiny) {
         saveGIF(
             animateForGIF(
-                reconstArray = reconstArray,
-                maskArray = maskArray,
+                basePlot = basePlot,
+                expDf = expDf,
+                dimOrder = dimOrder,
+                along = along,
+                xAxis = axesOrder[[along]][1],
+                yAxis = axesOrder[[along]][2],
                 main = main,
-                xlab = xlab,
-                ylab = ylab,
-                zlim = zlim,
-                aspectRatio = aspectRatio,
-                type = target,
                 forShiny = forShiny
             ),
             movie.name=file,
             interval=interval,
+            ani.width=800,
+            ani.height=800,
             autobrowse=FALSE
         )
     }
     if (is.null(getDefaultReactiveDomain())) {
         generateGIF(forShiny = FALSE)
     } else {
-        withProgress(message='generating GIF', value=0, {
+        withProgress(message='generating GIF. It takes long time...', value=0, {
             generateGIF(forShiny = TRUE)
         })
     }
