@@ -32,8 +32,7 @@ BiocManager::install("tomoseqr")
 Load the `tomoseqr` package with the following command.
 
 ```{r setup, message = FALSE}
-# library(tomoseqr)
-devtools::load_all(export_all = FALSE)
+library(tomoseqr)
 ```
 
 # Data preparation
