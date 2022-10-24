@@ -4,7 +4,7 @@
 \alias{estimate3dExpressions}
 \title{Estimate 3d expressions}
 \usage{
-estimate3dExpressions(x, y, z, mask, query, numIter = 100, normalize = FALSE)
+estimate3dExpressions(x, y, z, mask, query, numIter = 100, normalize = TRUE)
 }
 \arguments{
 \item{x}{A data.frame object containing a simulated Tomo-seq data
