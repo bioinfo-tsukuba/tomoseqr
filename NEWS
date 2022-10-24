@@ -1,2 +1,10 @@
 Changes in version 0.99.0 (2022-03-28)
 + Submitted to Bioconductor
+
+Changes in version 1.11.1 (2022-10-25)
++ Made the following changes:
+    o Added 3D visualize function to imageViewer
+    o Changed `normCount` and `normMask` options in `estimate3dExpressions()`
+        to `normalize` option. When it is `TRUE` (default), the function works as if
+        `normCount = "count", normMask = TRUE`. When it is `FALSE`, the
+        function works as if `normCount = "none", normMask = FALSE`.
