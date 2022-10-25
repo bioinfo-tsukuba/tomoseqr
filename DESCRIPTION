@@ -18,7 +18,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: FALSE
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 VignetteBuilder: knitr
 Depends:
     R (>= 4.2)
@@ -38,10 +38,14 @@ Imports:
     readr,
     tools,
     plotly,
-    ggplot2
+    ggplot2,
+    Rcpp
 Suggests:
     rmarkdown,
     knitr,
     BiocStyle,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+LinkingTo: 
+    Rcpp,
+    RcppArmadillo

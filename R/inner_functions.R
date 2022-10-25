@@ -1,3 +1,12 @@
+## usethis namespace: start
+  #' @useDynLib tomoseqr, .registration = TRUE
+  ## usethis namespace: end
+  NULL
+ ## usethis namespace: start
+  #' @importFrom Rcpp sourceCpp
+  ## usethis namespace: end
+  NULL
+
 #' @importFrom methods is
 #' @importFrom dplyr %>%
 #' @importFrom stringr str_c
@@ -106,6 +115,7 @@ singleEstimate <- function (
             sum((recArrY - yk)^2) +
             sum((recArrZ - zk)^2)
     }
+    # reconstArray <- hoge(reconstArray, xk, yk, zk, numIter)
 
     retList <- list(
         "geneID" = geneID,
