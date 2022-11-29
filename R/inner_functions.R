@@ -91,31 +91,31 @@ singleEstimate <- function (
 
     errFuncVal <- rep_len(0, numIter)
     dimMask <- dim(mask)
-    for (i in seq_len(numIter)) {
-        recArrX <- reconstArray %>% apply(1, sum)
-        reconstArray <- reconstArray *
-            repMat(xk / recArrX, c(1, dimMask[2], dimMask[3]))
-        reconstArray[is.nan(reconstArray)] <- 0
+    # for (i in seq_len(numIter)) {
+    #     recArrX <- reconstArray %>% apply(1, sum)
+    #     reconstArray <- reconstArray *
+    #         repMat(xk / recArrX, c(1, dimMask[2], dimMask[3]))
+    #     reconstArray[is.nan(reconstArray)] <- 0
 
-        recArrY <- reconstArray %>% apply(2, sum)
-        reconstArray <- reconstArray * aperm(
-            repMat(yk / recArrY, c(1, dimMask[1], dimMask[3])),
-            perm = c(2, 1, 3)
-        )
-        reconstArray[is.nan(reconstArray)] <- 0
+    #     recArrY <- reconstArray %>% apply(2, sum)
+    #     reconstArray <- reconstArray * aperm(
+    #         repMat(yk / recArrY, c(1, dimMask[1], dimMask[3])),
+    #         perm = c(2, 1, 3)
+    #     )
+    #     reconstArray[is.nan(reconstArray)] <- 0
 
-        recArrZ <- reconstArray %>% apply(3, sum)
-        reconstArray <- reconstArray * aperm(
-            repMat(zk / recArrZ, c(1, dimMask[1], dimMask[2])),
-            perm = c(2, 3, 1)
-        )
-        reconstArray[is.nan(reconstArray)] <- 0
+    #     recArrZ <- reconstArray %>% apply(3, sum)
+    #     reconstArray <- reconstArray * aperm(
+    #         repMat(zk / recArrZ, c(1, dimMask[1], dimMask[2])),
+    #         perm = c(2, 3, 1)
+    #     )
+    #     reconstArray[is.nan(reconstArray)] <- 0
 
-        errFuncVal[i] <- sum((recArrX - xk)^2) +
-            sum((recArrY - yk)^2) +
-            sum((recArrZ - zk)^2)
-    }
-    # reconstArray <- hoge(reconstArray, xk, yk, zk, numIter)
+    #     errFuncVal[i] <- sum((recArrX - xk)^2) +
+    #         sum((recArrY - yk)^2) +
+    #         sum((recArrZ - zk)^2)
+    # }
+    reconstArray <- hoge(reconstArray, xk, yk, zk, numIter)
 
     retList <- list(
         "geneID" = geneID,
