@@ -328,10 +328,11 @@ findAxialGenes <- function (tomoSeqData, genes = "all") {
 #' @return BiocFileCache object.
 #' @export 
 downloadJunker2014 <- function ( verbose = FALSE ) {
-    sheldAVURL <- "https://figshare.com/ndownloader/files/34384922"
-    sheldVDURL <- "https://figshare.com/ndownloader/files/34384928"
-    sheldLRURL <- "https://figshare.com/ndownloader/files/34384925"
-    maskURL <- "https://figshare.com/ndownloader/files/34523069"
+    sheldAVURL <- "https://figshare.com/ndownloader/files/38359121"
+    sheldVDURL <- "https://figshare.com/ndownloader/files/38359118"
+    sheldLRURL <- "https://figshare.com/ndownloader/files/38359115"
+
+    maskURL <- "https://figshare.com/ndownloader/files/38359109"
 
     bfc <- getTomoseqrCache()
     downloadData(bfc=bfc, rname="sheld_AV", URL=sheldAVURL)
