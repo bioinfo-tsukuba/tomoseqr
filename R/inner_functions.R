@@ -115,7 +115,7 @@ singleEstimate <- function (
     #         sum((recArrY - yk)^2) +
     #         sum((recArrZ - zk)^2)
     # }
-    reconstArray <- hoge(reconstArray, xk, yk, zk, numIter)
+    reconstArray <- hoge(reconstArray, xk, yk, zk, numIter)[[1]]
 
     retList <- list(
         "geneID" = geneID,
