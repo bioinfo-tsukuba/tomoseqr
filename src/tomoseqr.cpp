@@ -7,13 +7,13 @@ using namespace Rcpp;
 
 // [[Rcpp::plugins("cpp11")]]
 
-arma::vec sumX(arma::cube targetArr, std::int32_t vecLen);
-arma::vec sumY(arma::cube targetArr, std::int32_t vecLen);
-arma::vec sumZ(arma::cube targetArr, std::int32_t vecLen);
+arma::vec sumX(const arma::cube& targetArr, std::int32_t vecLen);
+arma::vec sumY(const arma::cube& targetArr, std::int32_t vecLen);
+arma::vec sumZ(const arma::cube& targetArr, std::int32_t vecLen);
 
-arma::cube repMatX(arma::vec sourceVec, std::int32_t len1, std::int32_t len2);
-arma::cube repMatY(arma::vec sourceVec, std::int32_t len1, std::int32_t len2);
-arma::cube repMatZ(arma::vec sourceVec, std::int32_t len1, std::int32_t len2);
+arma::cube repMatX(const arma::vec& sourceVec, std::int32_t len1, std::int32_t len2);
+arma::cube repMatY(const arma::vec& sourceVec, std::int32_t len1, std::int32_t len2);
+arma::cube repMatZ(const arma::vec& sourceVec, std::int32_t len1, std::int32_t len2);
 
 // [[Rcpp::export]]
 List hoge(
@@ -51,7 +51,7 @@ List hoge(
     return List::create(reconstArray);
 }
 
-arma::vec sumX(arma::cube targetArr, std::int32_t vecLen) {
+inline arma::vec sumX(const arma::cube& targetArr, std::int32_t vecLen) {
     // std::int32_t vecLen = targetArr.n_rows;
     arma::vec retVec = arma::vec(vecLen);
     for (std::int32_t i = 0; i < vecLen; i++)
@@ -67,7 +67,7 @@ arma::vec sumX(arma::cube targetArr, std::int32_t vecLen) {
     return retVec;
 }
 
-arma::vec sumY(arma::cube targetArr, std::int32_t vecLen) {
+inline arma::vec sumY(const arma::cube& targetArr, std::int32_t vecLen) {
     // std::int32_t vecLen = targetArr.n_cols;
     arma::vec retVec = arma::vec(vecLen);
     for (std::int32_t i = 0; i < vecLen; i++)
@@ -83,7 +83,7 @@ arma::vec sumY(arma::cube targetArr, std::int32_t vecLen) {
     return retVec;
 }
 
-arma::vec sumZ(arma::cube targetArr, std::int32_t vecLen) {
+inline arma::vec sumZ(const arma::cube& targetArr, std::int32_t vecLen) {
     // std::int32_t vecLen = targetArr.n_slices;
     arma::vec retVec = arma::vec(vecLen);
     for (std::int32_t i = 0; i < vecLen; i++)
@@ -99,28 +99,28 @@ arma::vec sumZ(arma::cube targetArr, std::int32_t vecLen) {
     return retVec;
 }
 
-arma::cube repMatX(arma::vec sourceVec, std::int32_t len1, std::int32_t len2) {
+inline arma::cube repMatX(const arma::vec& sourceVec, std::int32_t len1, std::int32_t len2) {
     arma::cube retCube = arma::cube(sourceVec.n_rows, len1, len2);
     arma::mat sourceMat = repmat(sourceVec, 1, len1);
     retCube.each_slice() = sourceMat;
     return retCube;
 }
 
-arma::cube repMatY(arma::vec sourceVec, std::int32_t len1, std::int32_t len2) {
+inline arma::cube repMatY(const arma::vec& sourceVec, std::int32_t len1, std::int32_t len2) {
     arma::cube retCube = arma::cube(len1, sourceVec.n_rows, len2);
     arma::mat sourceMat = repmat(sourceVec, 1, len1);
     retCube.each_slice() = sourceMat.t();
     return retCube;
 }
 
-arma::cube repMatZ(arma::vec sourceVec, std::int32_t len1, std::int32_t len2) {
+inline arma::cube repMatZ(const arma::vec& sourceVec, std::int32_t len1, std::int32_t len2) {
     std::int32_t zLen = sourceVec.n_rows;
     arma::cube retCube = arma::cube(len1, len2, zLen);
-    arma::mat sourceMat = arma::mat(len1, len2);
+    // arma::mat sourceMat = arma::mat(len1, len2);
     for (std::int32_t i = 0; i < zLen; i++)
     {
-        sourceMat.fill(sourceVec(i));
-        retCube.slice(i) = sourceMat;
+        // sourceMat.fill(sourceVec(i));
+        retCube.slice(i).fill(sourceVec(i));// = sourceMat;
     }
     return retCube;
 }
