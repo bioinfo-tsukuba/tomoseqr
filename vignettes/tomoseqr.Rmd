@@ -123,13 +123,13 @@ as if you were creating pixel art.
 Use the `estimate3dExpressions` function to reconstruct the 3D expression
 pattern of the gene specified by `query` from Tomo-seq data.
 
-```{r}
+```{r eval=FALSE}
 tomoObj <- estimate3dExpressions(
-    testx,
-    testy,
-    testz,
+    sheldAV,
+    sheldVD,
+    sheldLR,
     mask = mask,
-    query = c("gene1", "gene2", "gene3")
+    query = c("ENSDARG00000059073")
 )
 ```
 
