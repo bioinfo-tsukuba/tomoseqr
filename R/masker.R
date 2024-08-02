@@ -20,14 +20,13 @@
 #'    shinyApp
 #'    addResourcePath
 #'    removeResourcePath
-#' @import jsonlite
 #' @return NA
 #' @examples
 #' if (interactive()) {
-#'     Masker()
+#'     masker()
 #' }
 #' @export
-Masker <- function () {
+masker <- function () {
     ui <- function () {
         addResourcePath(
             'www',

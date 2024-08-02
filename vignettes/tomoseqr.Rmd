@@ -1,12 +1,22 @@
 ---
-Title: "R Package for Analyzing Tomo-seq Data"
-Author: "Ryosuke Matsuzawa"
-Output: BiocStyle::html_document
+title: "R Package for Analyzing Tomo-seq Data"
+author: "Ryosuke Matsuzawa"
+output: BiocStyle::html_document
 vignette: >
     %\VignetteIndexEntry{tomoseqr}
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
 ---
+
+# Introduction
+
+Tomo-seq is a genome-wide RNA tomography method that combines combining
+high-throughput RNA sequencing with cryosectioning for spatially resolved
+transcriptomics.
+In 2014, [Junker et al.](https://doi.org/10.1016/j.cell.2014.09.038) published a method for reconstructing 3D gene
+expression patterns from tomoseq data (iterative proportional fitting ([Fienberg, 1970](https://doi.org/10.1214/aoms/1177696968))). tomoseqr is a package to run
+this method in R. tomoseqr also includes a 3D silhouette maker
+for samples and tools to visualize the reconstruction results.
 
 # Installation and loading
 
@@ -55,8 +65,8 @@ head(testx)
 You can download part of the Tomo-seq data published by [Junker et al.](https://www.sciencedirect.com/science/article/pii/S0092867414012264#mmc3) with following commands. 
 
 ```{r, eval = FALSE}
-tomoCache <- DownloadJunker2014()
-junker2014 <- LoadJunker2014(tomoCache)
+tomoCache <- downloadJunker2014()
+junker2014 <- doadJunker2014(tomoCache)
 
 sheldAV <- junker2014[["sheldAV"]]
 sheldVD <- junker2014[["sheldVD"]]
@@ -86,7 +96,7 @@ The `tomoseqr` package provides a tool to create mask data,
 which can be run with the following command.
 
 ```{r eval = FALSE}
-Masker()
+masker()
 ```
 
 ![Interface of masker](masker_image.png)
@@ -110,11 +120,11 @@ as if you were creating pixel art.
 
 # Reconstruction of 3D expression patterns
 
-Use the `Estimate3dExpressions` function to reconstruct the 3D expression
+Use the `estimate3dExpressions` function to reconstruct the 3D expression
 pattern of the gene specified by `query` from Tomo-seq data.
 
 ```{r}
-tomoObj <- Estimate3dExpressions(
+tomoObj <- estimate3dExpressions(
     testx,
     testy,
     testz,
@@ -125,30 +135,35 @@ tomoObj <- Estimate3dExpressions(
 
 # Visualize result of reconstruction
 
-Visualize the reconstruction results using `ImageViewer`.
+Visualize the reconstruction results using `imageViewer`.
 
 ```{r eval = FALSE}
-ImageViewer(tomoObj, geneID = "gene3")
+imageViewer(tomoObj)
 ```
 
-This command starts a shiny app `ImageViewer`.
+This command starts a shiny app `imageViewer`.
 
-![Interface of ImageViewer](imageviewer_image.png)
+![Interface of ImageViewer (2D view)](2Dimage.png)
 
+![Interface of ImageViewer (3D view)](3Dimage.png)
+
+1. Select gene ID.
+1. Edit labels of each axes.
+1. Set the width of sections for each axis. it is used to calculate the
+aspect ratio of figures.
+1. Use this tab to switch between 2D and 3D views.
 1. Select which axis to look at the cross section perpendicular to.
-1. Choose the type of visualization (Expression: expression pattern,
-mask: silhouette of the mask, Unite: superimposition of the two).
-1. Move the slider to select the location you want to see.
-1. Press the Auto Play button to view each section of the image
+1. Move the slider to select the location you want to see. Press the Auto Play button to view each section of the image
 frame by frame.
-1. Set the aspect ratio of the figure (default is the ratio of the
-number of sections).
 1. Edit figure titles and labels.
 1. Specify the range of expression levels to be displayed (default is
 the full range).
 1. Rendering area.
 1. Obtain a cross-sectional view (png) or a frame-by-frame image (gif)
 of each fragment being displayed.
+1. Threshold of expression level. Expression points with levels lower than
+this value are not plotted.
+1. Toggle whether or not to plot points representing the mask.
 
 # Find axial peak gene
 
@@ -156,7 +171,7 @@ Detect genes with significant differences in expression levels between
 sections from Tomo-seq data.
 
 ```{r}
-axialGeneTable <- FindAxialGenes(testx)
+axialGeneTable <- findAxialGenes(testx)
 print(axialGeneTable)
 ```
 The results include these columns:
@@ -169,7 +184,7 @@ The results include these columns:
 You can also specify a vector of candidate gene IDs.
 
 ```{r}
-axialGeneTable <- FindAxialGenes(testx, genes = c("gene1", "gene3"))
+axialGeneTable <- findAxialGenes(testx, genes = c("gene1", "gene3"))
 print(axialGeneTable)
 ```
 

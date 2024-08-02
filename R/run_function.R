@@ -11,13 +11,13 @@
 #' contains gene IDs and the second and subsequent columns contain
 #' gene expression levels in sections.
 #' @return A vector that contains genes which can be used for
-#' `Estimate3dExpressions`.
+#' `estimate3dExpressions`.
 #' @examples
 #' data("testx", "testy", "testz")
-#' ExtractGeneList(testx, testy, testz)
+#' extractGeneList(testx, testy, testz)
 #' @importFrom dplyr %>%
 #' @export
-ExtractGeneList <- function (x, y, z) {
+extractGeneList <- function (x, y, z) {
     xGene <- x[, 1] %>% t()
     yGene <- y[, 1] %>% t()
     zGene <- z[, 1] %>% t()
@@ -41,47 +41,41 @@ ExtractGeneList <- function (x, y, z) {
 #' You can make a mask using `masker`.
 #' @param query Vector of gene IDs
 #' @param numIter How many times iterate
-#' @param normCount Specifies the method to normalize
-#' the expression amount data.
-#' @param normMask Whether to normalize by mask or not
+#' @param normalize Whether to normalize so that total expression per sample
+#' volume is equal between sections.
 #' @return tomoSeq object
 #' @importFrom purrr list_along
 #' @examples
 #' data("testx", "testy", "testz", "mask")
-#' Estimate3dExpressions(
+#' estimate3dExpressions(
 #'     testx,
 #'     testy,
 #'     testz,
 #'     mask = mask,
 #'     query = c("gene1"), 
-#'     normCount = "countSum",
-#'     normMask = TRUE
+#'     normalize = TRUE
 #' )
 #' @export
-Estimate3dExpressions <- function (
+estimate3dExpressions <- function (
     x,
     y,
     z,
     mask,
     query,
     numIter = 100,
-    normCount="countSum",
-    normMask=TRUE
+    normalize=TRUE
 ) {
-    recList <- list_along(query)
+    recList <- lapply(
+        X=query,
+        FUN=singleEstimate,
+        dataX=x,
+        dataY=y,
+        dataZ=z,
+        mask=mask,
+        normalize=normalize,
+        numIter=numIter
+    )
     names(recList) <- query
-    for (geneID in query) {
-        recList[[geneID]] <- SingleEstimate(
-            x,
-            y,
-            z,
-            mask=mask,
-            geneID=geneID,
-            normCount=normCount,
-            normMask=normMask,
-            numIter=numIter
-        )
-    }
     retList <- list(
         "mask" = mask,
         "results" = recList
@@ -98,10 +92,10 @@ Estimate3dExpressions <- function (
 #' @return NA
 #' @examples
 #' data(tomoObj)
-#' PlotLossFunction(tomoObj, "gene2")
+#' plotLossFunction(tomoObj, "gene2")
 #' @export
-PlotLossFunction <- function (tomoObj, geneID) {
-    CheckParameters(tomoObj, geneID)
+plotLossFunction <- function (tomoObj, geneID) {
+    checkParameters(tomoObj, geneID)
     tomoObj[["results"]][[geneID]][["errFunc"]] %>%
         plot(
             type = "l",
@@ -114,72 +108,115 @@ PlotLossFunction <- function (tomoObj, geneID) {
 #' Animate 2D expressions along one axis and generate GIF file.
 #' @param tomoObj tomoSeq object
 #' @param geneID single gene ID (string)
-#' @param target "expression", "mask" or "unite" (combination of expression and
-#' mask). Default is `expression`.
-#' @param xaxis Number to specify as x-axis (1, 2 or 3). Default is `1`.
-#' @param yaxis Number to specify as y-axis (1, 2 or 3). Default is `2`.
+#' @param along Parameter specifying along which axis the cross section should
+#' be plotted.
 #' @param main A string used for the title of the plot. Default is `geneID`.
 #' @param xlab Label of x axis. Default is `xaxis`.
 #' @param ylab Label of y axis. Default is `yaxis`.
 #' @param file Path of GIF file.
 #' @param zlim Limit of value of heatmap. If target="mask", it is ignored.
 #' @param interval interval of GIF animation.
-#' @param aspectRatio A 2D vector that represents the ratio of figure. You can
-#' specify the ratio as `c(width, height)`. If you don't specify the value of
-#' this parameter, the ratio is calculated based on the number of sections
-#' along each axis.
+#' @param aspectX Width of figure. If you don't specify the value of
+#' this parameter, It is calculated based on the number of sections
+#' Corresponding to the horizontal axis
+#' @param aspectY Height of figure. If you don't specify the value of
+#' this parameter, It is calculated based on the number of sections
+#' Corresponding to the vertical axis
 #' @importFrom stringr str_c
 #' @importFrom dplyr %>%
 #' @importFrom animation saveGIF
+#' @importFrom shiny
+#' getDefaultReactiveDomain
+#' withProgress
 #' @return It generate GIF file.
 #' @examples
 #' if(interactive()) {
 #'     data(tomoObj)
-#'     Animate2d(tomoObj, "gene2", target = "expression", file = "example.gif")
+#'     animate2d(tomoObj, "gene2", target = "expression", file = "example.gif")
 #' }
 #' @export
-Animate2d <- function (
+animate2d <- function (
     tomoObj,
     geneID,
-    target="expression",
-    xaxis=1,
-    yaxis=2,
+    along = "x",
     main=geneID,
-    xlab=xaxis,
-    ylab=yaxis,
-    file=str_c(geneID, "_", target, "_", xaxis, "_", yaxis, ".gif"),
+    xlab="x",
+    ylab="y",
+    file=str_c(geneID, "_", along, ".gif"),
     zlim=NA,
     interval=0.1,
-    aspectRatio=c()
+    aspectX = 1,
+    aspectY = 1
 ) {
-    CheckParameters(tomoObj, geneID)
-    if (length(aspectRatio) != 0 & length(aspectRatio) != 2) {
-        stop("`aspectRatio` should be a 2D vector.")
+    checkParameters(tomoObj, geneID)
+    if (!(along %in% c("x", "y", "z"))) {
+        stop("`along` should be 'x', 'y' or 'z'.")
     }
-    if (target == "mask" & is.na(zlim[1]) == FALSE) {
-        warning('If target = "mask", parameter "zlim" is ignored.')
-    }
+    # if (length(aspectRatio) != 0 & length(aspectRatio) != 2) {
+    #     stop("`aspectRatio` should be a 2D vector.")
+    # }
 
-    reconstArray <- tomoObj[["results"]][[geneID]][["reconst"]] %>%
-        aperm(perm=c(xaxis, yaxis, 6 - (xaxis + yaxis)))
-    maskArray <- tomoObj[["mask"]] %>%
-        aperm(perm=c(xaxis, yaxis, 6 - (xaxis + yaxis)))
-
-    saveGIF(
-        AnimateForGIF(
-            reconstArray = reconstArray,
-            maskArray = maskArray,
-            main = main,
-            xlab = xlab,
-            ylab = ylab,
-            zlim = zlim,
-            aspectRatio = aspectRatio,
-            type = target
-        ),
-        movie.name=file,
-        interval=interval,
-        autobrowse=FALSE
+    maskDf <- matrixToDataFrame(tomoObj[["mask"]])
+    expDf <- toDataFrame(tomoObj, geneID)
+    expDf <- expDf[maskDf[, 4] == 1,]
+    maskDim <- dim(tomoObj[["mask"]])
+    dimOrder <- list(
+        "x" = c(maskDim[2], maskDim[3], maskDim[1]),
+        "y" = c(maskDim[1], maskDim[3], maskDim[2]),
+        "z" = maskDim
     )
+    axesOrder <- list(
+        "x" = c("y", "z", "x"),
+        "y" = c("x", "z", "y"),
+        "z" = c("x", "y", "z")
+    )
+
+    if (is.na(zlim[1])) {
+        zlimParameter <- c(0, max(expDf[,4]))
+    } else {
+        zlimParameter <- zlim
+    }
+
+        print(dimOrder[[along]][1])
+    basePlot <- makeBasePlot(
+        expDf = expDf,
+        xAxis = axesOrder[[along]][1], 
+        yAxis = axesOrder[[along]][2],
+        xMax = dimOrder[[along]][1],
+        yMax = dimOrder[[along]][2],
+        xAsp = dimOrder[[along]][1] * aspectX,
+        yAsp = dimOrder[[along]][2] * aspectY,
+        xlabel = xlab,
+        ylabel = ylab,
+        zlim = zlimParameter
+    )
+
+    generateGIF <- function (forShiny) {
+        saveGIF(
+            animateForGIF(
+                basePlot = basePlot,
+                expDf = expDf,
+                dimOrder = dimOrder,
+                along = along,
+                xAxis = axesOrder[[along]][1],
+                yAxis = axesOrder[[along]][2],
+                main = main,
+                forShiny = forShiny
+            ),
+            movie.name=file,
+            interval=interval,
+            ani.width=800,
+            ani.height=800,
+            autobrowse=FALSE
+        )
+    }
+    if (is.null(getDefaultReactiveDomain())) {
+        generateGIF(forShiny = FALSE)
+    } else {
+        withProgress(message='generating GIF. It takes long time...', value=0, {
+            generateGIF(forShiny = TRUE)
+        })
+    }
 }
 
 #' Plot expression of single gene along an axis
@@ -190,10 +227,10 @@ Animate2d <- function (
 #' @return NA
 #' @examples
 #' data(tomoObj)
-#' Plot1dExpression(tomoObj, "gene2", "x")
+#' plot1dExpression(tomoObj, "gene2", "x")
 #' @export
-Plot1dExpression <- function (tomoObj, geneID, axes) {
-    CheckParameters(tomoObj, geneID)
+plot1dExpression <- function (tomoObj, geneID, axes) {
+    checkParameters(tomoObj, geneID)
     convertList <- list("x" = 1, "y" = 2, "z" = 3)
     oldpar <- par(no.readonly=TRUE)
     on.exit(par(oldpar))
@@ -226,9 +263,9 @@ Plot1dExpression <- function (tomoObj, geneID, axes) {
 #' @return NA
 #' @examples
 #' data("testx")
-#' Plot1dAllExpression(testx)
+#' plot1dAllExpression(testx)
 #' @export
-Plot1dAllExpression <- function (tomoSeqData, ...) {
+plot1dAllExpression <- function (tomoSeqData, ...) {
     tomoSeqData[, -1] %>% colSums() %>% plot(type="l", ...)
 }
 
@@ -239,12 +276,12 @@ Plot1dAllExpression <- function (tomoSeqData, ...) {
 #' @return Reconstruction result converted to dataframe.
 #' @examples
 #' data(tomoObj)
-#' ToDataFrame(tomoObj, "gene2")
+#' toDataFrame(tomoObj, "gene2")
 #' @export
-ToDataFrame <- function (tomoObj, geneID) {
-    CheckParameters(tomoObj, geneID)
+toDataFrame <- function (tomoObj, geneID) {
+    checkParameters(tomoObj, geneID)
     tomoObj[["results"]][[geneID]][["reconst"]] %>%
-        MatrixToDataFrame() %>%
+        matrixToDataFrame() %>%
         return()
 }
 
@@ -254,10 +291,10 @@ ToDataFrame <- function (tomoObj, geneID) {
 #' @return Reconstruction result as matrix
 #' @examples
 #' data(tomoObj)
-#' GetReconstructedResult(tomoObj, "gene2")
+#' getReconstructedResult(tomoObj, "gene2")
 #' @export
-GetReconstructedResult <- function (tomoObj, geneID) {
-    CheckParameters(tomoObj, geneID)
+getReconstructedResult <- function (tomoObj, geneID) {
+    checkParameters(tomoObj, geneID)
     return(tomoObj[["results"]][[geneID]][["reconst"]])
 }
 
@@ -271,16 +308,16 @@ GetReconstructedResult <- function (tomoObj, geneID) {
 #' @importFrom dplyr select
 #' @examples
 #' data(testx)
-#' FindAxialGenes(testx)
+#' findAxialGenes(testx)
 #' @export
-FindAxialGenes <- function (tomoSeqData, genes = "all") {
+findAxialGenes <- function (tomoSeqData, genes = "all") {
     if (length(genes) == 1 && genes == "all") {
         tomoSeqData %>%
-            FindAxialGenesInner() %>%
+            findAxialGenesInner() %>%
             return()
     } else {
         tomoSeqData[as.vector(t(tomoSeqData[, 1]) %in% genes), ] %>%
-            FindAxialGenesInner() %>%
+            findAxialGenesInner() %>%
             return()
     }
 }
@@ -289,29 +326,40 @@ FindAxialGenes <- function (tomoSeqData, genes = "all") {
 #' @param verbose If you want to force downloads with or without cache,
 #' set this to TRUE.
 #' @return BiocFileCache object.
+#' @examples 
+#' if(interactive) {
+#' tomoCache <- downloadJunker2014()
+#' junker2014 <- doadJunker2014(tomoCache)
+#' }
 #' @export 
-DownloadJunker2014 <- function ( verbose = FALSE ) {
-    sheldAVURL <- "https://figshare.com/ndownloader/files/34384922"
-    sheldVDURL <- "https://figshare.com/ndownloader/files/34384928"
-    sheldLRURL <- "https://figshare.com/ndownloader/files/34384925"
-    maskURL <- "https://figshare.com/ndownloader/files/34523069"
+downloadJunker2014 <- function ( verbose = FALSE ) {
+    sheldAVURL <- "https://figshare.com/ndownloader/files/38359121"
+    sheldVDURL <- "https://figshare.com/ndownloader/files/38359118"
+    sheldLRURL <- "https://figshare.com/ndownloader/files/38359115"
 
-    bfc <- GetTomoseqrCache()
-    DownloadData(bfc=bfc, rname="sheld_AV", URL=sheldAVURL)
-    DownloadData(bfc=bfc, rname="sheld_VD", URL=sheldVDURL)
-    DownloadData(bfc=bfc, rname="sheld_LR", URL=sheldLRURL)
-    DownloadData(bfc=bfc, rname="mask97x97x97", URL=maskURL)
+    maskURL <- "https://figshare.com/ndownloader/files/38359109"
+
+    bfc <- getTomoseqrCache()
+    downloadData(bfc=bfc, rname="sheld_AV", URL=sheldAVURL)
+    downloadData(bfc=bfc, rname="sheld_VD", URL=sheldVDURL)
+    downloadData(bfc=bfc, rname="sheld_LR", URL=sheldLRURL)
+    downloadData(bfc=bfc, rname="mask97x97x97", URL=maskURL)
     return(bfc)
 }
 
 #' Load data of Junker2014 from cache.
 #' @param tomoseqrCache Cache of tomoseqr. You can get it using
-#' `DownloadJunker2014`.
+#' `downloadJunker2014`.
 #' @return List of tomo-seq data in cache.
 #' @importFrom BiocFileCache bfcquery
 #' @importFrom readr read_tsv
+#' @examples 
+#' if(interactive) {
+#' tomoCache <- downloadJunker2014()
+#' junker2014 <- doadJunker2014(tomoCache)
+#' }
 #' @export
-LoadJunker2014 <- function (tomoseqrCache) {
+doadJunker2014 <- function (tomoseqrCache) {
     ridAV <- bfcquery(tomoseqrCache, "sheld_AV", "rname")$rid
     ridVD <- bfcquery(tomoseqrCache, "sheld_VD", "rname")$rid
     ridLR <- bfcquery(tomoseqrCache, "sheld_LR", "rname")$rid
@@ -335,10 +383,13 @@ LoadJunker2014 <- function (tomoseqrCache) {
 #' @importFrom tidyr unnest
 #' @importFrom stats p.adjust
 #' @importFrom utils combn
+#' @examples 
+#' data(tomoObj)
+#' findCorrelatedGenes(tomoObj)
 #' @export
-FindCorrelatedGenes <- function (tomoObj, corMethod = "pearson") {
+findCorrelatedGenes <- function (tomoObj, corMethod = "pearson") {
     argOfCor <- combn(names(tomoObj[["results"]]), m=2)
-    corResult <- VectorizedCorOfReconst(
+    corResult <- vectorizedCorOfReconst(
         tomoObj,
         argOfCor[1, ],
         argOfCor[2, ],

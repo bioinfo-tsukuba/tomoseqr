@@ -4,9 +4,24 @@
 genome-wide expression data with spatial resolution) data. The algorithm
 of image reconstruction is based on [Junker et al, 2014.](#reference)
 
+## Detailed manual
+
+Detailed manual is available at https://bioconductor.org/packages/release/bioc/vignettes/tomoseqr/inst/doc/tomoseqr.html
+
 ## Usage
 
 ### Installation
+
+#### From Bioconductor
+
+```{r}
+if (!require("BiocManager"))
+    install.packages("BiocManager")
+
+BiocManager::install("tomoseqr")
+```
+
+#### From Github
 
 ```{r}
 library(devtools)
@@ -40,23 +55,17 @@ the order of the sections.
 ```{r}
 library(tomoseqr)
 data("testx", "testy", "testz", "mask")
-tomo_obj <- Estimate3dExpressions(
+tomoObj <- estimate3dExpressions(
     testx,
     testy,
     testz,
-    mask=mask,
-    query=c("gene1", "gene2")
+    mask = mask,
+    query = c("gene1", "gene2", "gene3")
 )
-ImageViewer(tomo_obj, "gene1")
+imageViewer(tomo_obj)
 ```
 
-![example](./inst/imageviewer_example.png)
-
-```{r}
-Animate2d(tomo_obj, "gene1", target="unite")
-```
-
-![example](./inst/gene1_unite_1_2.gif)
+![example](./inst/images/imageViewer2D.png)
 
 ## Reference
 
