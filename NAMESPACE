@@ -2,6 +2,7 @@
 
 S3method(print,tomoSeq)
 export(animate2d)
+export(correlationWithSpecificGene)
 export(doadJunker2014)
 export(downloadJunker2014)
 export(estimate3dExpressions)

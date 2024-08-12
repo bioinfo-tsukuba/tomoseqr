@@ -406,3 +406,39 @@ findCorrelatedGenes <- function (tomoObj, corMethod = "pearson") {
         unnest(cols=c("cor", "pValue"))
     return(corTibble)
 }
+
+#' Find gorrelated genes with specific gene
+#' @param tomoObj tomoseq object
+#' @param geneID Target gene ID
+#' @param corMethod Method for calculating correlation. default is "pearson".
+#' @importFrom tidyr unnest
+#' @importFrom stats p.adjust
+#' @importFrom utils combn
+#' @examples 
+#' data(tomoObj)
+#' findCorrelatedGenes(tomoObj)
+#' @export
+correlationWithSpecificGene <- function (
+    tomoObj,
+    geneID,
+    corMethod = "pearson"
+) {
+    referenceGenes <- names(tomoObj[["results"]])
+    referenceGenes <- subset(referenceGenes, referenceGenes != geneID)
+    corResult <- vectorizedCorOfReconst(
+        tomoObj,
+        rep(geneID, length(referenceGenes)),
+        referenceGenes,
+        method=corMethod
+    )
+    pValueAdjusted <- p.adjust(corResult["pValue", ], method="BH")
+    corTibble <- tibble(
+        geneID1=rep(geneID, length(referenceGenes)),
+        geneID2=referenceGenes,
+        cor=corResult["cor", ],
+        pValue=corResult["pValue", ],
+        pValueAdjusted=pValueAdjusted
+    ) %>%
+        unnest(cols=c("cor", "pValue"))
+    return(corTibble)
+}
